@@ -517,7 +517,7 @@ const SETS={
  bouftou:{n:'Panoplie de Grondecorne',col:'#e6dcc4',hat:'wool',stats:['vit','for'],b:{2:{vit:40},3:{for:30,res:4},4:{pct:15,vit:80}}},
  tofu:{n:'Panoplie de Vifplume',col:'#e8c84a',hat:'feather',stats:['agi','crit'],b:{2:{agi:20},3:{crit:6},4:{pct:12,agi:40}}},
  scara:{n:'Panoplie de la Tisseuse',col:'#d4a73a',hat:'helm',stats:['res','vit'],b:{2:{res:4},3:{vit:80},4:{res:8,pct:10}}},
- wa:{n:'Panoplie de la Mandragore',col:'#5a8fd0',hat:'hood',stats:['cha','soin'],b:{2:{cha:25},3:{soin:20,vit:50},4:{pct:15,cha:40}}},
+ wa:{n:'Panoplie de Sylvaine',col:'#5a8fd0',hat:'hood',stats:['cha','soin'],b:{2:{cha:25},3:{soin:20,vit:50},4:{pct:15,cha:40}}},
  craq:{n:'Panoplie de Basalte',col:'#8a8174',hat:'stone',stats:['vit','res'],b:{2:{vit:60},3:{res:6},4:{vit:150,pct:8}}},
  krala:{n:'Panoplie de Mâchevase',col:'#2f8a86',hat:'hood',stats:['agi','dmg'],b:{2:{dmg:4},3:{agi:35},4:{pct:18}}},
  kimbo:{n:'Panoplie de l\u2019Arbitre',col:'#a46ad0',hat:'halo',stats:['int','pct'],b:{2:{int:30},3:{pct:10},4:{pct:15,crit:8}}},
@@ -807,8 +807,8 @@ const ADD={
  scaraf:{n:'Aragnée',r:15,hp:.045,spd:150,trig:55,atk:'slam',ar:42,wind:.5,dmg:9,cd:1.7,geo:'ico',col:'ok',slow:1.2},
  wabbit:{n:'Radicelle',r:14,hp:.04,spd:140,trig:65,atk:'slam',ar:48,wind:.55,dmg:12,cd:1.8,geo:'tetra',col:'eau'},
  roc:{n:'Golem éveillé',r:24,hp:.08,spd:55,trig:90,atk:'slam',ar:85,wind:1,dmg:22,cd:3,geo:'box',col:'terre'},
- tentacule:{n:'Bras d\u2019encre',r:18,hp:.035,spd:0,trig:520,atk:'shot',wind:.8,dmg:14,cd:2.8,geo:'cone',col:'eau',slow:2},
- glyphe:{n:'Sentinelle',r:16,hp:.05,spd:0,trig:600,atk:'radial',count:8,wind:.9,dmg:14,cd:3.5,geo:'octa',col:'ember'},
+ tentacule:{n:'Leurre des profondeurs',r:18,hp:.035,spd:0,trig:520,atk:'shot',wind:.8,dmg:14,cd:2.8,geo:'cone',col:'eau',slow:2},
+ glyphe:{n:'Double d’ombre',r:16,hp:.05,spd:0,trig:600,atk:'radial',count:8,wind:.9,dmg:14,cd:3.5,geo:'octa',col:'ember'},
  givre:{n:'Éclat de givre',r:14,hp:.035,spd:135,trig:62,atk:'boom',ar:90,wind:1,dmg:30,cd:1,geo:'cone',col:'frost',gel:1},
  rouage:{n:'Rouage',r:20,hp:.05,spd:0,trig:600,atk:'radial',count:6,wind:1,dmg:16,cd:3,geo:'torus',col:'ember'}
 };
@@ -823,12 +823,12 @@ const PHASES={
  scara:[{at:.55,evo:{bond:{n:'Double bond',repeat:2,gap:.5},mord:{n:'Morsure frénétique',r:165,half:.75,repeat:2,gap:.35}},n:'Le nid s’éveille',d:'Invoque 2 Aragnées (la Tisseuse subit −50% de dégâts tant qu\u2019elles vivent). Les toiles tombent plus souvent.',adds:[['scaraf',2]],link:.5,fx:f=>{f.ms.webFast=1}},
         {at:.25,n:'Pluie de venin',d:'Intouchable 7 s : des gouttes de venin s’abattent sur toi. Ne t’arrête pas.',storm:{dur:7,pat:'rain'}}],
  wa:[{at:.6,n:'Les Radicelles surgissent',d:'Invoque 3 Radicelles.',adds:[['wabbit',3]]},
-     {at:.3,n:'Sève affolée',evo:{wak:{n:'Trois rayons de sève',multi:[-.6,0,.6],w:80,wind:1.2},bond:{n:'Bonds en série',repeat:3,gap:.35}},d:'+20% de dégâts, +30% de vitesse, bulbes plus fréquents.',dmg:1.2,spd:1.3,seq:['cawotte','bond','coup','wak','coup']}],
+     {at:.3,n:'Sève affolée',evo:{wak:{n:'Trois rayons de sève',multi:[-.6,0,.6],w:80,wind:1.2},bond:{n:'Envols en série',repeat:3,gap:.35},tourb:{n:'Tempête de feuilles',count:16,repeat:3,gap:.4}},d:'+20% de dégâts, +30% de vitesse, bulbes et feuilles plus fréquents.',dmg:1.2,spd:1.3,seq:['cawotte','bond','tourb','coup','wak','ronces']}],
  craq:[{at:.5,evo:{seisme:{n:'Séisme double',r1:40,r2:150,grow:110,repeat:2,gap:.5},poing:{n:'Poings de roche',r:170,half:.65,repeat:2,gap:.4},ebou:{n:'Grand éboulement',count:7,onP:3}},n:'Éveil des rochers',d:'Invoque 2 Golems éveillés, des Basalte en miniature. Basalte frappe plus fort et plus vite.',adds:[['roc',2]],wind:.9,dmg:1.15}],
- krala:[{at:.5,evo:{encre:{n:'Déluge d’encre',count:5,spread:.9,repeat:2,gap:.35},tent:{n:'Forêt de tentacules',count:5,onP:2}},n:'Les bras d\u2019encre',d:'4 Bras d\u2019encre crachent de l\u2019encre. Mâchevase est invulnérable tant qu\u2019ils vivent.',adds:[['tentacule',4]],link:1}],
- kimbo:[{at:.6,evo:{double:{n:'Glyphes tournoyants',count:14,repeat:3,gap:.45,spin:.2},glyphe:{n:'Triple glyphe',count:3,onP:1,spread:90}},n:'Sentinelles de glyphes',d:'Invoque 2 Sentinelles (boss −50% tant qu\u2019elles vivent).',adds:[['glyphe',2]],link:.5},
+ krala:[{at:.5,evo:{encre:{n:'Déluge de vase',count:5,spread:.9,repeat:2,gap:.35},tent:{n:'Marée de geysers',count:5,onP:2},leurre:{n:'Double rayon',multi:[-.35,.35]}},n:'Les leurres s\u2019allument',d:'4 Leurres flottants crachent de la vase. Mâchevase est invulnérable tant qu\u2019ils brillent.',adds:[['tentacule',4]],link:1}],
+ kimbo:[{at:.6,evo:{double:{n:'Rafale tournoyante',radial:1,count:14,speed:260,repeat:3,gap:.45,spin:.2},glyphe:{n:'Triple marque',count:3,onP:1,spread:90},lame:{n:'Double lame',repeat:2,gap:.35}},n:'Doubles d’ombre',d:'Invoque 2 Doubles d’ombre (boss −50% tant qu\u2019ils vivent).',adds:[['glyphe',2]],link:.5},
         {at:.42,n:'Jugement',d:'Intouchable 8 s : des anneaux de glyphes partent de l’Arbitre. Glisse-toi dans les brèches.',storm:{dur:8,pat:'rings'}},
-        {at:.25,n:'Glyphes affolés',evo:{fatal:{n:'Double jugement',safe:72,wind:1.6,repeat:2,gap:.7}},d:'La parité change toutes les 3 s. Attaques plus rapides.',wind:.85,fx:f=>{f.ms.parFast=1}}],
+        {at:.25,n:'Glyphes affolés',evo:{fatal:{n:'Double sentence',safe:72,wind:1.6,repeat:2,gap:.7}},d:'La parité change toutes les 3 s. Attaques plus rapides.',wind:.85,fx:f=>{f.ms.parFast=1}}],
  obsi:[{at:.6,evo:{pic:{n:'Éventail d’obsidienne',multi:[-.45,0,.45],repeat:2,gap:.45}},n:'Hiver éternel',d:'+20% de dégâts, attaques plus rapides.',dmg:1.2,wind:.9},
        {at:.45,n:'Tempête blanche',d:'Intouchable 8 s : la glace pleut sur toi et laisse des plaques glissantes. Reste près des braises.',storm:{dur:7,pat:'rain',pool:'ice'}},
        {at:.3,n:'Éclats de givre',evo:{souffle:{n:'Souffle polaire',r:260,half:.6,repeat:2,gap:.4}},d:'Invoque 4 Éclats qui foncent sur toi et explosent.',adds:[['givre',4]]}],
@@ -860,14 +860,16 @@ const BOSSES=[
   toile:{n:'Jet de toile',k:'drops',count:3,r:62,wind:.9,dmg:10,pool:'toile',slow:1.2},
   crachat:{n:'Crachat de venin',k:'proj',count:5,spread:.9,speed:300,wind:.7,dmg:12,slow:1},
   bond:{n:'Bond chasseur',k:'leap',r:115,wind:1.2,dmg:40,heavy:1}}},
-{id:'wa',name:'La Mandragore Mère',de:'de la Mandragore',zone:'Îles Vertes',hp:330,r:36,spd:115,keep:110,res:{terre:0,feu:15,air:-15,eau:0},loot:['cha','soin'],
- lore:'Elle plante un bulbe dans le sable : tu as 6 secondes pour lui infliger assez de dégâts, sinon elle le mange et se soigne.',
+{id:'wa',name:'Sylvaine, mère des Mandragores',de:'de Sylvaine',zone:'Îles Vertes',hp:330,r:36,spd:115,keep:110,res:{terre:0,feu:15,air:-15,eau:0},loot:['cha','soin'],
+ lore:'Une druidesse qui flotte au-dessus des Îles Vertes. Elle plante des bulbes de mandragore : tu as 6 secondes pour lui infliger assez de dégâts, sinon elle absorbe le bulbe et se soigne. Ses feuilles volent en spirale et ses ronces jaillissent sous tes pieds.',
  tick:(f,dt)=>{const c=f.ms.caw;if(!c)return;c.t-=dt;if(c.t<=0){if(c.dealt<c.need){const h=healBoss(f,Math.round(f.bmax*.06));say(f,`Elle mange le bulbe : +${h} PV`)}else say(f,'Bulbe écrasé');f.ms.caw=null}},
  onDealt:(f,d)=>{if(f.ms.caw)f.ms.caw.dealt+=d},
  chips:f=>f.ms.caw?[{t:`Bulbe ${Math.min(f.ms.caw.dealt,f.ms.caw.need)}/${f.ms.caw.need} · ${Math.ceil(f.ms.caw.t)} s`,w:f.ms.caw.dealt<f.ms.caw.need}]:[],
- seq:['cawotte','coup','bond','coup','wak','coup','bond'],
+ seq:['cawotte','coup','tourb','bond','ronces','coup','wak','bond'],
  atks:{cawotte:{n:'Plante un bulbe',k:'special',fx:f=>{f.ms.caw={t:6,need:Math.round(f.bmax*.045),dealt:0}}},
-  coup:{n:'Coup d’oreilles',k:'line',len:210,w:60,wind:.6,dmg:22},bond:{n:'Bond',k:'leap',r:90,wind:.8,dmg:22,pool:'thorn'},
+  coup:{n:'Lame de feuilles',k:'line',len:260,w:60,wind:.6,dmg:22},bond:{n:'Envol',k:'leap',r:95,wind:.85,dmg:24,pool:'thorn'},
+  tourb:{n:'Tourbillon de feuilles',k:'proj',radial:1,count:12,speed:230,dmg:14,wind:.8,spin:.25,repeat:2,gap:.5},
+  ronces:{n:'Ronces',k:'drops',count:3,onP:1,r:60,wind:.9,dmg:16,pool:'thorn'},
   wak:{n:'Rayon de sève',k:'line',len:620,w:95,wind:1.4,dmg:50,heavy:1}}},
 {id:'craq',name:'Basalte',de:'de Basalte',zone:'La Faille',hp:420,r:50,spd:60,keep:80,res:{terre:30,feu:0,air:0,eau:-15},loot:['vit','res'],
  lore:'La Terre ne lui fait presque rien, l’Eau l’érode. Son Séisme frappe en anneau : colle-toi à lui ou fuis tout au bord.',
@@ -876,23 +878,26 @@ const BOSSES=[
   ebou:{n:'Éboulement',k:'drops',count:4,onP:2,spread:110,r:62,wind:1,dmg:18,slow:2,pool:'magma'},
   seisme:{n:'Séisme',k:'ring',r1:95,r2:255,wind:1.5,dmg:62,heavy:1}}},
 {id:'krala',name:'Mâchevase',de:'de Mâchevase',zone:'Les Vasières',hp:460,r:46,spd:65,keep:140,res:{terre:-15,feu:0,air:0,eau:30},loot:['agi','dmg'],
- lore:'Il plonge et devient intouchable pendant que ses tentacules jaillissent sous tes pieds. Ne reste pas immobile.',
+ lore:'Une baudroie géante tapie dans la vase. Son leurre lumineux tire un rayon en ligne droite, sa gueule mord en cône, et quand il plonge, il devient intouchable pendant que la vase jaillit sous tes pieds. Ne reste pas immobile.',
  tick:(f,dt)=>{if(f.b.inv>0){f.ms.tentT=(f.ms.tentT||0)-dt;if(f.ms.tentT<=0){f.ms.tentT=.85;addZone(f,f.p.x,f.p.y,55,.75,9,'ink')}}},
  chips:f=>f.b.inv>0?[{t:`Immergé : invulnérable · ${Math.ceil(f.b.inv)} s`,w:1}]:[],
- seq:['tent','plonge','encre','tent','etreinte'],
- atks:{tent:{n:'Tentacules',k:'drops',count:3,onP:1,r:55,wind:.7,dmg:9,repeat:3,gap:.45,pool:'ink'},
+ seq:['tent','leurre','plonge','encre','tent','etreinte'],
+ atks:{tent:{n:'Geysers de vase',k:'drops',count:3,onP:1,r:55,wind:.7,dmg:9,repeat:3,gap:.45,pool:'ink'},
   plonge:{n:'Plongée',k:'special',fx:f=>{f.b.inv=2.8;f.ms.tentT=.4},cool:3.1},
-  encre:{n:'Jet d’encre',k:'proj',count:3,spread:.5,speed:330,dmg:16,wind:.7,slow:3},
-  etreinte:{n:'Étreinte abyssale',k:'circle',r:215,wind:1.6,dmg:66,heavy:1}}},
+  encre:{n:'Crachat de vase',k:'proj',count:3,spread:.5,speed:330,dmg:16,wind:.7,slow:3},
+  leurre:{n:'Rayon du leurre',k:'line',len:560,w:70,wind:1.1,dmg:30},
+  etreinte:{n:'Mâchoires abyssales',k:'cone',r:190,half:.7,wind:1.4,dmg:62,heavy:1}}},
 {id:'kimbo',name:'L’Arbitre aux deux visages',de:'de l’Arbitre',zone:'Canopée des Glyphes',hp:470,r:46,spd:95,keep:170,big:1.2,res:{terre:0,feu:20,air:0,eau:-15},loot:['int','pct'],
- lore:'Chacune de tes attaques a un poids : coup léger 1, coup lourd 2, chaque sort son coût en points (2 à 5). Le glyphe de l’Arbitre alterne Pair et Impair toutes les 5 s : seules les attaques dont le poids est de la même parité le blessent. Un indicateur au centre de l’écran te dit lesquelles.',
+ lore:'Un duelliste masqué, une lame dans une main, un pistolet dans l’autre. Chacune de tes attaques a un poids : coup léger 1, coup lourd 2, chaque sort son coût en points (2 à 5). Le glyphe de l’Arbitre alterne Pair et Impair toutes les 5 s : seules les attaques dont le poids est de la même parité le blessent. Un indicateur au centre de l’écran te dit lesquelles.',
  tick:(f,dt)=>{if(!f.ms.par){f.ms.par='impair';f.ms.parT=5}f.ms.parT-=dt;if(f.ms.parT<=0){f.ms.parT=f.ms.parFast?3:5;f.ms.par=f.ms.par==='pair'?'impair':'pair';say(f,f.ms.par==='pair'?'Glyphe Pair':'Glyphe Impair')}},
  dmgMod:(f,sp)=>(sp.pa%2===0)===(f.ms.par==='pair'),
  chips:f=>[],
- seq:['glyphe','double','glyphe','fatal'],
- atks:{glyphe:{n:'Glyphe de l’Arbitre',k:'drops',count:1,onP:1,r:95,wind:.8,dmg:34},
-  double:{n:'Double glyphe',k:'proj',radial:1,count:10,speed:230,dmg:20,wind:.7,repeat:2,gap:.5},
-  fatal:{n:'Glyphe fatal',k:'safe',safe:85,wind:1.9,dmg:75,heavy:1}}},
+ seq:['lame','glyphe','double','salto','lame','fatal'],
+ atks:{glyphe:{n:'Marque de l’ombre',k:'drops',count:1,onP:1,r:95,wind:.8,dmg:34},
+  double:{n:'Rafale du pistolet',k:'proj',count:5,spread:.6,speed:420,dmg:18,wind:.7,repeat:2,gap:.4},
+  lame:{n:'Lame d’ombre',k:'cone',r:150,half:.55,wind:.55,dmg:24},
+  salto:{n:'Salto de l’ombre',k:'leap',r:95,wind:.9,dmg:30},
+  fatal:{n:'Sentence',k:'safe',safe:85,wind:1.9,dmg:75,heavy:1}}},
 {id:'obsi',name:'Hiverne',de:'d’Hiverne',zone:'Le Glacis',hp:520,r:56,spd:75,keep:130,big:1.25,res:{terre:0,feu:-20,air:0,eau:30},loot:['res','int'],
  lore:'Chaque coup de glace ajoute du Gel. À 3 Gel, tu es figé 1,4 s. Une fiole, une parade parfaite ou une esquive en roulade font fondre la glace ; sinon elle fond seule, un Gel toutes les 2,5 s.',
  seq:['souffle','pic','souffle','blizzard'],
@@ -2237,7 +2242,7 @@ function kkData(idn){const el=document.getElementById(idn);return el?b64buf(el.t
 const KKP={};
 function kkParse(k,buf){return new Promise(res=>{try{new THREE.GLTFLoader().parse(buf,'',g=>{g.scene.traverse(o=>{if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{['map','emissiveMap'].forEach(t=>{if(m[t]){m[t].encoding=THREE.LinearEncoding;m[t].needsUpdate=true}})})});
     g.scene.updateMatrixWorld(true);const bx=new THREE.Box3().setFromObject(g.scene);
-    if(k.startsWith('m:'))MON[k.slice(2)]={scene:g.scene,clips:g.animations,h:MONH[k.slice(2)]||(bx.max.y-bx.min.y)};else if(k.startsWith('anim'))KK.clips.push(...g.animations);else{KK.chars[k]=g.scene;KK.h[k]=bx.max.y-bx.min.y}res(true)},()=>res(false))}catch(e){res(false)}})}
+    if(k.startsWith('m:')){const mk=k.slice(2),SP=MONSPLIT[mk];let clips=g.animations;if(SP&&clips[0]){const src=clips[0];clips=Object.entries(SP).map(([n,[a,b2]])=>{const c=THREE.AnimationUtils.subclip(src,n,Math.round(a*30),Math.max(Math.round(a*30)+2,Math.round(b2*30)),30);c.name=n;return c})}MON[mk]={scene:g.scene,clips,h:MONH[mk]||(bx.max.y-bx.min.y)}}else if(k.startsWith('anim'))KK.clips.push(...g.animations);else{KK.chars[k]=g.scene;KK.h[k]=bx.max.y-bx.min.y}res(true)},()=>res(false))}catch(e){res(false)}})}
 function kkFetch(name){if(document.getElementById('kk-'+name))return Promise.resolve(kkData('kk-'+name));return fetch('models/'+name+'.txt').then(r=>{if(!r.ok)throw new Error('http '+r.status);return r.text()}).then(b64buf)}
 function kkNeed(k){if(!k)return Promise.resolve(false);if(KKP[k])return KKP[k];if(!window.THREE||!THREE.GLTFLoader||!THREE.SkeletonUtils)return Promise.resolve(false);
   return KKP[k]=kkFetch(k.replace('m:','')).then(buf=>kkParse(k,buf)).catch(()=>false)}
@@ -2255,6 +2260,11 @@ function aimBone(bone,tip,target,w){const T=THREE,b=bone.getWorldPosition(new T.
   bone.quaternion.copy(pq.multiply(q.multiply(bq)));bone.updateMatrixWorld(true)}
 /* ===================== GARDIENS EN MODÈLES ANIMÉS (Mixamo) ===================== */
 const MON={},MONH={golem:1.95};
+/* modèles à une seule animation : découpée en morceaux nommés (secondes) */
+const MONSPLIT={
+ shadow:{idle:[3.45,3.8],walk:[3.45,3.8],run:[3.45,3.8],slash:[2.35,3.4],flip:[0,1.65],land:[1.6,2.35],impact:[1.7,2.1]},
+ abyss:{idle:[0,1.66],walk:[0,1.66],run:[0,1.66],bite:[0,1.66],impact:[.2,.6]},
+ sylve:{idle:[2.2,3.95],walk:[2.2,3.95],run:[2.2,3.95],cast:[.1,2.2],rise:[0,1.2],impact:[2.4,2.8]}};
 const MONB={bouftou:{key:'warrok',hk:1.25,
   clips:{cone:['slash','slash_3','attack_2'],line:['attack'],circle:['attack_3','kick'],leap:['jump'],charge:['power_up'],proj:['casting'],drops:['casting'],special:['power_up'],ring:['attack_3'],safe:['casting']},
   hit:{slash:.42,slash_3:.45,attack_2:.5,attack:.5,attack_3:.55,kick:.45,jump:.55,power_up:.6,casting:.55},mini:['slash','attack_2','kick']},
@@ -2264,12 +2274,16 @@ const MONB={bouftou:{key:'warrok',hk:1.25,
  obsi:{key:'wyvern',hk:1.15,auto:1,tint:'#ffffff',hitClip:'flap',roarClip:'takeoff',
   clips:{cone:['flap'],line:['takeoff'],drops:['fly'],circle:['flap'],ring:['fly'],leap:['takeoff'],charge:['takeoff'],proj:['flap'],special:['fly'],safe:['fly']},
   hit:{flap:.5,takeoff:.4,fly:.3}},
+ krala:{key:'abyss',hk:1.25,auto:1,hitClip:'impact',roarClip:'bite',clips:{cone:['bite'],line:['bite'],circle:['bite'],drops:['bite'],proj:['bite'],special:['bite'],leap:['bite'],charge:['bite'],ring:['bite'],safe:['bite']},hit:{bite:.55}},
+ wa:{key:'sylve',hk:1.9,auto:1,hitClip:'impact',roarClip:'cast',flyClip:'idle',clips:{line:['cast'],leap:['rise'],proj:['cast'],drops:['cast'],special:['cast'],cone:['cast'],circle:['cast'],ring:['cast'],safe:['cast'],charge:['rise']},hit:{cast:.75,rise:.8}},
+ kimbo:{key:'shadow',hk:1.3,lit:1,auto:1,hitClip:'impact',roarClip:'slash',flyClip:'idle',clips:{cone:['slash'],line:['slash'],leap:['flip'],charge:['flip'],proj:['slash'],drops:['slash'],safe:['flip'],ring:['slash'],circle:['flip'],special:['slash']},hit:{slash:.45,flip:.6}},
  craq:{key:'golem',hk:1.3,hitClip:'hit',roarClip:'attack4',
   clips:{cone:['attack1','attack2','attack3'],line:['attack2'],circle:['attack5'],ring:['attack5'],drops:['attack4'],leap:['attack5'],charge:['attack4'],proj:['attack4'],special:['attack4'],safe:['attack4']},
   hit:{attack1:.42,attack2:.45,attack3:.45,attack4:.5,attack5:.5},mini:['attack1','attack2','attack3']}};
 /* gabarit d'un modèle quelconque, mesuré sur son squelette en pose d'attente : hauteur, sol, centre, sens du regard */
 function monMetrics(M,faceRot){if(M.met)return M.met;const T=THREE,m=THREE.SkeletonUtils.clone(M.scene),mx=new T.AnimationMixer(m),ci=M.clips.find(c=>c.name==='idle');if(ci){mx.clipAction(ci).play();mx.update(.1)}m.updateMatrixWorld(true);
   const bb=new T.Box3();let head=null,hip=null;m.traverse(o=>{if(o.isBone){const v=o.getWorldPosition(new T.Vector3());bb.expandByPoint(v);if(/head$/i.test(o.name)&&!head)head=v;if(/hips$|pelvis|^body$/i.test(o.name)&&!hip)hip=v}});
+  if(bb.isEmpty()){bb.setFromObject(m)}
   const ctr=bb.getCenter(new T.Vector3()),h=Math.max(.01,bb.max.y-bb.min.y)*1.15,w=Math.max(bb.max.x-bb.min.x,bb.max.z-bb.min.z);let rot=Math.PI/2;if(head){const c0=hip||ctr;rot=Math.atan2(head.z-c0.z,head.x-c0.x)}rot+=faceRot||0;
   return M.met={h,w,minY:bb.min.y,cx:ctr.x,cz:ctr.z,rot}}
 function monPlace(model,M,D,target){const T=THREE,me=monMetrics(M,D&&D.faceRot),sc=target/Math.max(me.h,me.w*((D&&D.wk)||0));model.scale.setScalar(sc);model.rotation.y=me.rot;
@@ -2278,7 +2292,8 @@ function creatureMonster(id,R,proto){const T=THREE,D=MONB[id],M=MON[D.key],g=new
   let h=R*2;if(proto){const bx=new T.Box3().setFromObject(proto.g);h=Math.max(1,bx.max.y-Math.min(0,bx.min.y));disposeObj(proto.g)}
   const model=THREE.SkeletonUtils.clone(M.scene);let sc=h*D.hk/M.h;model.scale.setScalar(sc);model.rotation.y=Math.PI/2;g.add(model);
   if(D.auto)monPlace(model,M,D,h*D.hk);g.userData.hT=D.auto&&D.wk?h*D.hk*.6:h*D.hk;
-  const mats=[];model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;o.frustumCulled=false;o.material=o.material.clone();if(!o.material.emissive)o.material.emissive=new T.Color(0);if(o.material.emissiveMap)o.material.userData.em='#ffffff';mats.push(o.material)}});
+  const mats=[];model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;o.frustumCulled=false;o.material=o.material.clone();if(!o.material.emissive)o.material.emissive=new T.Color(0);if(o.material.emissiveMap)o.material.userData.em='#ffffff';
+    if(D.lit){const m=o.material;if(m.metalness!==undefined)m.metalness=Math.min(m.metalness,.15);if(m.roughness!==undefined)m.roughness=Math.max(m.roughness,.5);if(m.color)m.color.multiplyScalar(2.2);if(!m.emissiveMap){m.emissive.set('#2a1830');m.userData.em='#2a1830'}}mats.push(o.material)}});
   const mx=new T.AnimationMixer(model),act={};M.clips.forEach(c=>{act[c.name]=mx.clipAction(c)});act.idle&&act.idle.play();mx.update(.1);
   const dummy=new T.MeshStandardMaterial({color:0});
   const c={g,mat:dummy,rocks:mats,ground:true,ownDeath:!!act[D.deathClip||'death'],mx,act,cur:'idle',wasWind:false,follow:0,
@@ -5009,7 +5024,7 @@ function rOptions(){return `<section class="panel"><span class="label">Son et to
   <div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn sm" data-a="savex">Exporter</button><button class="btn sm" data-a="savei">Importer le code collé</button></div>
   <textarea id="savecode" rows="3" spellcheck="false" placeholder="Le code de sauvegarde apparaît ici ; colle un code ici pour l’importer." style="width:100%;margin-top:8px;font:12px ui-monospace,monospace;background:var(--well);color:var(--bone);border:1px solid var(--line);border-radius:8px;padding:8px;box-sizing:border-box">${esc(ui.saveCode||'')}</textarea>
   ${ui.saveMsg?`<p class="${ui.saveBad?'down':'dim'}" style="font-size:13px;margin:6px 0 0">${esc(ui.saveMsg)}</p>`:''}</section>
-  <p class="dim" style="font-size:11.5px;text-align:center;margin:4px 0">Bruitages d’impact : Kenney (kenney.nl, CC0) · Modèles 3D : héros KayKit Adventurers (Kay Lousberg, CC0) · Grondecorne : Mixamo (Adobe) · Basalte : Armored Stone Golem (Alexander Lenski, Fab) · Hiverne : « Wyvern animated » par Charlie catling (Fab, CC-BY) · Vifplume « Animated Cockatrice » par Marko J (Fab) · La Tisseuse : « Spiders » par Mixall (Fab, CC-BY) · Régent « Vampire » par Khornes (Fab) · sbires « Stylized Low Poly Skeleton » par SazenGames (Fab)</p>
+  <p class="dim" style="font-size:11.5px;text-align:center;margin:4px 0">Bruitages d’impact : Kenney (kenney.nl, CC0) · Modèles 3D : héros KayKit Adventurers (Kay Lousberg, CC0) · Grondecorne : Mixamo (Adobe) · Basalte : Armored Stone Golem (Alexander Lenski, Fab) · Hiverne : « Wyvern animated » par Charlie catling (Fab, CC-BY) · Vifplume « Animated Cockatrice » par Marko J (Fab) · La Tisseuse : « Spiders » par Mixall (Fab, CC-BY) · Mâchevase « MONSTER », Sylvaine « Sorceress » (CC-BY-SA) et l’Arbitre « SHADOWs MAN » (CC-BY) par NORBERTO-3D (Sketchfab) · Régent « Vampire » par Khornes (Fab) · sbires « Stylized Low Poly Skeleton » par SazenGames (Fab)</p>
 <footer><span>${meta.runs} ascension${meta.runs>1?'s':''} · ${meta.wins} victoire${meta.wins>1?'s':''}</span>
   ${ui.confirm==='reset'?`<span class="row"><span>Tout effacer ?</span><button data-a="reset">Oui, effacer</button><button data-a="cancel">Annuler</button></span>`:`<button data-a="confirm" data-v="reset">Effacer la sauvegarde</button>`}</footer>`}
 const SVG_TOUR=`<svg viewBox="0 0 160 120" aria-hidden="true"><defs><linearGradient id="tg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd27a" stop-opacity=".55"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></linearGradient></defs>

@@ -1742,7 +1742,7 @@ function setupTargets(f,a){
     else if(i<onP){const an=Math.random()*Math.PI*2,r=Math.random()*(d.spread||100);const t={x:p.x+Math.cos(an)*r,y:p.y+Math.sin(an)*r};clampArena(t,10);a.tgts.push(t)}
     else a.tgts.push(randArena(d.r))}}
   if(d.k==='leap')a.tgt={x:p.x,y:p.y};
-  if(d.k==='safe'){let t=randArena(d.safe+20);for(let i=0;i<6&&dist(t,p)<90;i++)t=randArena(d.safe+20);a.tgt=t}
+  if(d.k==='safe'){/* la zone sûre doit rester atteignable à pied pendant la préparation */const reach=150*(a.wind||1)+d.safe-PR;let t=null,best=null;for(let i=0;i<16;i++){const c=randArena(d.safe+20),dd=dist(c,p);if(dd>=90&&dd<=reach){t=c;break}if(!best||Math.abs(dd-Math.min(reach,140))<Math.abs(dist(best,p)-Math.min(reach,140)))best=c}a.tgt=t||best}
 }
 function inLine(b,ang,len,w,p){const dx=p.x-b.x,dy=p.y-b.y,c=Math.cos(ang),s=Math.sin(ang);const al=dx*c+dy*s,pe=Math.abs(-dx*s+dy*c);return al>-PR&&al<len+PR&&pe<w/2+PR}
 const ringR=a=>{const g=(a.d.grow||0)*(a.rk||0);return [a.d.r1+g,a.d.r2+g]};
@@ -2137,7 +2137,7 @@ function bossStep(f,dt,p){const b=f.b,B=f.B;
     if(a.d.k==='leap'&&a.t<a.wind*.5){a.tgt={x:p.x,y:p.y};clampArena(a.tgt,b.r)}
     if(a.t>=a.wind){const h0=run.hp;resolveAtk(f,a);if(f.tut&&run.hp>=h0&&!f.p.guard)f.tut.dodge++;a.rep--;
       if(b.dash||b.jump)b.atk=null;
-      else if(a.rep>0&&!f.over){a.t=0;a.wind=((a.d.gap||.4)+.15)*windMul(f);a.rk=(a.rk||0)+1;a.gen=(f.gen2=(f.gen2||0)+1);setupTargets(f,a);a.ang=b.face}
+      else if(a.rep>0&&!f.over){a.t=0;a.wind=(a.d.k==='safe'?Math.max((a.d.gap||.4)+.15,(a.d.wind||1)*.85):((a.d.gap||.4)+.15))*windMul(f);a.rk=(a.rk||0)+1;a.gen=(f.gen2=(f.gen2||0)+1);setupTargets(f,a);a.ang=b.face}
       else{b.atk=null;b.rec=a.d.heavy?1.1:.25;if(a.d.heavy)b.vuln=1.4;b.cool=b.rec+.3}}}
   else{
     b.rec-=dt;b.cool-=dt;

@@ -90,7 +90,8 @@ button:focus-visible{outline:2px solid var(--ember);outline-offset:2px}
 .pacts,.achs{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px}
 .pact{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:3px;padding:9px 11px;border:1px solid var(--line);border-radius:8px}.pact:hover{border-color:var(--dim)}.pact.on{border-color:var(--blood);background:color-mix(in srgb,var(--blood) 10%,transparent)}.pact small,.ach small{font-size:12.5px;color:var(--dim)}.pact:focus-visible{outline:2px solid var(--ember)}
 .rushp{position:absolute;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;background:rgba(8,10,14,.55);padding:16px}.rpin{text-align:center;max-width:820px;width:100%}.rpin h2{font-family:var(--f-disp);font-weight:400;font-size:clamp(24px,4vw,38px);margin:4px 0 14px;color:var(--bone)}
-.rpc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.rpcard{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(18,21,27,.92);transition:transform .12s,border-color .12s}.rpcard:hover:not([disabled]){transform:translateY(-3px);border-color:var(--ember)}.rpcard.on{border-color:var(--ember);background:color-mix(in srgb,var(--ember) 14%,rgba(18,21,27,.95))}.rpcard.off{opacity:.35}.rpcard .rpi{font-size:28px;color:var(--ember)}.rpcard b{font-size:15px;color:var(--bone)}.rpcard small{font-size:12.5px;color:var(--dim)}.rpin .dim{margin-top:12px;font-size:13.5px}
+.rpc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.rpcard{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(18,21,27,.92);transition:transform .12s,border-color .12s}.rpcard:hover:not([disabled]){transform:translateY(-3px);border-color:var(--ember)}.rpcard.on{border-color:var(--ember);background:color-mix(in srgb,var(--ember) 14%,rgba(18,21,27,.95))}.rpcard.off{opacity:.35}.rpcard.duo{border-color:#7fd3ff88;position:relative}.rpcard.duo .rpi{color:#9fdcff}.rptag{position:absolute;top:8px;right:10px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#9fdcff;border:1px solid #7fd3ff66;border-radius:999px;padding:1px 7px}.duoi{margin-top:4px;font-size:14px;color:#9fdcff;letter-spacing:2px}
+.rpcard .rpi{font-size:28px;color:var(--ember)}.rpcard b{font-size:15px;color:var(--bone)}.rpcard small{font-size:12.5px;color:var(--dim)}.rpin .dim{margin-top:12px;font-size:13.5px}
 @media (max-width:600px){.rpc{grid-template-columns:1fr}.rpcard{flex-direction:row;padding:10px 12px;text-align:left}.rpcard .rpi{font-size:22px}}
 .rushres{text-align:center;padding:10px;margin-bottom:10px;border:1px solid var(--ember);border-radius:10px}.rushres h2{font-family:var(--f-disp);font-weight:400;margin:4px 0}
 .coban{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin:0 0 12px;padding:9px 14px;border:1px solid #7fd3ff66;border-radius:10px;background:color-mix(in srgb,#7fd3ff 8%,transparent)}.coban b{color:#9fdcff}.coban span{font-size:13.5px;color:var(--dim)}.coban .cost{color:var(--bone);margin-left:auto}.coban.warn{border-color:var(--line)}
@@ -1301,7 +1302,7 @@ function altMul(sp){if(!run)return 1;let m=1;if(hasA('verre'))m*=1.4;if(hasA('sa
 function dmgBase(sp,base,lv){if(sp.fixed)return sp.fixed;const wp=sp.id==='wl'||sp.id==='wh',tm=(1+(talE('dmg',sp.id)+(wp?talE('wdmg')+(sp.id==='wh'?talE('heavy'):0):0))/100)*(sp.id==='wh'&&WM('geant')?1.4:1);return altMul(sp)*tm*base*SPELLMUL(sp)*LV5[lv-1]*(100+statT(sp.stat||EL[sp.el].s)+pctDmg())/100+itemSum('dmg')}
 function dmgCalc(sp,base){let d=dmgBase(sp,base,lvOf(sp));d*=1+buffPct()/100;if(fight){if(!sp.pure)d*=1-resOf(sp.el)/100;if(fight.b.vuln>0)d*=1.25}return Math.max(1,Math.round(d))}
 function healCalc(sp,base,lv){return Math.round(base*LV5[(lv||lvOf(sp))-1]*(100+statT('int'))/100*(1+talE('heal')/100)+itemSum('soin'))}
-function healP(h){const before=run.hp;run.hp=Math.min(maxHp(),run.hp+h);return run.hp-before}
+function healP(h){const before=run.hp;run.hp=Math.min(maxHp(),run.hp+h);const got=run.hp-before;if(h>0&&duoHas('lien')&&fight&&fight.co)coHealAlly(Math.round(h*.5));return got}
 
 /* ===================== ASCENSION ===================== */
 function newRun(daily){
@@ -1574,7 +1575,7 @@ function resolveAtk(f,a){
   if(f.co&&f.co.role==='A')coAtkOther(f,a,raw);
 }
 function hurtP(f,raw,d){
-  const p=f.p;if(f.over)return false;if(p.ghost){coHit(f,raw,d);return false}if(p.down)return false;
+  const p=f.p;if(f.over)return false;if(p.ghost){coHit(f,raw,d);return false}if(p.down)return false;if(f.co)raw=coDR(f,raw);
   if(p.iframe>0){txt(f,p.x,p.y,'Esquivé','frost');if(p.roll>0&&hasA('esquive')&&!(f.ms.pendT>f.t)&&!f.storm&&!f.b.jump){const b=f.b;f.ms.pendT=f.t+4;f.frz=Math.max(f.frz||0,.7);b.atk=null;b.dash=null;b.rec=Math.max(b.rec,.7);b.cool=Math.max(b.cool,1.1);ev(f,'freeze');txt(f,p.x,p.y-20,'Pendule','frost');if(hasS('horsT'))spells().forEach(x=>f.cds[x.id]=0)}if(p.roll>0&&hasL('gelano')&&!(f.ms.lierreCd>0)){p.st=Math.min(stMax(),p.st+25);f.ms.lierre=1;f.ms.lierreCd=.4;txt(f,p.x,p.y-20,'Lierre','ok')}return false}
   if(f.buffs.some(x=>x.id==='bdiv')){txt(f,p.x,p.y,'Bouclier divin','ember');return false}
   const ub=d&&(d.unblock||d.k==='ring'||d.k==='safe');
@@ -1786,6 +1787,7 @@ function applyDmg(f,sp,base,T){sp._b=base;
   if(f.brokenT>0)d=Math.round(d*1.3);
   d=altPre(f,sp,d);
   if(sp.inf==='pierre'&&f.bshield>0){const ex=Math.min(f.bshield,d);f.bshield-=ex;if(ex)txt(f,b.x,b.y,'Bouclier brisé','ember')}
+  if(f.co){d=coDmgMod(f,d);if(duoHas('sang'))coHealAlly(Math.round(d*.1))}
   const abs=Math.min(f.bshield,d);f.bshield-=abs;
   if(f.tut&&!sp.chain){if(sp.id==='wl')f.tut.hits++;if(sp.id==='wh'&&(sp.tier||0)>=1)f.tut.charge++}
   if(f.pvp){pvpHit(f,sp,d-abs);ev(f,'hit',{el:sp.el,col:sp.col,crit,sid:sp.id,cls:run.cls});if(crit||sp.id==='wh')f.hitstop=Math.max(f.hitstop||0,.06);if(sp.inf)infProc(f,sp,d,b,sp.id==='wh');altAfter(f,sp,base,d,b);if(sp.fx==='push'||sp.fx==='slowB'){}return}
@@ -4139,7 +4141,7 @@ function hud(){
   if(f.burn&&f.burn.length)bc.push({id:'burn',t:`Brûlure ×${f.burn.length}`,g:1,ic:'♨',p:Math.max(...f.burn.map(x=>x.t))/3});if(f.pois&&f.pois.length)bc.push({id:'pois',t:`Venin ×${f.pois.length}`,g:1,ic:'☣',p:Math.max(...f.pois.map(x=>x.t))/6});if(f.frost>0&&!(f.frz>0))bc.push({id:'frost',t:`Givre ${f.frost}/6`,g:1,ic:'❄',p:f.frost/6});if(f.frz>0)bc.push({id:'frz',t:'Figé : +15% de dégâts',g:1,ic:'✱',p:f.frz/2});
   if(f.bshield>0)bc.push({id:'shield',t:`Bouclier ${f.bshield}`,w:1,ic:'⛨',p:f.bshieldT/4});if(f.brokenT>0)bc.unshift({id:'broken',t:'Posture brisée : +30% de dégâts',g:1,ic:'✸',p:f.brokenT/2.6});
   const nAdd=f.adds.filter(a=>a.alive).length,lk=bossLink(f);
-  if(!f.hits&&!f.over&&!f.B.echo&&!f.B.train&&!f.pvp&&!f.tut)bc.push({t:f.B.secret?'Sans dégâts : bonus de grains doublé':'Sans dégâts : légendaire en jeu',g:1});if(f.B.echo)bc.push({t:'Écho : arme légendaire en jeu',g:1});
+  if(!f.hits&&!f.over&&!f.B.echo&&!f.B.train&&!f.pvp&&!f.tut&&!(run&&run.rush))bc.push({t:f.B.secret?'Sans dégâts : bonus de grains doublé':'Sans dégâts : légendaire en jeu',g:1});if(f.B.echo)bc.push({t:'Écho : arme légendaire en jeu',g:1});
   if(lk>=1)bc.unshift({id:'link',t:'Invulnérable : tue les invocations reliées',w:1,ic:'⛓',tip:'Les liens bleus montrent les invocations qui le protègent.'});else if(lk)bc.unshift({id:'link',t:`Protégé −${Math.round(lk*100)}% : tue les invocations reliées`,w:1,ic:'⛓',tip:'Les liens bleus montrent les invocations qui le protègent.'});
   const phs=PHASES[f.B.id];if(phs)bc.push({t:`Phase ${(f.ms.ph||0)+1}/${phs.length+1}`});
   badges(H.bchips,bc,H.bc||(H.bc=new Map()),c=>{if(f.t>.5)txt(f,f.b.x,f.b.y-20,c.t.split(' :')[0],c.w?'blood':'ok')});
@@ -4542,7 +4544,8 @@ function coOn(e,m){const f=fight&&fight.co?fight:null;CO.last=performance.now();
   case 'cgo':{if(CO.role!=='B'||!run||!run.coop)return;run.order=m.order.slice();run.paths=Object.assign({},m.paths);run.mut=m.mut;CO.ready=null;CO.mateReady=null;if(m.sec&&!run.secret)return;ui.confirm=null;startFight();return}
   }
   if(!f)return;
-  if(e==='s'){const A=f.ally;if(!A)return;A.tx=m.x;A.ty=m.y;A.face=m.fa;A.hp=m.hp;A.mx=m.mx;A.roll=m.r?.2:0;A.iframe=m.r?.2:0;A.guard=!!m.g;A.drink=m.d?.5:0;A.leap=m.l?1:null;A.atkT=m.a?.3:A.atkT;A.castT=m.c?.4:A.castT;A.down=!!m.dn;
+  if(e==='s'){const A=f.ally;if(!A)return;A.tx=m.x;A.ty=m.y;A.face=m.fa;A.hp=m.hp;A.mx=m.mx;A.roll=m.r?.2:0;A.iframe=m.r?.2:0;A.guard=!!m.g;A.drink=m.d?.5:0;A.leap=m.l?1:null;A.atkT=m.a?.3:A.atkT;A.castT=m.c?.4:A.castT;A.down=!!m.dn;A.duo=m.du||null;
+    if(m.acc&&m.acc.hl>0&&!f.p.down&&!f.over){const h=Math.min(maxHp()-run.hp,m.acc.hl);if(h>0){run.hp+=h;txt(f,f.p.x,f.p.y-18,'+'+h,'ok')}}
     if(A.x===undefined){A.x=m.x;A.y=m.y}
     if(CO.role==='A'&&m.acc&&!f.over){const q=m.acc;if(q.d>0){f.bhp=Math.max(0,f.bhp-q.d);f.b.hurt=.12;f.co.dA+=q.d;checkPhase(f)}if(q.po>0)addPosture(f,q.po);
       if(q.ad)for(const k in q.ad){const a=f.adds.find(x=>x.id===+k);if(a&&a.alive){a.hp-=q.ad[k];a.hurt=.12;if(a.hp<=0)killAdd(f,a)}}
@@ -4552,7 +4555,7 @@ function coOn(e,m){const f=fight&&fight.co?fight:null;CO.last=performance.now();
       if(f.bhp<=0)endFight(true)}return}
   if(e==='cb'&&CO.role==='B'){CO.bs=m;coGuestApply(f,m);return}
   if(e==='chit'&&CO.role==='B'){if(f.over||f.p.down)return;hurtP(f,m.raw,{heavy:m.h,unblock:m.u,slow:m.sl,gel:m.gel,n:m.n});return}
-  if(e==='crev'){const p=f.p;if(p.down&&!f.over){p.down=false;run.hp=Math.max(1,Math.round(maxHp()*.3));p.iframe=2;if(R3)R3.pdead=null;f.msg={txt:(f.co.mate||'Ton partenaire')+' t’a relevé',t:2.4,big:1};ev(f,'revive')}return}
+  if(e==='crev'){const p=f.p;if(p.down&&!f.over){p.down=false;run.hp=Math.max(1,Math.round(maxHp()*(m.hp||.3)));p.iframe=2;if(R3)R3.pdead=null;f.msg={txt:(f.co.mate||'Ton partenaire')+' t’a relevé',t:2.4,big:1};ev(f,'revive')}return}
   if(e==='cdn'){if(f.ally)f.ally.down=true;if(f.p.down&&!f.over){if(CO.role==='A'){endFight(false)}}return}
   if(e==='cend'&&CO.role==='B'){f.coEnd=1;if(!f.over){if(m.won&&f.p.down)run.hp=Math.max(1,Math.round(maxHp()*.3));endFight(!!m.won)}return}
 }
@@ -4575,7 +4578,7 @@ function coFightInit(f){f.co={role:CO.role,tgt:'me',next:6,dM:0,dA:0};f.addId=0;
 /* le gardien vise le joueur qui l'a le plus blessé ces dernières secondes */
 function coTarget(f,p){const c=f.co;if(!c||c.role!=='A'||!f.ally)return p;c.realP=p;const A=f.ally;
   if(p.down)return A.down?p:A;if(A.down)return p;
-  if(f.t>=c.next){c.next=f.t+5+Math.random()*2;const tot=c.dM+c.dA;let pa=tot>0?c.dA/tot:.5;pa=Math.max(.25,Math.min(.75,pa));c.tgt=Math.random()<pa?'ally':'me';c.dM*=.3;c.dA*=.3}
+  if(f.t>=c.next){c.next=f.t+5+Math.random()*2;const tot=c.dM+c.dA;let pa=tot>0?c.dA/tot:.5;pa=Math.max(.25,Math.min(.75,pa));if(allyHas(f,'provoc'))pa+=.35;if(duoHas('provoc'))pa-=.35;pa=Math.max(.08,Math.min(.92,pa));c.tgt=Math.random()<pa?'ally':'me';c.dM*=.3;c.dA*=.3}
   return c.tgt==='ally'?A:p}
 const coOther=f=>{const c=f.co;if(!c||c.role!=='A')return null;if(f.p.ghost)return c.realP&&!c.realP.down?c.realP:null;return f.ally&&!f.ally.down?f.ally:null};
 function coHit(f,raw,d){coSend('chit',{raw:Math.round(raw),h:d&&d.heavy?1:0,u:d&&d.unblock?1:0,sl:d&&d.slow||0,gel:d&&d.gel||0,n:d&&d.n||''})}
@@ -4598,10 +4601,10 @@ function coTick(f,dt){if(!f.co)return;const A=f.ally;coRevive(f,dt);
   if(performance.now()-CO.last>45000&&!f.over&&coLive()){CO.mate=null;coSolo('Plus de nouvelles de ton partenaire : tu continues seul.');return}
   CO.sendT-=dt;if(CO.sendT<=0){CO.sendT=1/12;const p=f.p;
     if(f.coG){const b=f.b,c=f.co,q2=CO.acc||(CO.acc={d:0,po:0});if(f.frz>(c.lfz||0)+.05){q2.fz=+f.frz.toFixed(2)}c.lfz=f.frz>0?f.frz:0;if(b.vuln>.3)q2.vu=+b.vuln.toFixed(2);if(f.ms.slowB>.3)q2.sl=+f.ms.slowB.toFixed(2)}
-    const q=CO.acc;CO.acc=null;coSend('s',{x:Math.round(p.x),y:Math.round(p.y),fa:+(p.face||0).toFixed(2),hp:run.hp,mx:maxHp(),r:p.roll>0?1:0,g:p.guard?1:0,d:p.drink>0?1:0,l:p.leap?1:0,a:f.swing&&f.swing.t<.15?1:0,c:p.cast>0?1:0,dn:p.down?1:0,acc:q||undefined})}
+    const q=CO.acc;CO.acc=null;coSend('s',{x:Math.round(p.x),y:Math.round(p.y),fa:+(p.face||0).toFixed(2),hp:run.hp,mx:maxHp(),r:p.roll>0?1:0,g:p.guard?1:0,d:p.drink>0?1:0,l:p.leap?1:0,a:f.swing&&f.swing.t<.15?1:0,c:p.cast>0?1:0,dn:p.down?1:0,du:run.duo||undefined,acc:q||undefined})}
   if(f.co.role==='A'){CO.syncT-=dt;if(CO.syncT<=0){CO.syncT=1/15;coSend('cb',coSnap(f))}}}
 const coD=d=>{const o={};for(const k in d){const v=d[k];if(typeof v!=='function')o[k]=v}return o};
-function coSnap(f){const b=f.b,a=b.atk,J=b.jump,c=f.co;const S={x:Math.round(b.x),y:Math.round(b.y),fa:+(b.face||0).toFixed(2),hp:Math.round(f.bhp),mx:f.bmax,po:Math.round(f.post||0),br:+(f.brokenT||0).toFixed(2),vu:b.vuln>0?1:0,fz:f.frz>0?+f.frz.toFixed(2):0};
+function coSnap(f){const b=f.b,a=b.atk,J=b.jump,c=f.co;const S={x:Math.round(b.x),y:Math.round(b.y),fa:+(b.face||0).toFixed(2),hp:Math.round(f.bhp),mx:f.bmax,po:Math.round(f.post||0),br:+(f.brokenT||0).toFixed(2),vu:b.vuln>0?1:0,fz:f.frz>0?+f.frz.toFixed(2):0,tg:c.tgt==='ally'?'B':'A'};
   if(a&&a.d){if(!a._cid)a._cid=(c.cid=(c.cid||0)+1);S.at={i:a._cid,k:a.key,t:+a.t.toFixed(2),w:+a.wind.toFixed(2),an:+(a.ang||0).toFixed(3),tg:a.tgt?{x:Math.round(a.tgt.x),y:Math.round(a.tgt.y)}:null,ts:a.tgts?a.tgts.map(t=>({x:Math.round(t.x),y:Math.round(t.y)})):null,rk:a.rk||0};if(c.sentD!==a._cid){c.sentD=a._cid;S.at.d=coD(a.d)}}
   if(J)S.ju={fx:J.fx,fy:J.fy,tx:J.tx,ty:J.ty,t:+J.t.toFixed(2),du:J.dur,r:J.d&&J.d.r};
   if(b.dash)S.da={vx:Math.round(b.dash.vx),vy:Math.round(b.dash.vy)};
@@ -4636,8 +4639,10 @@ function coFx(k,v){const q=CO.acc||(CO.acc={d:0,po:0});(q.fx||(q.fx=[])).push([k
 function coAddT(f,a,p0){const A=f.ally;if(!f.co||f.co.role!=='A'||!A||A.down)return p0;if(p0.down)return A;return dist(a,A)<dist(a,p0)?A:p0}
 /* relever son partenaire : rester 3 s à côté de lui */
 function coRevive(f,dt){const A=f.ally,p=f.p,c=f.co;if(!c||!A||f.over)return;
-  if(A.down&&!p.down&&dist(p,A)<PR*2+40){c.rev=(c.rev||0)+dt;if(Math.floor(c.rev*4)!==Math.floor((c.rev-dt)*4))txt(f,A.x,A.y-30,'Relève… '+Math.min(100,Math.round(c.rev/3*100))+'%','ok');
-    if(c.rev>=3){c.rev=0;A.down=false;A.hp=1;coSend('crev',{});txt(f,A.x,A.y-40,'Relevé !','ok');ev(f,'revive')}}else c.rev=Math.max(0,(c.rev||0)-dt*2)}
+  if(allyHas(f,'vigueur')&&!A.down&&!p.down&&dist(p,A)<230&&run.hp<maxHp()){c.vg=(c.vg||0)+maxHp()*.015*dt;if(c.vg>=1){const n=Math.floor(c.vg);c.vg-=n;run.hp=Math.min(maxHp(),run.hp+n)}}
+  const RT=duoHas('souffle')?1.5:3;
+  if(A.down&&!p.down&&dist(p,A)<PR*2+40){c.rev=(c.rev||0)+dt;if(Math.floor(c.rev*4)!==Math.floor((c.rev-dt)*4))txt(f,A.x,A.y-30,'Relève… '+Math.min(100,Math.round(c.rev/RT*100))+'%','ok');
+    if(c.rev>=RT){c.rev=0;A.down=false;A.hp=1;coSend('crev',{hp:duoHas('souffle')?.5:.3});txt(f,A.x,A.y-40,'Relevé !','ok');ev(f,'revive')}}else c.rev=Math.max(0,(c.rev||0)-dt*2)}
 /* rendu : le héros du partenaire */
 function coAllyBuild(S,f){const M=CO.mate||{};let ch;try{ch=buildCharacter({cls:CLASSES[M.cls]?M.cls:'iop',race:RACES[M.race]?M.race:'plainois',items:M.items||{},inf:M.inf,wsel:M.wsel})}catch(e){return null}
   S.add(ch.pg);const ring=new THREE.Mesh(new THREE.RingGeometry(1.05,1.25,40),new THREE.MeshBasicMaterial({color:'#7fd3ff',transparent:true,opacity:.5,depthWrite:false}));ring.rotation.x=-Math.PI/2;S.add(ring);return {ch,ring,ph:0}}
@@ -4649,9 +4654,9 @@ function coAllyRender(R,f,dt){const A=f.ally,Y=R.ally;if(!A||!Y)return;const pg=
     if(want&&K.cur!==want&&K.act[want]){const a=K.act[want],p0=K.act[K.cur];a.reset();a.setLoop(once?THREE.LoopOnce:THREE.LoopRepeat,Infinity);a.clampWhenFinished=once;a.enabled=true;a.fadeIn(.12).play();if(p0&&p0!==a)p0.fadeOut(.12);K.cur=want}
     K.mixer.update(dt);pg.updateMatrixWorld(true);if(!A.down&&typeof kkHands==='function')kkHands(Y.ch,null)}
   else{Y.ph+=dt*Math.min(1,sp/120)*10;const s=Math.sin(Y.ph)*.5;if(Y.ch.legL){Y.ch.legL.rotation.x=s;Y.ch.legR.rotation.x=-s}pg.rotation.z=A.down?Math.PI/2:0}}
-function coHud(f){const el=id('coop');if(!el||!f.co||!f.ally)return;const A=f.ally,k=Math.round(A.hp)+'|'+A.mx+'|'+(A.down?1:0)+'|'+(f.co.tgt);if(el.dataset.k===k)return;el.dataset.k=k;
+function coHud(f){const el=id('coop');if(!el||!f.co||!f.ally)return;const A=f.ally,k=Math.round(A.hp)+'|'+A.mx+'|'+(A.down?1:0)+'|'+(f.co.tgt)+'|'+(run.duo||[]).join()+'|'+(A.duo||[]).join();if(el.dataset.k===k)return;el.dataset.k=k;
   const pc=A.mx>0?Math.max(0,Math.min(100,A.hp/A.mx*100)):0;
-  el.innerHTML=`<div class="between"><b>${esc(f.co.mate||'Partenaire')}</b><span class="num">${A.down?'À terre':Math.max(0,Math.round(A.hp))+' / '+A.mx}</span></div><div class="bar ${A.down?'':'ok'}"><i style="width:${A.down?0:pc}%"></i></div>${f.co.role==='A'&&!A.down&&f.co.tgt==='ally'?'<small>Le gardien le vise</small>':''}`}
+  el.innerHTML=`<div class="between"><b>${esc(f.co.mate||'Partenaire')}</b><span class="num">${A.down?'À terre':Math.max(0,Math.round(A.hp))+' / '+A.mx}</span></div><div class="bar ${A.down?'':'ok'}"><i style="width:${A.down?0:pc}%"></i></div>${f.co.role==='A'&&!A.down&&f.co.tgt==='ally'?'<small>Le gardien le vise</small>':''}${(run.duo||[]).length||(A.duo||[]).length?`<div class="duoi">${(run.duo||[]).map(k=>`<span title="${DUO[k].n}">${DUO[k].i}</span>`).join('')}${(A.duo||[]).length?' · '+(A.duo||[]).filter(k=>DUO[k]).map(k=>`<span title="${DUO[k].n}">${DUO[k].i}</span>`).join(''):''}</div>`:''}`}
 /* écrans */
 function coBanner(){if(!run||!run.coop)return '';const M=CO.mate;if(!coLive())return `<div class="coban warn"><b>Ascension à deux</b><span>Connexion avec ton partenaire perdue : tu continues seul.</span></div>`;
   const R=CO.ready,MR=CO.mateReady,fl=run.floor;
@@ -4677,6 +4682,20 @@ function rCoop(){const st=CO.st,me=pvpName(),M=CO.mate,RR=ui.rushRes,best=meta.r
 /* ===================== TOUR À DEUX : les gardiens s'enchaînent sans fin =====================
    Pas de carte : après chaque gardien, chacun choisit un bonus parmi trois, puis le suivant arrive.
    Tous les 9 gardiens, la boucle recommence plus forte. */
+/* bonus de duo : ils servent l'autre joueur et dessinent des rôles (soigneur, tank, frappeur…) */
+const DUO={
+ lien:{i:'❦',n:'Lien de vie',d:'Tes soins soignent aussi ton allié (50 %).'},
+ sang:{i:'♥',n:'Sang partagé',d:'10 % des dégâts que tu infliges soignent ton allié.'},
+ egide:{i:'⛉',n:'Égide',d:'Ton allié subit 20 % de dégâts en moins à moins de 3 pas de toi.'},
+ provoc:{i:'⚑',n:'Provocation',d:'Le gardien te vise bien plus souvent et tu subis 20 % de dégâts en moins.'},
+ embus:{i:'➹',n:'Embuscade',d:'+30 % de dégâts quand le gardien vise ton allié.'},
+ vigueur:{i:'✚',n:'Aura de vigueur',d:'Ton allié récupère 1,5 % de ses PV par seconde près de toi.'},
+ souffle:{i:'☼',n:'Second souffle',d:'Tu relèves ton allié en 1,5 s, avec 50 % de ses PV.'}};
+const duoHas=k=>!!(run&&run.duo&&run.duo.includes(k));
+const allyHas=(f,k)=>!!(f&&f.ally&&f.ally.duo&&f.ally.duo.includes(k));
+function coHealAlly(n){if(!fight||!fight.co||!fight.ally||fight.ally.down||n<=0)return;const q=CO.acc||(CO.acc={d:0,po:0});q.hl=(q.hl||0)+n}
+function coDR(f,raw){if(!f.co||!f.ally)return raw;let k=1;if(duoHas('provoc'))k*=.8;if(allyHas(f,'egide')&&!f.ally.down&&dist(f.p,f.ally)<260)k*=.8;return raw*k}
+function coDmgMod(f,d){if(!f.co||!duoHas('embus'))return d;const tgtAlly=f.co.role==='A'?f.co.tgt==='ally':CO.bs&&CO.bs.tg==='A';return tgtAlly?Math.round(d*1.3):d}
 const RBON={
  stat:{i:'⚔',n:o=>`+${o.v} ${STATN[o.s]}`,mk:w=>{const s=mainStat();return {s,v:18+3*Math.floor(w/9)}},ap:o=>{run.stats[o.s]=(run.stats[o.s]||0)+o.v}},
  vit:{i:'❤',n:o=>`+${o.v*3} PV max`,mk:w=>({v:15+3*Math.floor(w/9)}),ap:o=>{run.stats.vit=(run.stats.vit||0)+o.v*3;run.hp+=o.v*3}},
@@ -4686,6 +4705,7 @@ const RBON={
  spell:{i:'✺',n:o=>`${o.sn} : niveau ${o.lv+1}`,ok:()=>spells().some(s=>unlocked(s)&&lvOf(s)<5),mk:()=>{const L=spells().filter(s=>unlocked(s)&&lvOf(s)<5),s=pick(L);return {id:s.id,sn:s.n,lv:lvOf(s)}},ap:o=>{run.spellLv[o.id]=Math.min(5,(run.spellLv[o.id]||1)+1)}},
  wpn:{i:'⚒',n:()=>`${WPN().n} : rang ${wRank()+1}`,ok:()=>wRank()<5,mk:()=>({}),ap:()=>{run.wpn=Math.min(5,wRank()+1)}},
  item:{i:'◈',n:o=>o.it.name||o.it.n||'Objet',d:o=>Object.entries(o.it.stats).slice(0,3).map(([k,v])=>`+${v} ${STATN[k]||k}`).join(' · '),mk:()=>({it:genItem([],[])}),ap:o=>{const k=slotKey(o.it);run.items[k]=o.it;checkSyn();run.hp=Math.min(maxHp(),run.hp)}},
+ duo:{i:'',n:o=>DUO[o.dk].n,d:o=>DUO[o.dk].d,mk:()=>({}),ap:o=>{(run.duo||(run.duo=[])).push(o.dk)}},
  heal:{i:'⚗',n:()=>'Soin complet et +1 fiole',mk:()=>({}),ap:()=>{run.fb=(run.fb||0)+1;run.flasks=flaskMax();run.hp=maxHp()}}};
 const rushLive=()=>!!(run&&run.rush);
 function rushStart(solo){if(run&&!run.rush&&!run.pvp&&!run.tut){CO.err='Termine ou abandonne ton ascension en cours d’abord (Nouvelle ascension → Abandonner).';render();return}
@@ -4703,7 +4723,8 @@ function rushAfter(f,won){if(!run||!run.rush)return;
   if(run.lvl<12)run.lvl++;{const ms=mainStat();run.stats[ms]=(run.stats[ms]||0)+8;run.stats.vit=(run.stats.vit||0)+9}
   {const L=spells().filter(s=>unlocked(s)&&lvOf(s)<5);if(L.length){L.sort((a,b)=>lvOf(a)-lvOf(b));run.spellLv[L[0].id]=lvOf(L[0])+1}}
   run.hp=Math.min(maxHp(),Math.max(run.hp,1)+Math.round(maxHp()*.4));run.flasks=Math.max(run.flasks,Math.min(flaskMax(),run.flasks+1));
-  const keys=Object.keys(RBON).filter(k=>!RBON[k].ok||RBON[k].ok());const opts=shuffle(keys).slice(0,3).map(k=>Object.assign({k},RBON[k].mk(R.w)));
+  const keys=Object.keys(RBON).filter(k=>k!=='duo'&&(!RBON[k].ok||RBON[k].ok()));let opts=shuffle(keys).slice(0,3).map(k=>Object.assign({k},RBON[k].mk(R.w)));
+  if(coRun()){const dk=shuffle(Object.keys(DUO).filter(k=>!duoHas(k)));const nd=Math.min(dk.length,R.w%2===0?2:1);for(let i=0;i<nd;i++)opts[2-i]={k:'duo',dk:dk[i]}}
   ui.rpick={opts,t:25,chosen:-1};try{document.exitPointerLock&&document.exitPointerLock()}catch(e){}rushPaint();
   clearInterval(CO.rpT);CO.rpT=setInterval(()=>{const P=ui.rpick;if(!P){clearInterval(CO.rpT);return}P.t--;if(P.t<=0&&P.chosen<0)rushPick(Math.floor(Math.random()*P.opts.length));else rushPaint()},1000)}
 function rushPick(i){const P=ui.rpick;if(!P||P.chosen>=0||!P.opts[i])return;const o=P.opts[i];RBON[o.k].ap(o);P.chosen=i;save();
@@ -4716,7 +4737,7 @@ function rushPaint(){const st=id('stage');if(!st)return;let el=id('rushp');const
   if(!el){el=document.createElement('div');el.id='rushp';el.className='rushp';st.appendChild(el)}
   const waitMate=P.chosen>=0&&coRun()&&!(CO.role==='A'?CO.matePick:0);
   el.innerHTML=`<div class="rpin"><span class="label">Gardien vaincu · vague ${run.rush.w+1}</span><h2>Choisis un bonus</h2>
-    <div class="rpc">${P.opts.map((o,i)=>{const B=RBON[o.k];return `<button class="rpcard ${P.chosen===i?'on':''} ${P.chosen>=0&&P.chosen!==i?'off':''}" data-a="rpick" data-v="${i}" ${P.chosen>=0?'disabled':''}><span class="rpi">${B.i}</span><b>${esc(B.n(o))}</b>${B.d?`<small>${esc(B.d(o))}</small>`:''}</button>`}).join('')}</div>
+    <div class="rpc">${P.opts.map((o,i)=>{const B=RBON[o.k];return `<button class="rpcard ${o.k==='duo'?'duo':''} ${P.chosen===i?'on':''} ${P.chosen>=0&&P.chosen!==i?'off':''}" data-a="rpick" data-v="${i}" ${P.chosen>=0?'disabled':''}>${o.k==='duo'?'<span class="rptag">Duo</span>':''}<span class="rpi">${o.k==='duo'?DUO[o.dk].i:B.i}</span><b>${esc(B.n(o))}</b>${B.d?`<small>${esc(B.d(o))}</small>`:''}</button>`}).join('')}</div>
     <p class="dim">${P.chosen>=0?(coRun()?(CO.role==='A'?(waitMate?`En attente de ${esc(CO.mate.pseudo)}…`:'Gardien suivant…'):`En attente de ${esc(CO.mate?CO.mate.pseudo:'ton partenaire')}…`):'Gardien suivant…'):`Choix automatique dans ${P.t} s`}</p></div>`}
 
 function rArena(){

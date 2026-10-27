@@ -94,6 +94,9 @@ button:focus-visible{outline:2px solid var(--ember);outline-offset:2px}
 .rpcard .rpi{font-size:28px;color:var(--ember)}.rpcard b{font-size:15px;color:var(--bone)}.rpcard small{font-size:12.5px;color:var(--dim)}.rpin .dim{margin-top:12px;font-size:13.5px}
 @media (max-width:600px){.rpc{grid-template-columns:1fr}.rpcard{flex-direction:row;padding:10px 12px;text-align:left}.rpcard .rpi{font-size:22px}}
 .rushres{text-align:center;padding:10px;margin-bottom:10px;border:1px solid var(--ember);border-radius:10px}.rushres h2{font-family:var(--f-disp);font-weight:400;margin:4px 0}
+.amodes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}.amode{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 12px 16px;border:1px solid var(--line);border-radius:14px;background:var(--panel);text-align:center;transition:border-color .15s,transform .15s}.amode:hover{border-color:var(--dim);transform:translateY(-2px)}.amode.on{border-color:var(--ember);background:color-mix(in srgb,var(--ember) 9%,var(--panel))}.amode:focus-visible{outline:2px solid var(--ember)}
+.amart{display:flex;justify-content:center;width:100%}.amart svg{width:min(170px,100%);height:auto;display:block}.amode b{font-family:var(--f-disp);font-weight:400;font-size:22px;color:var(--bone)}.amode.on b{color:var(--ember)}.amode small{font-size:13px;color:var(--dim)}
+@media (max-width:520px){.amart svg{width:110px}.amode b{font-size:18px}.amode{padding:10px 8px 12px}}
 .coban{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin:0 0 12px;padding:9px 14px;border:1px solid #7fd3ff66;border-radius:10px;background:color-mix(in srgb,#7fd3ff 8%,transparent)}.coban b{color:#9fdcff}.coban span{font-size:13.5px;color:var(--dim)}.coban .cost{color:var(--bone);margin-left:auto}.coban.warn{border-color:var(--line)}
 .coopb{position:absolute;left:max(22px,env(safe-area-inset-left,0px));top:calc(124px + env(safe-area-inset-top,0px));width:min(230px,30vw);background:rgba(10,12,16,.8);border:1px solid #7fd3ff55;border-radius:10px;padding:7px 10px;font-size:13px;pointer-events:none}.coopb b{color:#9fdcff;font-weight:600}.coopb .bar{margin-top:4px;height:6px}.coopb small{display:block;margin-top:3px;color:var(--ember);font-size:11.5px}.touch .coopb{top:calc(70px + env(safe-area-inset-top,0px));width:min(180px,28vw);padding:5px 8px;font-size:12px}
 .lookrow{display:flex;gap:10px;align-items:flex-start;margin:6px 0}.lookrow .lk{min-width:46px;color:var(--dim);font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;padding-top:7px}.chips{display:flex;flex-wrap:wrap;gap:6px}
@@ -189,7 +192,7 @@ kbd{display:inline-block;min-width:24px;text-align:center;font:600 12.5px var(--
 .tutcta{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-color:var(--ok)}.tutcta div{display:flex;flex-direction:column}.tutcta b{font-family:var(--f-disp);font-weight:400;font-size:22px}
 .prog{padding-top:6px}
 .ptabs{display:flex;border-bottom:1px solid var(--line);margin:0 -2px 12px}.ptabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;padding:10px 6px;color:var(--dim);font-size:15px;display:flex;gap:8px;align-items:center;justify-content:center}.ptabs button.on{color:var(--bone);border-bottom-color:var(--ember)}.ptabs button:hover{color:var(--bone)}
-.pbadge{background:var(--ember);color:#1a1208;font-size:12px;font-weight:700;border-radius:10px;padding:0 7px;line-height:18px;font-variant-numeric:tabular-nums}
+.pbadge{display:inline-block;white-space:nowrap;vertical-align:middle;font-family:var(--f-body);font-variant:normal;text-transform:none;letter-spacing:0;background:var(--ember);color:#1a1208;font-size:12px;font-weight:700;border-radius:10px;padding:0 7px;line-height:18px;font-variant-numeric:tabular-nums}
 .ptop{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}.ptop>div:first-child{display:flex;align-items:baseline;gap:8px}.pbig{font-family:var(--f-disp);font-size:34px;line-height:1;color:var(--dim)}.pbig.on{color:var(--ember)}
 .stc{display:flex;flex-direction:column;gap:8px}
 .stcard{border:1px solid var(--line);border-left:3px solid var(--c);border-radius:6px;padding:10px 12px;background:color-mix(in srgb,var(--c) 5%,var(--panel));display:flex;flex-direction:column;gap:6px}
@@ -4273,7 +4276,7 @@ function makeSheet(won){
   {const R=meta.rec||(meta.rec={});if(S.maxHit>(R.maxHit||0)){S.recHit=!!R.maxHit;R.maxHit=S.maxHit}if(S.parries>(R.parries||0)){S.recPar=!!R.parries;R.parries=S.parries}Object.entries(S.bossT).forEach(([k,t])=>{const bt=R.bossT||(R.bossT={});if(!bt[k]||t<bt[k]){if(bt[k])(S.recBoss||(S.recBoss=[])).push(k);bt[k]=t}})}
   return S;
 }
-function sheetText(S){return `Le Sablier Brisé · ${S.cls} niveau ${S.lvl} · ⏱ ${fmtT(S.time)}\n${S.won?'Victoire contre le Régent des Heures':'Tombé à l\u2019étage '+ROMAN[S.floor]+' face à '+S.boss} (cycle ${ROMAN[S.cycle]||S.cycle})\nArme : ${S.wpn} rang ${ROMAN[S.wr]}\nSorts : ${S.sp.map(x=>x.n+' '+x.lv).join(', ')}\nÉquipement : ${S.items.map(x=>x.n).join(', ')||'aucun'}${S.sets.length?'\nPanoplies : '+S.sets.join(', '):''}${S.alts&&S.alts.length?'\nAltérations : '+S.alts.join(', '):''}${S.dmg&&S.dmg.length?'\nDégâts : '+S.dmg.map(([k,v])=>k+' '+v).join(' · '):''}\n${Object.entries(S.st).map(([k,v])=>k+' '+v).join(' · ')}`}
+function sheetText(S){return `Le Sablier Brisé · ${S.cls} niveau ${S.lvl} · ⏱ ${fmtT(S.time)}\n${S.won?'Victoire contre le Régent des Heures':(S.boss==='l’abandon'?'Abandon à l\u2019étage '+ROMAN[S.floor]:'Tombé à l\u2019étage '+ROMAN[S.floor]+' face à '+S.boss)} (cycle ${ROMAN[S.cycle]||S.cycle})\nArme : ${S.wpn} rang ${ROMAN[S.wr]}\nSorts : ${S.sp.map(x=>x.n+' '+x.lv).join(', ')}\nÉquipement : ${S.items.map(x=>x.n).join(', ')||'aucun'}${S.sets.length?'\nPanoplies : '+S.sets.join(', '):''}${S.alts&&S.alts.length?'\nAltérations : '+S.alts.join(', '):''}${S.dmg&&S.dmg.length?'\nDégâts : '+S.dmg.map(([k,v])=>k+' '+v).join(' · '):''}\n${Object.entries(S.st).map(([k,v])=>k+' '+v).join(' · ')}`}
 function rSheet(S){if(!S)return '';return `<div class="sheet">
   <div>${S.img?`<img src="${S.img}" alt="Portrait du ${S.cls}">`:''}</div>
   <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
@@ -4789,6 +4792,7 @@ function act(a,v){
     case 'coopnew': {const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<4;i++)c+=A[Math.floor(Math.random()*A.length)];coConnect(c,'A')} break;
     case 'coopjoin': {const el=id('coopcode'),c=((el&&el.value)||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);if(c.length===4)coConnect(c,'B');else{ui.toast='Le code fait 4 caractères.';render()}} break;
     case 'coopquit': coQuit(); break;
+    case 'amode': ui.amode=v;render(); break;
     case 'coopgo': rushStart(false); break;
     case 'rushsolo': rushStart(true); break;
     case 'rpick': rushPick(+v); break;
@@ -4799,7 +4803,7 @@ function act(a,v){
     case 'pact':{const L=meta.pacts||(meta.pacts=[]);const i=L.indexOf(v);if(i>=0)L.splice(i,1);else L.push(v);save();render()} break;
     case 'again': ui.screen='home';ui.hub='play';ui.pstep=meta.sel&&meta.unlocked[meta.sel]?(talFree()>0?2:3):0;ui.confirm=null;render();window.scrollTo(0,0); break;
     case 'home': ui.screen='home';ui.hub='menu';ui.confirm=null;render(); break;
-    case 'hub': ui.hub=v;ui.confirm=null;if(v==='play')ui.pstep=meta.sel&&meta.unlocked[meta.sel]?(talFree()>0?2:(ui.pstep??0)):0;render();window.scrollTo(0,0); break;
+    case 'hub': if(v==='defis'){meta.dSeen=todaySeed();meta.wSeen=weekSeed();save()}ui.hub=v;ui.confirm=null;if(v==='play')ui.pstep=meta.sel&&meta.unlocked[meta.sel]?(talFree()>0?2:(ui.pstep??0)):0;render();window.scrollTo(0,0); break;
     case 'pstep': ui.pstep=+v;render();window.scrollTo(0,0); break;
     case 'path':{const O=run.pathOff;if(!O||!needPath())break;const o=O.opts[+v],q=O.opts[1-v],fl=run.floor;run.order[fl-1]=o.i;run.order[fl]=q.i;run.paths[fl]=o.perk;run.pathOff=null;if(run.coop&&CO.role==='A')coSend('cpa',{order:run.order,paths:run.paths});
       let m=`${PERKS[o.perk].n} : tu affrontes ${BOSSES[o.i].name}.`;if(o.perk==='soin'){run.hp=maxHp();run.flasks=Math.max(run.flasks,flaskMax())}if(o.perk==='savoir')run.spPts=(run.spPts??1)+2;if(o.perk==='mut')run.mut=fl;ui.toast=m;save();render()} break;
@@ -4859,7 +4863,7 @@ function codexHtml(){const C=cx(),bs=BOSSES,nB=bs.length*2+bs.length-1,gB=bs.red
 const HUBS={
  play:{t:'Nouvelle ascension',k:'Prépare ton héros'},
  defis:{t:'Défis',k:'Du jour et de la semaine'},
- arena:{t:'En ligne',k:'Tour à deux · duel 1 contre 1'},
+ arena:{t:'À deux',k:'Tour en coop · duel 1 contre 1'},
  ladder:{t:'Classement',k:'Les Veilleurs'},
  temple:{t:'Temple',k:'Améliorations permanentes'},
  codex:{t:'Codex',k:'Gardiens, objets, secrets'},
@@ -4870,7 +4874,7 @@ const talFree=()=>{const k=meta.sel;return k&&meta.unlocked[k]&&TAL[k]?Math.max(
 function rHome(){const h=ui.hub||'menu';if(h==='menu'||!HUBS[h])return rMenu();const P=HUBS[h];
   return `<header class="hubh"><button class="hback" data-a="hub" data-v="menu" aria-label="Retour au menu">←<span>Menu</span></button><div><span class="kicker">${P.k}</span><h1>${P.t}</h1></div><span class="hwal num" title="Grains au temple">⏳ ${meta.souls}</span></header>
   ${({play:rPlay,defis:rDefis,arena:rArenaHub,ladder:rLadder,temple:rTemple,guide:rGuide,codex:()=>`<section class="panel">${codexHtml()}</section>`,options:rOptions})[h]()}`}
-function rMenu(){const st=meta.stain,tp=meta.sel&&meta.unlocked[meta.sel]&&TAL[meta.sel]?talPts(meta.sel)-talSel(meta.sel).length:0,dOk=!(meta.daily||{})[todaySeed()],wOk=!(meta.weekly||{})[weekSeed()];
+function rMenu(){const st=meta.stain,tp=meta.sel&&meta.unlocked[meta.sel]&&TAL[meta.sel]?talPts(meta.sel)-talSel(meta.sel).length:0,dOk=!(meta.daily||{})[todaySeed()]&&meta.dSeen!==todaySeed(),wOk=!(meta.weekly||{})[weekSeed()]&&meta.wSeen!==weekSeed();
   const B=(a,v,t,d,cls,badge)=>`<button class="mbtn ${cls||''}" data-a="${a}" data-v="${v}"><span><b>${t}</b><small>${d}</small></span>${badge?`<i class="mdot">${badge}</i>`:'<i class="marr">›</i>'}</button>`;
   return `<header class="title mtitle"><div class="kicker">Horlunde · La Tour des Neuf Heures</div><h1>Le Sablier Brisé</h1><span class="pcnote">${TOUCH?'Commandes tactiles · à jouer à l’horizontale':'Roguelite en 3D · clavier et souris'}</span></header>
   <div class="mgrid">
@@ -4959,7 +4963,22 @@ function rOptions(){return `<section class="panel"><span class="label">Son et to
   <p class="dim" style="font-size:11.5px;text-align:center;margin:4px 0">Bruitages d’impact : Kenney (kenney.nl, CC0) · Modèles 3D : héros KayKit Adventurers (Kay Lousberg, CC0) · Grondecorne : Mixamo (Adobe) · Basalte : Armored Stone Golem (Alexander Lenski, Fab) · Hiverne : « Wyvern animated » par Charlie catling (Fab, CC-BY) · Vifplume « Animated Cockatrice » par Marko J (Fab) · Orbelithe « Spiders » par Mixall (Fab, CC-BY) · Régent « Vampire » par Khornes (Fab) · sbires « Stylized Low Poly Skeleton » par SazenGames (Fab)</p>
 <footer><span>${meta.runs} ascension${meta.runs>1?'s':''} · ${meta.wins} victoire${meta.wins>1?'s':''}</span>
   ${ui.confirm==='reset'?`<span class="row"><span>Tout effacer ?</span><button data-a="reset">Oui, effacer</button><button data-a="cancel">Annuler</button></span>`:`<button data-a="confirm" data-v="reset">Effacer la sauvegarde</button>`}</footer>`}
-function rArenaHub(){return typeof rArena==='function'?rCoop()+rArena():'<section class="panel"><p>L’arène de chaos arrive bientôt : des duels 1 contre 1 en ligne avec des héros tirés au sort.</p></section>'}
+const SVG_TOUR=`<svg viewBox="0 0 160 120" aria-hidden="true"><defs><linearGradient id="tg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd27a" stop-opacity=".55"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></linearGradient></defs>
+ <ellipse cx="80" cy="16" rx="34" ry="14" fill="url(#tg1)"/><path d="M52 112 L58 34 L102 34 L108 112 Z" fill="#2a2f39" stroke="#5b6372" stroke-width="2"/>
+ <path d="M54 34 h52 v-9 h-7 v5 h-7 v-5 h-7 v5 h-8 v-5 h-7 v5 h-7 v-5 h-9 Z" fill="#343a46" stroke="#5b6372" stroke-width="2"/>
+ <path d="M58 98 Q80 92 104 86 M57 80 Q80 74 103 68 M56 62 Q80 56 102 50" stroke="#d89b47" stroke-width="2.5" fill="none" stroke-dasharray="5 4" opacity=".75"/>
+ <rect x="76" y="40" width="8" height="12" rx="4" fill="#ffd27a" opacity=".85"/>
+ <g fill="#9fdcff"><circle cx="67" cy="82" r="3.3"/><path d="M64 86 h6 l1 8 h-8 Z"/></g><g fill="#ffb86b"><circle cx="90" cy="62" r="3.3"/><path d="M87 66 h6 l1 8 h-8 Z"/></g>
+ <path d="M36 112 h88" stroke="#5b6372" stroke-width="2"/></svg>`;
+const SVG_DUEL=`<svg viewBox="0 0 160 120" aria-hidden="true"><defs><radialGradient id="dg1"><stop offset="0" stop-color="#ff8a5a" stop-opacity=".6"/><stop offset="1" stop-color="#ff8a5a" stop-opacity="0"/></radialGradient></defs>
+ <circle cx="80" cy="60" r="34" fill="url(#dg1)"/>
+ <g stroke-linecap="round"><path d="M44 22 L104 86" stroke="#d8dee8" stroke-width="6"/><path d="M44 22 L104 86" stroke="#ffffff" stroke-width="2" opacity=".7"/><path d="M96 92 L112 76" stroke="#d89b47" stroke-width="7"/><path d="M104 86 L118 100" stroke="#6b4a2a" stroke-width="6"/><circle cx="120" cy="102" r="4.5" fill="#d89b47"/>
+ <path d="M116 22 L56 86" stroke="#d8dee8" stroke-width="6"/><path d="M116 22 L56 86" stroke="#ffffff" stroke-width="2" opacity=".7"/><path d="M64 92 L48 76" stroke="#d89b47" stroke-width="7"/><path d="M56 86 L42 100" stroke="#6b4a2a" stroke-width="6"/><circle cx="40" cy="102" r="4.5" fill="#d89b47"/></g>
+ <g fill="#fff1a8"><path d="M80 44 l3 9 l9 3 l-9 3 l-3 9 l-3 -9 l-9 -3 l9 -3 Z"/></g></svg>`;
+function rArenaHub(){if(typeof rArena!=='function')return '';const m=ui.amode||(PV.st!=='idle'&&PV.st!=='err'?'duel':'tour');
+  const card=(k,svg,t,d)=>`<button class="amode ${m===k?'on':''}" data-a="amode" data-v="${k}" aria-pressed="${m===k}"><span class="amart">${svg}</span><b>${t}</b><small>${d}</small></button>`;
+  return `<div class="amodes">${card('tour',SVG_TOUR,'Tour à deux','Gardiens à l’infini, en coop')}${card('duel',SVG_DUEL,'Duel','1 contre 1, héros tirés au sort')}</div>${m==='tour'?rCoop():rArena()}`}
+function rArenaHub_old(){return typeof rArena==='function'?rCoop()+rArena():'<section class="panel"><p>L’arène de chaos arrive bientôt : des duels 1 contre 1 en ligne avec des héros tirés au sort.</p></section>'}
 function rTalents(){const k=meta.sel;if(!k||!meta.unlocked[k]||!TAL[k])return '';const C=CLASSES[k],sel=talSel(k),pts=talPts(k),lv=mastLv(k),nx=MAST[lv];
   return `<section class="panel tal" id="sec-tal"><div class="between"><span class="label">Talents · ${C.name}</span><span class="num ${pts-sel.length>0?'tpl':'dim'}">${sel.length} / ${pts} point${pts>1?'s':''}</span></div>
   <p class="dim tali">Un point par niveau de maîtrise de la classe (${TALMAX} au plus). Un seul talent ultime (rang III) à la fois. Change-les librement avant chaque ascension ; ils ne s’appliquent pas aux ascensions du jour et de la semaine.${pts<TALMAX&&nx?` <span style="color:var(--bone)">Prochain point : ${mastXp(k)} / ${nx.xp} XP de maîtrise.</span>`:''}</p>
@@ -5216,8 +5235,8 @@ function rDead(){const e=ui.end;if(e.endless)return `<section class="end dead"><
   <p style="color:var(--ok)">Tes ${e.kept} grains gagnés dans la tour rejoignent le temple.</p>
   ${e.lad!=null?`<p class="ladres">Score : <b class="num">${Number(e.lad).toLocaleString('fr-FR')}</b> · <span id="ladst" class="dim">${esc(e.ladSt||'')}</span></p>`:''}${rMast(e.mast)}
   <div class="endbtns"><button class="btn primary big" data-a="again">Nouvelle ascension${talFree()?` <span class="pbadge">${talFree()} talent${talFree()>1?"s":""}</span>`:""}</button><button class="btn big" data-a="home">Menu principal</button></div>${ui.screen==='dead'&&!e.endless?`<p class="etip">💡 ${TIPS[(meta.runs||0)%TIPS.length]}</p>`:''}
-  <details class="esheet"><summary>Fiche de l’ascension</summary>${rSheet(e.sheet)}</details></section>`;return `<section class="end dead"><h1>TU ES MORT</h1>
-  <p>Tombé à l’étage ${ROMAN[e.floor]} face à ${esc(e.boss)}.</p>
+  <details class="esheet"><summary>Fiche de l’ascension</summary>${rSheet(e.sheet)}</details></section>`;return `<section class="end dead"><h1>${e.boss==='l’abandon'?'ABANDON':'TU ES MORT'}</h1>
+  <p>${e.boss==='l’abandon'?`Ascension abandonnée à l’étage ${ROMAN[e.floor]}.`:`Tombé à l’étage ${ROMAN[e.floor]} face à ${esc(e.boss)}.`}</p>
   ${e.kept?`<p style="color:var(--ok)">La moitié de tes grains (${e.kept}) rejoint le temple : tu peux les dépenser dès maintenant.</p>`:''}
   ${e.souls?`<p>${e.souls} grains sont restés à l’étage ${ROMAN[e.floor]}. Atteins-le à nouveau pour les récupérer.</p>`:'<p>Tu n’avais aucun grain sur toi.</p>'}
   ${e.lost?`<p class="down">L’ancienne tache de grains (${e.lost}) est perdue.</p>`:''}${ui.dailyLast?`<p style="color:var(--ember)">Score ${ui.dailyLbl||'de l’ascension du jour'} : ${ui.dailyLast}</p>`:''}

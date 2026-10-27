@@ -490,6 +490,7 @@ footer button{background:none;border:0;color:var(--dim);text-decoration:underlin
  .mapl .bcta{position:static!important;background:none!important;padding:0!important;margin:0!important;flex-direction:row}.mapl .bcta .big{flex:1}#app.wide:has(.bcta){padding-bottom:16px!important}
  .pbar{position:static}.mhero{position:static!important;min-height:0!important}.mhero img{max-height:200px!important}.pside{position:static!important}}
 .pso{position:fixed;inset:0;z-index:60;background:rgba(6,8,12,.72);display:flex;align-items:center;justify-content:center;padding:16px}.psin{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 22px 16px;max-width:380px;width:100%;text-align:center;display:flex;flex-direction:column;gap:6px}.psin h2{margin:2px 0}.psin input{font-size:17px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:inherit;text-align:center;margin-top:6px}
+.pvpk{position:fixed;z-index:55;background:rgba(8,10,14,.92)}
 </style>
 
 <div id="app"></div>
@@ -827,9 +828,9 @@ const PHASES={
      {at:.3,n:'Sève affolée',evo:{wak:{n:'Trois rayons de sève',multi:[-.6,0,.6],w:80,wind:1.2},bond:{n:'Envols en série',repeat:3,gap:.35},tourb:{n:'Tempête de feuilles',count:16,repeat:3,gap:.4}},d:'+20% de dégâts, +30% de vitesse, bulbes et feuilles plus fréquents.',dmg:1.2,spd:1.3,seq:['cawotte','bond','tourb','coup','wak','ronces']}],
  craq:[{at:.5,evo:{seisme:{n:'Séisme double',r1:40,r2:150,grow:110,repeat:2,gap:.5},poing:{n:'Poings de roche',r:170,half:.65,repeat:2,gap:.4},ebou:{n:'Grand éboulement',count:7,onP:3}},n:'Éveil des rochers',d:'Invoque 2 Golems éveillés, des Basalte en miniature. Basalte frappe plus fort et plus vite.',adds:[['roc',2]],wind:.9,dmg:1.15}],
  krala:[{at:.5,evo:{encre:{n:'Déluge de vase',count:5,spread:.9,repeat:2,gap:.35},tent:{n:'Marée de geysers',count:5,onP:2},leurre:{n:'Double rayon',multi:[-.35,.35]}},n:'Les leurres s\u2019allument',d:'4 Leurres flottants crachent de la vase. Mâchevase est invulnérable tant qu\u2019ils brillent.',adds:[['tentacule',4]],link:1}],
- kimbo:[{at:.6,evo:{double:{n:'Rafale tournoyante',radial:1,count:14,speed:260,repeat:3,gap:.45,spin:.2},glyphe:{n:'Triple marque',count:3,onP:1,spread:90},lame:{n:'Double lame',repeat:2,gap:.35}},n:'Doubles d’ombre',d:'Invoque 2 Doubles d’ombre (boss −50% tant qu\u2019ils vivent).',adds:[['glyphe',2]],link:.5},
+ kimbo:[{at:.6,evo:{dague:{n:'Éventail de dagues',count:7,spread:.9},ombre:{n:'Pas de l’ombre redoublé',repeat:2,gap:.45},lame:{n:'Double entaille',repeat:2,gap:.35}},n:'Doubles d’ombre',d:'Invoque 2 Doubles d’ombre (boss −50% tant qu\u2019ils vivent).',adds:[['glyphe',2]],link:.5},
         {at:.42,n:'Jugement',d:'Intouchable 8 s : des anneaux de glyphes partent de l’Arbitre. Glisse-toi dans les brèches.',storm:{dur:8,pat:'rings'}},
-        {at:.25,n:'Glyphes affolés',evo:{fatal:{n:'Double sentence',safe:72,wind:1.6,repeat:2,gap:.7}},d:'La parité change toutes les 3 s. Attaques plus rapides.',wind:.85,fx:f=>{f.ms.parFast=1}}],
+        {at:.25,n:'Glyphes affolés',evo:{fatal:{n:'Double exécution',repeat:2,gap:.7},ruee:{n:'Ruées en chaîne',repeat:3}},d:'La parité change toutes les 3 s. Attaques plus rapides.',wind:.85,fx:f=>{f.ms.parFast=1}}],
  obsi:[{at:.6,evo:{pic:{n:'Éventail d’obsidienne',multi:[-.45,0,.45],repeat:2,gap:.45}},n:'Hiver éternel',d:'+20% de dégâts, attaques plus rapides.',dmg:1.2,wind:.9},
        {at:.45,n:'Tempête blanche',d:'Intouchable 8 s : la glace pleut sur toi et laisse des plaques glissantes. Reste près des braises.',storm:{dur:7,pat:'rain',pool:'ice'}},
        {at:.3,n:'Éclats de givre',evo:{souffle:{n:'Souffle polaire',r:260,half:.6,repeat:2,gap:.4}},d:'Invoque 4 Éclats qui foncent sur toi et explosent.',adds:[['givre',4]]}],
@@ -863,11 +864,11 @@ const BOSSES=[
   bond:{n:'Bond chasseur',k:'leap',r:115,wind:1.2,dmg:40,heavy:1}}},
 {id:'wa',name:'Sylvaine, mère des Mandragores',de:'de Sylvaine',zone:'Îles Vertes',hp:330,r:36,spd:115,keep:110,res:{terre:0,feu:15,air:-15,eau:0},loot:['cha','soin'],
  lore:'Une druidesse qui flotte au-dessus des Îles Vertes. Elle plante des bulbes de mandragore : tu as 6 secondes pour lui infliger assez de dégâts, sinon elle absorbe le bulbe et se soigne. Ses feuilles volent en spirale et ses ronces jaillissent sous tes pieds.',
- tick:(f,dt)=>{const c=f.ms.caw;if(!c)return;c.t-=dt;if(c.t<=0){if(c.dealt<c.need){const h=healBoss(f,Math.round(f.bmax*.06));say(f,`Elle mange le bulbe : +${h} PV`)}else say(f,'Bulbe écrasé');f.ms.caw=null}},
- onDealt:(f,d)=>{if(f.ms.caw)f.ms.caw.dealt+=d},
- chips:f=>f.ms.caw?[{t:`Bulbe ${Math.min(f.ms.caw.dealt,f.ms.caw.need)}/${f.ms.caw.need} · ${Math.ceil(f.ms.caw.t)} s`,w:f.ms.caw.dealt<f.ms.caw.need}]:[],
+ tick:(f,dt)=>{const c=f.ms.caw;if(!c)return;c.t-=dt;if(c.t<=0){const h=healBoss(f,Math.round(f.bmax*.06));f.msg={txt:`Elle absorbe le bulbe : +${h} PV`,t:2.2,big:1};f.ms.caw=null}},
+ onDealt:(f,d)=>{const c=f.ms.caw;if(!c)return;c.dealt+=d;if(c.dealt>=c.need){f.ms.caw=null;f.b.rec=Math.max(f.b.rec,.9);f.b.vuln=Math.max(f.b.vuln,1.2);f.msg={txt:'Bulbe brisé : Sylvaine vacille',t:2,big:1};ev(f,'stagger')}},
+ chips:f=>f.ms.caw?[{t:`Bulbe : ${Math.max(0,f.ms.caw.need-f.ms.caw.dealt)} PV · ${Math.ceil(f.ms.caw.t)} s pour le briser`,w:1}]:[],
  seq:['cawotte','coup','tourb','bond','ronces','coup','wak','bond'],
- atks:{cawotte:{n:'Plante un bulbe',k:'special',fx:f=>{f.ms.caw={t:6,need:Math.round(f.bmax*.045),dealt:0}}},
+ atks:{cawotte:{n:'Plante un bulbe',k:'special',fx:f=>{f.ms.caw={t:7,need:Math.round(f.bmax*.03),dealt:0};f.msg={txt:'Un bulbe pousse : frappe Sylvaine pour le briser !',t:2.2,big:1}}},
   coup:{n:'Lame de feuilles',k:'line',len:260,w:60,wind:.6,dmg:22},bond:{n:'Envol',k:'leap',r:95,wind:.85,dmg:24,pool:'thorn'},
   tourb:{n:'Tourbillon de feuilles',k:'proj',radial:1,count:12,speed:230,dmg:14,wind:.8,spin:.25,repeat:2,gap:.5},
   ronces:{n:'Ronces',k:'drops',count:3,onP:1,r:60,wind:.9,dmg:16,pool:'thorn'},
@@ -889,16 +890,18 @@ const BOSSES=[
   leurre:{n:'Rayon du leurre',k:'line',len:560,w:70,wind:1.1,dmg:30},
   etreinte:{n:'Mâchoires abyssales',k:'cone',r:190,half:.7,wind:1.4,dmg:62,heavy:1}}},
 {id:'kimbo',name:'L’Arbitre aux deux visages',de:'de l’Arbitre',zone:'Canopée des Glyphes',hp:470,r:46,spd:95,keep:170,big:1.2,res:{terre:0,feu:20,air:0,eau:-15},loot:['int','pct'],
- lore:'Un duelliste masqué, une lame dans une main, un pistolet dans l’autre. Chacune de tes attaques a un poids : coup léger 1, coup lourd 2, chaque sort son coût en points (2 à 5). Le glyphe de l’Arbitre alterne Pair et Impair toutes les 5 s : seules les attaques dont le poids est de la même parité le blessent. Un indicateur au centre de l’écran te dit lesquelles.',
- tick:(f,dt)=>{if(!f.ms.par){f.ms.par='impair';f.ms.parT=5}f.ms.parT-=dt;if(f.ms.parT<=0){f.ms.parT=f.ms.parFast?3:5;f.ms.par=f.ms.par==='pair'?'impair':'pair';say(f,f.ms.par==='pair'?'Glyphe Pair':'Glyphe Impair')}},
+ lore:'Un assassin masqué, dague dans une main, lame courbe dans l’autre. Il disparaît dans l’ombre, réapparaît dans ton dos et lance ses dagues en éventail. Chacune de tes attaques a un poids : coup léger 1, coup lourd 2, chaque sort son coût en points (2 à 5). Le glyphe de l’Arbitre alterne Pair et Impair toutes les 5 s : seules les attaques dont le poids est de la même parité le blessent. Un indicateur te dit lesquelles.',
+ tick:(f,dt)=>{if(!f.ms.par){f.ms.par='impair';f.ms.parT=5}f.ms.parT-=dt;if(f.ms.parT<=0){f.ms.parT=f.ms.parFast?3:5;f.ms.par=f.ms.par==='pair'?'impair':'pair';say(f,f.ms.par==='pair'?'Glyphe Pair':'Glyphe Impair')}if(f.ms.hide>0)f.ms.hide-=dt},
  dmgMod:(f,sp)=>(sp.pa%2===0)===(f.ms.par==='pair'),
- chips:f=>[],
- seq:['lame','glyphe','double','salto','lame','fatal'],
- atks:{glyphe:{n:'Marque de l’ombre',k:'drops',count:1,onP:1,r:95,wind:.8,dmg:34},
-  double:{n:'Rafale du pistolet',k:'proj',count:5,spread:.6,speed:420,dmg:18,wind:.7,repeat:2,gap:.4},
-  lame:{n:'Lame d’ombre',k:'cone',r:150,half:.55,wind:.55,dmg:24},
-  salto:{n:'Salto de l’ombre',k:'leap',r:95,wind:.9,dmg:30},
-  fatal:{n:'Sentence',k:'safe',safe:85,wind:1.9,dmg:75,heavy:1}}},
+ chips:f=>f.ms.hide>0?[{t:'Dans l’ombre : intouchable',w:1}]:[],
+ seq:['lame','dague','ombre','fumee','lame','ruee','dague','fatal'],
+ atks:{lame:{n:'Entaille',k:'cone',r:150,half:.55,wind:.5,dmg:24},
+  dague:{n:'Dagues de jet',k:'proj',count:3,spread:.28,speed:520,dmg:15,wind:.6,repeat:3,gap:.28},
+  ombre:{n:'Pas de l’ombre',k:'cone',blink:80,r:140,half:.75,wind:.6,dmg:30},
+  fumee:{n:'Bombe de fumée',k:'drops',count:3,onP:1,spread:90,r:80,wind:.8,dmg:20,pool:'ink'},
+  ruee:{n:'Ruée de l’ombre',k:'charge',len:420,w:60,wind:.6,dmg:26,repeat:2,gap:.3},
+  glyphe:{n:'Marque de l’ombre',k:'drops',count:1,onP:1,r:95,wind:.8,dmg:34},
+  fatal:{n:'Exécution',k:'cone',vanish:1.1,blink:70,r:130,half:.95,wind:1.5,dmg:70,heavy:1}}},
 {id:'obsi',name:'Hiverne',de:'d’Hiverne',zone:'Le Glacis',hp:520,r:56,spd:75,keep:130,big:1.25,res:{terre:0,feu:-20,air:0,eau:30},loot:['res','int'],
  lore:'Chaque coup de glace ajoute du Gel. À 3 Gel, tu es figé 1,4 s. Une fiole, une parade parfaite ou une esquive en roulade font fondre la glace ; sinon elle fond seule, un Gel toutes les 2,5 s.',
  seq:['souffle','pic','souffle','blizzard'],
@@ -921,12 +924,12 @@ const BOSSES=[
   cadran:{n:'Cadran',k:'ring',r1:120,r2:285,wind:1.2,dmg:40},
   minuit:{n:'Minuit',k:'safe',safe:80,wind:2,dmg:95,heavy:1}}},
 {id:'secret',name:'Le Sablier Vivant',de:'du Sablier Vivant',zone:'Le Hors-Temps',hp:1050,r:52,spd:115,keep:150,big:1.4,res:{terre:20,feu:20,air:20,eau:20},loot:['pct','crit'],secret:1,
- lore:'Le sablier lui-même, enfin éveillé. Il n’attaque pas : il rejoue les attaques des gardiens, d’abord à leur rythme, puis bien plus vite dès qu’il passe sous 75% de ses PV.',
+ lore:'Le gardien du sablier, enfin éveillé : un faucheur aux ailes d’os qui fauche le temps d’une lame de sable. Il n’attaque pas : il rejoue les attaques des gardiens, d’abord à leur rythme, puis bien plus vite dès qu’il passe sous 75% de ses PV.',
  seq:['faux','spirale','charge','aiguilles','sable','bond','retour','jugement'],
  atks:{faux:{n:'Faux du temps',k:'cone',r:220,half:.8,multi:[-.75,.75],wind:.7,dmg:42,repeat:2,gap:.35},
   spirale:{n:'Spirale de sable',k:'proj',radial:1,count:18,speed:250,dmg:20,wind:.7,repeat:5,gap:.25,spin:.17},
-  charge:{n:'Ruée',k:'charge',len:500,w:80,wind:.85,dmg:44,heavy:1,repeat:3,gap:.3},
-  aiguilles:{n:'Aiguilles éternelles',k:'line',len:520,w:42,wind:.9,dmg:48,multi:[-.9,-.45,0,.45,.9]},
+  charge:{n:'Ruée spectrale',k:'charge',len:500,w:80,wind:.85,dmg:44,heavy:1,repeat:3,gap:.3},
+  aiguilles:{n:'Lames de sable',k:'line',len:520,w:42,wind:.9,dmg:48,multi:[-.9,-.45,0,.45,.9]},
   sable:{n:'Pluie de sable',k:'drops',count:9,onP:3,spread:90,r:60,wind:.95,dmg:28,repeat:3,gap:.35,pool:'magma'},
   bond:{n:'Chute des heures',k:'leap',r:120,wind:.9,dmg:50,heavy:1,repeat:3,gap:.35},
   retour:{n:'Retour du temps',k:'ring',r1:0,r2:90,grow:90,wind:.8,dmg:40,repeat:3,gap:.3,heavy:1},
@@ -1080,13 +1083,17 @@ const PRESTT=(k,n)=>CLASSES[k].name+(n>=2?' immortel':' éternel');
 const TITLES=()=>Object.values(ACH).map(A=>A.t).filter(Boolean).concat(...Object.keys(CLASSES).map(k=>[PRESTT(k,1),PRESTT(k,2)]));
 const myTitle=()=>{const t=meta.title||'';if(t.startsWith('p:')){const [,k,n]=t.split(':');return CLASSES[k]&&((meta.prest||{})[k]||0)>=+n?PRESTT(k,+n):''}const A=ACH[t];return A&&A.t&&(meta.ach||{})[t]?A.t:''};
 const cosOk=k=>!!(k&&COS[k]&&(Object.keys(ACH).some(a=>ACH[a].cos===k&&(meta.ach||{})[a])||(k==='eternite'&&Object.values(meta.prest||{}).some(v=>v>0))));
-function cosAura(f,R){const k=meta.aura;if(!R||!R.pg||!R.scene)return;const on=cosOk(k)&&!f.over;
-  if(!on){if(R.cosRing)R.cosRing.visible=false;return}const C=COS[k],T=THREE,p=R.pg.position;R.cosT=(R.cosT||0)+1;
-  if(!R.cosRing){const m=new T.Mesh(new T.PlaneGeometry(3.2,3.2),new T.MeshBasicMaterial({map:fxTex('ring'),transparent:true,depthWrite:false,blending:T.AdditiveBlending,toneMapped:false}));m.rotation.x=-Math.PI/2;m.renderOrder=1;R.scene.add(m);R.cosRing=m}
-  const g=R.cosRing;g.visible=true;g.material.color.set(C.c);g.material.opacity=.32+.12*Math.sin(R.cosT*.08);g.position.set(p.x,.08,p.z);g.rotation.z+=.01;
-  if(Math.random()<.7*FXQ){const a=R.cosT*.21+Math.random()*.6,rr=.55+Math.random()*.35,P=new T.Vector3(p.x+Math.cos(a)*rr,.1+Math.random()*.4,p.z+Math.sin(a)*rr);
+function cosAura(f,R){if(!R||!R.pg||!R.scene)return;
+  cosDraw(R,'me',cosOk(meta.aura)&&!f.over?meta.aura:'',R.pg.position);
+  if(f.co&&R.ally){const k=CO.mate&&COS[CO.mate.aura]?CO.mate.aura:'';cosDraw(R,'ally',f.ally&&!f.ally.down&&!f.over?k:'',R.ally.ch.pg.position)}
+  if(f.pvp&&R.bg){const k=PV.opp&&COS[PV.opp.aura]?PV.opp.aura:'';cosDraw(R,'opp',!f.over?k:'',R.bg.position)}}
+function cosDraw(R,slot,k,p){const S=R.cosS||(R.cosS={}),o=S[slot]||(S[slot]={t:0,ring:null});
+  if(!k){if(o.ring)o.ring.visible=false;return}const C=COS[k],T=THREE;o.t++;
+  if(!o.ring||o.ring.parent!==R.scene){const m=new T.Mesh(new T.PlaneGeometry(3.2,3.2),new T.MeshBasicMaterial({map:fxTex('ring'),transparent:true,depthWrite:false,blending:T.AdditiveBlending,toneMapped:false}));m.rotation.x=-Math.PI/2;m.renderOrder=1;R.scene.add(m);o.ring=m}
+  const g=o.ring;g.visible=true;g.material.color.set(C.c);g.material.opacity=.32+.12*Math.sin(o.t*.08);g.position.set(p.x,.08,p.z);g.rotation.z+=.01;
+  if(Math.random()<.7*FXQ){const a=o.t*.21+Math.random()*.6,rr=.55+Math.random()*.35,P=new T.Vector3(p.x+Math.cos(a)*rr,.1+Math.random()*.4,p.z+Math.sin(a)*rr);
     FE(C.fx,P,.3,{col:C.c,size:.9,spd:.25,lift:1.4})}
-  if(C.ring&&R.cosT%45===0)fxRing(new T.Vector3(p.x,0,p.z),C.c,1.4,.9,{a:.55})}
+  if(C.ring&&o.t%45===0)fxRing(new T.Vector3(p.x,0,p.z),C.c,1.4,.9,{a:.55})}
 
 function achieve(id){if(!ACH[id]||(meta.ach||(meta.ach={}))[id])return;meta.ach[id]=1;meta.souls+=ACH[id].r;const A=ACH[id],m=`Exploit : ${A.n} (+${A.r} grains${A.t?', titre « '+A.t+' »':''}${A.cos?', aura '+COS[A.cos].n:''})`;
   if(fight){(fight.achMsg||(fight.achMsg=[])).push(m);txt(fight,fight.p.x,fight.p.y-30,ACH[id].n,'ember')}else ui.toast=(ui.toast?ui.toast+' · ':'')+m;save()}
@@ -1205,6 +1212,7 @@ function sfx(k,e){if(!AU.on)return;const now=performance.now(),gap={hit:45,burn:
   case 'heal':[660,880,1320].forEach((f2,i)=>tone(f2,.4,{vol:.1,delay:i*.06,send:1}));break;
   case 'drink':noise(.35,{f:500,q:4,vol:.12});break;
   case 'freeze':tone(2000,.5,{to:3500,vol:.08});noise(.4,{f:6000,q:2,vol:.12});tone(1500,.6,{type:'triangle',vol:.08,delay:.05});break;
+  case 'vanish':noise(.5,{f:600,to:3000,q:1,vol:.2});tone(300,.4,{to:90,vol:.08});break;
   case 'blink':noise(.3,{f:3000,to:400,q:2,vol:.18});tone(800,.25,{to:200,vol:.08});break;
   case 'bite':tone(200,.08,{type:'triangle',to:120,vol:.08});break;
   case 'trap':tone(900,.06,{type:'square',vol:.1});noise(.15,{f:2500,vol:.25});tone(120,.2,{to:60,vol:.2});break;
@@ -1443,7 +1451,7 @@ function startFight(){tickClock();if(run){run.alloc={};run.spAlloc={}}
     b:{x:CX,y:CY-150,r:B.r,atk:null,cool:1.6,rec:0,vuln:0,inv:0,dash:null,wait:0,hurt:0},
     cds:{},buffs:[],bombs:[],adds:[],tgt:null,weaken:0,gel:0,gelT:0,stacks:{},hist:[],ms:{},hz:[],storm:null,proj:[],pproj:[],zones:[],texts:[],fx:[],pending:[],
     msg:{txt:B.name,t:2.2},paused:false,over:false,shake:0};
-  if(main&&run.coop&&coLive()){coFightInit(fight);const k=coKey();fight.coWait={k,me:0,mate:CO.pendLd===k?1:0,s:0,t:0,go:1.2};CO.pendLd=null}
+  if(main&&run.coop&&coLive()){coFightInit(fight);const k=coKey();fight.coWait={k,me:0,mate:CO.pendLd===k?1:0,s:0,t:0,go:1.6};CO.pendLd=null}
   B.tick&&B.tick(fight,0);
   if(WPN().pet)spawnPet(fight,1);
   if(run.mini){fight.ms.pdmg=1+.12*(run.floor-1-run.mini.idx);fight.msg={txt:B.name,t:2.4,big:1}}
@@ -1455,7 +1463,7 @@ function startFight(){tickClock();if(run){run.alloc={};run.spAlloc={}}
   if(main&&run.speed===run.floor)fight.speed=90;
   fight.ptr=[];
   if(run.tutB){fight.tut={step:0,mv:0,hits:0,charge:0,dodge:0,parry:0,cast:0,flask:0};fight.sc=.55;fight.b.cool=999;fight.msg={txt:'Combat tutoriel',t:2,big:1}}
-  else if(PB){fight.pvp=1;fight.sc=1;fight.b.y=CY-170;fight.b.cool=999;fight.p.frozen=2.2;fight.msg={txt:'Manche '+PV.round+' · miroir : '+CLASSES[run.cls].name,t:2.2,big:1}}
+  else if(PB){fight.pvp=1;fight.sc=1;fight.b.y=CY-170;fight.b.cool=999;const k=coKey();fight.coWait={k,me:0,mate:PV.pendLd===k?1:0,s:0,t:0,go:1.6};PV.pendLd=null;fight.msg={txt:'Manche '+PV.round+' · '+CLASSES[run.cls].name,t:2.2,big:1}}
   input.keys.clear();input.js=null;
   ui.screen='fight';render();
 }
@@ -1593,6 +1601,8 @@ function startAtk(f){
 }
 function setupTargets(f,a){
   const d=a.d,p=f.p;
+  if(d.vanish&&!a.rk){f.ms.hide=d.vanish;ev(f,'vanish',{x:f.b.x,y:f.b.y})}
+  if(d.blink){const b=f.b,P=p,fa=P.face??angTo(P,b),from={x:b.x,y:b.y};b.x=P.x-Math.cos(fa)*d.blink;b.y=P.y-Math.sin(fa)*d.blink;clampArena(b,b.r);b.face=angTo(b,P);a.ang=b.face;b.dash=null;ev(f,'blink',{from,to:{x:b.x,y:b.y},quiet:!!d.vanish&&!a.rk})}
   if(d.k==='drops'){a.tgts=[];const onP=d.onP??1;for(let i=0;i<d.count;i++){
     if(i===0&&onP>0)a.tgts.push({x:p.x,y:p.y});
     else if(i<onP){const an=Math.random()*Math.PI*2,r=Math.random()*(d.spread||100);const t={x:p.x+Math.cos(an)*r,y:p.y+Math.sin(an)*r};clampArena(t,10);a.tgts.push(t)}
@@ -1807,6 +1817,7 @@ function applyDmg(f,sp,base,T){sp._b=base;
   const link=bossLink(f);if(link>=1){txt(f,b.x,b.y,'Protégé','frost');return}
   if(f.ms.evade>0&&Math.random()<.4){txt(f,b.x,b.y,'Esquive','frost');return}
   if(b.inv>0){txt(f,b.x,b.y,'Immergé','frost');return}
+  if(f.ms.hide>0){txt(f,b.x,b.y,'Dans l’ombre','frost');return}
   if(B.dmgMod&&!B.dmgMod(f,sp)){txt(f,b.x,b.y,'Parité','blood');return}
   const lv=lvOf(sp);
   if(sp.fx==='bomb'){f.bombs.push({t:1,sp:Object.assign({},sp,{fx:'boom'}),base,tgt:b});txt(f,b.x,b.y,'Mèche','ember');return}
@@ -2260,7 +2271,7 @@ function kkData(idn){const el=document.getElementById(idn);return el?b64buf(el.t
 const KKP={};
 function kkParse(k,buf){return new Promise(res=>{try{new THREE.GLTFLoader().parse(buf,'',g=>{g.scene.traverse(o=>{if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{['map','emissiveMap'].forEach(t=>{if(m[t]){m[t].encoding=THREE.LinearEncoding;m[t].needsUpdate=true}})})});
     g.scene.updateMatrixWorld(true);const bx=new THREE.Box3().setFromObject(g.scene);
-    if(k.startsWith('m:')){const mk=k.slice(2),SP=MONSPLIT[mk];let clips=g.animations;if(SP&&clips[0]){const src=clips[0];clips=Object.entries(SP).map(([n,[a,b2]])=>{const c=THREE.AnimationUtils.subclip(src,n,Math.round(a*30),Math.max(Math.round(a*30)+2,Math.round(b2*30)),30);c.name=n;return c})}MON[mk]={scene:g.scene,clips,h:MONH[mk]||(bx.max.y-bx.min.y)}}else if(k.startsWith('anim'))KK.clips.push(...g.animations);else{KK.chars[k]=g.scene;KK.h[k]=bx.max.y-bx.min.y}res(true)},()=>res(false))}catch(e){res(false)}})}
+    if(k.startsWith('m:')){const mk=k.slice(2),SP=MONSPLIT[mk];let clips=g.animations;if(SP&&clips.length>1)clips=[new THREE.AnimationClip('all',-1,[].concat(...clips.map(c=>c.tracks)))];if(SP&&clips[0]){const src=clips[0];clips=Object.entries(SP).map(([n,[a,b2]])=>{const c=THREE.AnimationUtils.subclip(src,n,Math.round(a*30),Math.max(Math.round(a*30)+2,Math.round(b2*30)),30);c.name=n;return c})}MON[mk]={scene:g.scene,clips,h:MONH[mk]||(bx.max.y-bx.min.y)}}else if(k.startsWith('anim'))KK.clips.push(...g.animations);else{KK.chars[k]=g.scene;KK.h[k]=bx.max.y-bx.min.y}res(true)},()=>res(false))}catch(e){res(false)}})}
 function kkFetch(name){if(document.getElementById('kk-'+name))return Promise.resolve(kkData('kk-'+name));return fetch('models/'+name+'.txt').then(r=>{if(!r.ok)throw new Error('http '+r.status);return r.text()}).then(b64buf)}
 function kkNeed(k){if(!k)return Promise.resolve(false);if(KKP[k])return KKP[k];if(!window.THREE||!THREE.GLTFLoader||!THREE.SkeletonUtils)return Promise.resolve(false);
   return KKP[k]=kkFetch(k.replace('m:','')).then(buf=>kkParse(k,buf)).catch(()=>false)}
@@ -2282,6 +2293,7 @@ const MON={},MONH={golem:1.95};
 const MONSPLIT={
  shadow:{idle:[3.45,3.8],walk:[3.45,3.8],run:[3.45,3.8],slash:[2.35,3.4],flip:[0,1.65],land:[1.6,2.35],impact:[1.7,2.1]},
  abyss:{idle:[0,1.66],walk:[0,1.66],run:[0,1.66],bite:[0,1.66],impact:[.2,.6]},
+ reaper:{idle:[1.95,3.98],walk:[1.95,3.98],run:[1.95,3.98]},
  sylve:{idle:[2.7,3.8],walk:[2.7,3.8],run:[2.7,3.8],cast:[1.4,2.65],impact:[2.65,2.95]}};
 const MONB={bouftou:{key:'warrok',hk:1.25,
   clips:{cone:['slash','slash_3','attack_2'],line:['attack'],circle:['attack_3','kick'],leap:['jump'],charge:['power_up'],proj:['casting'],drops:['casting'],special:['power_up'],ring:['attack_3'],safe:['casting']},
@@ -2294,6 +2306,7 @@ const MONB={bouftou:{key:'warrok',hk:1.25,
   hit:{flap:.5,takeoff:.4,fly:.3}},
  krala:{key:'abyss',hk:1.25,auto:1,hitClip:'impact',roarClip:'bite',clips:{cone:['bite'],line:['bite'],circle:['bite'],drops:['bite'],proj:['bite'],special:['bite'],leap:['bite'],charge:['bite'],ring:['bite'],safe:['bite']},hit:{bite:.55}},
  wa:{key:'sylve',hk:1.9,auto:1,solid:1,hitClip:'impact',roarClip:'cast',flyClip:'idle',clips:{line:['cast'],leap:['cast'],proj:['cast'],drops:['cast'],special:['cast'],cone:['cast'],circle:['cast'],ring:['cast'],safe:['cast'],charge:['cast']},hit:{cast:.6}},
+ secret:{key:'reaper',hk:1.15,auto:1,lit:.6,solid:1,proc:1,hitClip:'idle',roarClip:'idle',flyClip:'idle',clips:{cone:['idle']},hit:{idle:.5}},
  kimbo:{key:'shadow',hk:1.3,lit:1,auto:1,hitClip:'impact',roarClip:'slash',flyClip:'idle',clips:{cone:['slash'],line:['slash'],leap:['flip'],charge:['flip'],proj:['slash'],drops:['slash'],safe:['flip'],ring:['slash'],circle:['flip'],special:['slash']},hit:{slash:.45,flip:.6}},
  craq:{key:'golem',hk:1.3,hitClip:'hit',roarClip:'attack4',
   clips:{cone:['attack1','attack2','attack3'],line:['attack2'],circle:['attack5'],ring:['attack5'],drops:['attack4'],leap:['attack5'],charge:['attack4'],proj:['attack4'],special:['attack4'],safe:['attack4']},
@@ -2308,17 +2321,23 @@ function monMetrics(M,faceRot){if(M.met)return M.met;const T=THREE,m=THREE.Skele
   return M.met={h,w,minY:bb.min.y,cx:ctr.x,cz:ctr.z,rot}}
 function monPlace(model,M,D,target){const T=THREE,me=monMetrics(M,D&&D.faceRot),sc=target/Math.max(me.h,me.w*((D&&D.wk)||0));model.scale.setScalar(sc);model.rotation.y=me.rot;
   const off=new T.Vector3(me.cx,me.minY,me.cz).multiplyScalar(sc).applyAxisAngle(new T.Vector3(0,1,0),me.rot);model.position.set(-off.x,-off.y,-off.z)}
+/* modèles sans animation d'attaque : le corps se cabre pendant la préparation puis fauche */
+function monProc(c,pv,dt,st){const P=c.pr||(c.pr={lean:0,sw:0,was:false});
+  if(st.dead){P.lean+=(.9-P.lean)*Math.min(1,dt*2);pv.rotation.z=P.lean;pv.position.y+=(-.6-pv.position.y)*Math.min(1,dt*1.5);return}
+  if(st.wind){P.was=true;P.lean+=((.32*Math.min(1,st.pr*1.3))-P.lean)*Math.min(1,dt*10)}
+  else{if(P.was){P.was=false;P.sw=1}P.sw=Math.max(0,P.sw-dt*2.4);P.lean+=((-.5*Math.sin(P.sw*Math.PI))-P.lean)*Math.min(1,dt*16)}
+  const sg=st.stagger?Math.sin(st.t*40)*.04:0;pv.rotation.z=P.lean+sg;pv.rotation.x=Math.sin(st.t*1.3)*.04;pv.position.y=Math.sin(st.t*1.7)*.12+(st.roar?.4:0)}
 function creatureMonster(id,R,proto){const T=THREE,D=MONB[id],M=MON[D.key],g=new T.Group();
   let h=R*2;if(proto){const bx=new T.Box3().setFromObject(proto.g);h=Math.max(1,bx.max.y-Math.min(0,bx.min.y));disposeObj(proto.g)}
-  const model=THREE.SkeletonUtils.clone(M.scene);let sc=h*D.hk/M.h;model.scale.setScalar(sc);model.rotation.y=Math.PI/2;g.add(model);
+  const model=THREE.SkeletonUtils.clone(M.scene);let sc=h*D.hk/M.h;model.scale.setScalar(sc);model.rotation.y=Math.PI/2;const pv=new T.Group();g.add(pv);pv.add(model);
   if(D.auto)monPlace(model,M,D,h*D.hk);g.userData.hT=D.auto&&D.wk?h*D.hk*.6:h*D.hk;
   const mats=[];model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;o.frustumCulled=false;o.material=o.material.clone();if(!o.material.emissive)o.material.emissive=new T.Color(0);if(o.material.emissiveMap)o.material.userData.em='#ffffff';
-    if(D.solid){const m=o.material;m.transparent=false;m.alphaTest=.5;m.depthWrite=true}if(D.lit){const m=o.material;if(m.metalness!==undefined)m.metalness=Math.min(m.metalness,.15);if(m.roughness!==undefined)m.roughness=Math.max(m.roughness,.5);if(m.color)m.color.multiplyScalar(2.2);if(!m.emissiveMap){m.emissive.set('#2a1830');m.userData.em='#2a1830'}}mats.push(o.material)}});
+    if(D.solid){const m=o.material;m.transparent=false;m.alphaTest=.5;m.depthWrite=true}if(D.lit){const m=o.material;if(m.metalness!==undefined)m.metalness=Math.min(m.metalness,.15);if(m.roughness!==undefined)m.roughness=Math.max(m.roughness,.5);if(m.color)m.color.multiplyScalar(D.lit===1?2.2:1+D.lit*2);if(!m.emissiveMap){m.emissive.set('#2a1830');m.userData.em='#2a1830'}}mats.push(o.material)}});
   const mx=new T.AnimationMixer(model),act={};M.clips.forEach(c=>{act[c.name]=mx.clipAction(c)});act.idle&&act.idle.play();mx.update(.1);
   const dummy=new T.MeshStandardMaterial({color:0});
   const c={g,mat:dummy,rocks:mats,ground:true,ownDeath:!!act[D.deathClip||'death'],mx,act,cur:'idle',wasWind:false,follow:0,
     play(name,once,fade){const a=this.act[name];if(!a)return null;if(this.cur!==name){const o=this.act[this.cur];a.reset();a.enabled=true;a.setLoop(once?T.LoopOnce:T.LoopRepeat,Infinity);a.clampWhenFinished=!!once;a.fadeIn(fade??.15).play();if(o&&o!==a)o.fadeOut(fade??.15);this.cur=name}return a},
-    anim(c,dt,st){
+    anim(c,dt,st){if(D.proc)monProc(c,pv,dt,st);
       if(st.dead){const a=c.play(D.deathClip||'death',true,.2);if(a){a.paused=false;a.timeScale=1}c.mx.update(dt);return}
       if(st.wind){if(!c.wasWind){const L=D.clips[st.kind]||D.clips.cone;c.atk=L[(c.n=(c.n||0)+1)%L.length]}c.wasWind=true;const a=c.play(c.atk,true,.1);
         if(a){const hf=(D.hit[c.atk]||.45)*a.getClip().duration;a.paused=true;a.time=Math.min(hf,hf*Math.max(0,st.pr))}c.mx.update(dt);return}
@@ -3606,6 +3625,8 @@ function handleEvents(f){
     else if(e.k==='astrike'){bstyOf(f).imp(W3(e,.3),.9);shock(W3(e),COL.blood,e.r/10,.35);if(e.boom){burst(W3(e,.5),COL.frost,20,9,.3);f.shake=Math.max(f.shake,.3)}}
     else if(e.k==='phase'){bstyOf(f).imp(W3(f.b,1.2),2.6);fxFlash(W3(f.b,1),bstyOf(f).c,6,.5);shock(W3(f.b),COL.ember,22,1);shock(W3(f.b),COL.blood,14,.7);burst(W3(f.b,R.holder.position.y),COL.ember,30,10,.3);R.stagger=0;id('stage')&&id('stage').classList.add('flash');setTimeout(()=>{const s=id('stage');s&&s.classList.remove('flash')},400)}
     else if(e.k==='unlink'){shock(W3(f.b),COL.frost,6,.6)}
+    else if(e.k==='vanish'){const q=W3(e,1);burst(q,'#2a2238',30,7,.35,1.2);burst(q,'#8a6cff',10,5,.2,1.5);shock(W3(e),'#5a3a8a',4,.4)}
+    else if(e.k==='blink'){if(!e.quiet){const a=W3(e.from,1);burst(a,'#2a2238',18,6,.3,1.2)}const q=W3(e.to,1);burst(q,'#2a2238',22,6,.3,1.2);burst(q,'#b48cff',12,6,.18,1.6);shock(W3(e.to),'#8a6cff',3,.35)}
     else if(e.k==='stagger'){R.stagger=.7;burst(bossSurf(f),COL.frost,14,7,.25)}
     else if(e.k==='heavyhit'){R.recoil=.3;R.camKick=Math.max(R.camKick||0,.6)}
     else if(e.k==='break'){R.camKick=1.4;shock(W3(f.b),'#ffe08a',f.b.r/10+5,.6);burst(W3(f.b,R.holder.position.y+1.5),'#ffe08a',36,10,.28,1);burst(W3(f.b,1),'#ffffff',18,8,.2)}
@@ -4019,7 +4040,7 @@ function render3D(dt){
   const R0=R.R,fa=b.face??angTo(b,p);
   let bpos=W3(b,0);
   if(b.jump){const k=Math.min(1,b.jump.t/b.jump.dur);bpos.y=Math.sin(k*Math.PI)*Math.min(6,2+dist({x:b.jump.fx,y:b.jump.fy},{x:b.jump.tx,y:b.jump.ty})/60)}
-  R.bg.position.copy(bpos);R.bg.rotation.y=-fa;
+  R.bg.position.copy(bpos);R.bg.rotation.y=-fa;R.bg.visible=!(f.ms.hide>0)||Math.sin(t*26)>.92;
   let pr=0,hv=false;if(b.atk){pr=prog(b.atk);hv=!!b.atk.d.heavy}
   R.flinch=Math.max(0,R.flinch-dt);R.lunge=Math.max(0,R.lunge-dt);R.stagger=Math.max(0,R.stagger-dt);
   let ty=b.inv>0?-R0*2.4:(R.cr?0:R0+.7+Math.sin(t*2)*.15),lean=0,lx=0;
@@ -4043,10 +4064,11 @@ function render3D(dt){
   if(f.B.id==='wa'){if(!R.bulb){const bg2=new T.Group(),bm=new T.MeshStandardMaterial({color:new T.Color('#e6872e'),emissive:new T.Color('#e6872e'),emissiveIntensity:.5,roughness:.4,flatShading:true});
       const bb=new T.Mesh(new T.IcosahedronGeometry(.9,0),bm);bb.scale.y=.75;bb.position.y=.55;bb.castShadow=true;bg2.add(bb);
       for(let i=0;i<4;i++){const l=new T.Mesh(new T.ConeGeometry(.22,1.3,4),LPM('#76a845'));l.position.set(0,1.4,0);l.rotation.set(0,i*1.57,.35);l.scale.z=.3;bg2.add(l)}
+      const sb=(c)=>{const m=new T.Sprite(new T.SpriteMaterial({color:new T.Color(c),depthTest:false,toneMapped:false}));m.center.set(0,.5);m.renderOrder=999;return m},bk=sb('#14161c'),fl=sb('#ffb04a');bk.scale.set(2.6,.3,1);bk.position.set(-1.3,2.6,0);fl.position.set(-1.26,2.6,0);bg2.add(bk,fl);R.bulbF=fl;
       bg2.visible=false;R.scene.add(bg2);R.bulb=bg2;R.bulbM=bm;R.bulbOn=false}
     const cw=f.ms.caw;if(cw&&!R.bulbOn){R.bulbOn=true;R.bulb.position.copy(W3({x:b.x+Math.cos(fa)*(b.r+28),y:b.y+Math.sin(fa)*(b.r+28)},0));shock(R.bulb.position,'#e6872e',3,.4);burst(R.bulb.position.clone().setY(.4),'#76a845',10,5,.2)}
     else if(!cw&&R.bulbOn){R.bulbOn=false;burst(R.bulb.position.clone().setY(.6),'#e6872e',16,7,.25)}
-    R.bulb.visible=!!cw;if(cw){const k=Math.max(0,1-cw.t/6),done=cw.dealt>=cw.need;R.bulb.scale.setScalar(.6+.8*Math.min(1,(6-cw.t)*2)*(done?.5:1));R.bulbM.emissiveIntensity=done?.1:.4+.5*k+Math.sin(t*8)*.15*k}}
+    R.bulb.visible=!!cw;if(cw){const k=Math.max(0,1-cw.t/7),done=cw.dealt>=cw.need,hp=Math.max(0,1-cw.dealt/cw.need);R.bulbF.scale.set(Math.max(.001,2.52*hp),.22,1);R.bulbF.material.color.set(cw.t<2.5&&Math.sin(t*14)>0?'#ff5a3a':'#ffb04a');R.bulb.scale.setScalar(.6+.8*Math.min(1,(7-cw.t)*2)*(done?.5:1));R.bulbM.emissiveIntensity=done?.1:.4+.5*k+Math.sin(t*8)*.15*k}}
   if(R.dead===null){const s=(1+pr*(hv?.16:.08)*(R.cr?.4:1))*(R.flinch>0?.94:1);R.core.scale.set(s,s,s)}
   {const A=f.axe;if(A&&!R3.axeM){const T=THREE,g=new T.Group(),m=smat('#b9bec4',{metalness:.85,roughness:.3,emissive:new T.Color(COL.ember),emissiveIntensity:.35});
       const hf=new T.Mesh(new T.CylinderGeometry(.06,.07,1.3,8),LPM('#4a3220')),hd=new T.Mesh(new T.CylinderGeometry(.42,.42,.08,14,1,false,0,Math.PI),m);hf.position.y=.55;hd.position.set(0,1.05,0);hd.rotation.set(Math.PI/2,0,Math.PI/2);g.add(hf);g.add(hd);
@@ -4375,7 +4397,7 @@ function rSheet(S){if(!S)return '';return `<div class="sheet">
 function win(){if(run&&run.tut){tutLeave(true);return}
   if(run&&run.secret){cx().boss.secret=Object.assign(cx().boss.secret||{},{w:1},fight&&!fight.hits?{nh:1}:{});(meta.mast||(meta.mast={}))[run.cls]=mastXp(run.cls)+500;const g=Math.round(1500*(1+meta.cycle*.5)*(1+.15*heatOf(run.pacts))*(fight&&!fight.hits?2:1));meta.souls+=g;achieve('secret');if(fight&&!fight.hits)achieve('secretnh');
     ui.end=ui.end||{souls:0,cycle:meta.cycle,cls:RC().n+' '+CLS().name,sheet:makeSheet(true)};ui.end.secret={won:1,g,nohit:fight&&!fight.hits};ui.end.sheet=Object.assign(makeSheet(true),{best:ui.end.sheet&&ui.end.sheet.best,newBest:ui.end.sheet&&ui.end.sheet.newBest,secret:1});
-    meta.secretWins=(meta.secretWins||0)+1;if(!run.daily){const E=ladEntry(true,1,fight&&!fight.hits,ui.end.ladCyc||0);ui.end.lad=E.score;ladSubmit(E)}fight=null;run=null;ui.screen='win';save();render();return}
+    meta.secretWins=(meta.secretWins||0)+1;if(!run.daily){const E=ladEntry(true,1,fight&&!fight.hits,ui.end.ladCyc||0);ui.end.lad=E.score;ladSubmit(E)}ui.endRun=(!run.daily&&!run.coop&&!run.train)?run:null;fight=null;run=null;ui.screen='win';save();render();return}
   if(run.mini){achieve('echo');const k=grantWeapon(),g=Math.round((15+run.floor*8)*(RC().grains||1));run.carried+=g;run.mini=null;fight=null;run.hp=Math.min(maxHp(),run.hp+Math.round(maxHp()*.15));
     if(k)ui.got={kind:'weapon',k};ui.toast=`Écho vaincu : +${g} grains.`;ui.screen='map';save();render();return}
   const perk=(run.paths||{})[run.floor],mutd=!!(fight&&fight.mut);
@@ -4497,7 +4519,7 @@ function pvpConnect(code,role){pvpClose();PV.code=code;PV.role=role;PV.opp=null;
   ws.onopen=()=>{ws.send(JSON.stringify({topic:PV.topic,event:'phx_join',payload:{config:{broadcast:{self:false,ack:false},presence:{key:''},private:false},access_token:LADDER_API.key},ref:String(PV.ref++)}));
     PV.hb=setInterval(()=>{try{ws.send(JSON.stringify({topic:'phoenix',event:'heartbeat',payload:{},ref:String(PV.ref++)}))}catch(e){}},25000)};
   ws.onmessage=e=>{let m;try{m=JSON.parse(e.data)}catch(_){return}
-    if(m.event==='phx_reply'&&m.topic===PV.topic&&m.payload&&m.payload.status==='ok'&&!PV.joined){PV.joined=1;pvpSend('hello',{pseudo:pvpName(),v:1});pvpPaint()}
+    if(m.event==='phx_reply'&&m.topic===PV.topic&&m.payload&&m.payload.status==='ok'&&!PV.joined){PV.joined=1;pvpSend('hello',{pseudo:pvpName(),v:1,...myFlex()});pvpPaint()}
     else if(m.event==='phx_reply'&&m.payload&&m.payload.status==='error'){PV.st='err';PV.err='Le serveur a refusé le salon (Realtime désactivé ?).';pvpPaint()}
     else if(m.event==='broadcast'&&m.payload)pvpOn(m.payload.event,m.payload.payload||{})};
   ws.onerror=()=>{if(PV.ws===ws){PV.err='Connexion perdue.';pvpPaint()}};
@@ -4508,9 +4530,11 @@ function pvpSendRaw(w,ev){w.send(JSON.stringify({topic:PV.topic,event:'broadcast
 const pvpName=()=>ladName(meta.pseudo)||'Veilleur';
 const mir=o=>({x:2*CX-o.x,y:2*CY-o.y});
 function pvpOn(e2,m){const f=fight&&fight.pvp?fight:null;
-  if(e2==='hello'){const fresh=!PV.opp;PV.opp={pseudo:ladName(m.pseudo)||'Adversaire'};PV.last=performance.now();if(fresh)pvpSend('hello',{pseudo:pvpName(),v:1});if(PV.st==='wait'||PV.st==='joining')PV.st='ready';pvpPaint();return}
+  if(e2==='hello'){const fresh=!PV.opp;PV.opp={pseudo:ladName(m.pseudo)||'Adversaire',aura:COS[m.aura]?m.aura:'',title:String(m.title||'').slice(0,40),wins:+m.wins||0,pvpW:+m.pvpW||0};PV.last=performance.now();if(fresh)pvpSend('hello',{pseudo:pvpName(),v:1,...myFlex()});if(PV.st==='wait'||PV.st==='joining')PV.st='ready';pvpPaint();return}
   if(e2==='bye'){if(PV.opp){PV.err=PV.opp.pseudo+' a quitté l’arène.';PV.opp=null}if(f&&!f.over){f.over=true;f.msg={txt:'Adversaire parti',t:3,big:1}}PV.st=PV.ws?'wait':'err';if(PV.role==='B')PV.st='err';setTimeout(()=>{if(fight&&fight.pvp)pvpLeaveFight()},1500);pvpPaint();return}
-  if(e2==='start'){PV.last=performance.now();pvpRound(m);return}
+  if(e2==='start'){PV.last=performance.now();if(fight&&fight.pvp&&R3&&R3.scene){}pvpPickStart(m);return}
+  if(e2==='pick'){PV.last=performance.now();if(PV.pk&&PV.pk.m.round===m.r){PV.pk.theirs=m.c;pvpPickPaint();pvpPickGo()}else PV.pkEarly={r:m.r,c:m.c};return}
+  if(e2==='cld'){PV.last=performance.now();const F=fight;if(F&&F.pvp&&coKey()===m.k){if(F.coWait)F.coWait.mate=1;else if(performance.now()-(PV.ldT||0)>400){PV.ldT=performance.now();pvpSend('cld',{k:m.k})}}else PV.pendLd=m.k;return}
   if(!f)return;PV.last=performance.now();
   if(e2==='s'){const q=mir(m);PV.os=Object.assign({},m,{x:q.x,y:q.y,face:(m.face||0)+Math.PI});f.bhp=Math.max(0,m.hp);f.bmax=m.mx||f.bmax}
   else if(e2==='act'){const b=f.b,C=R3&&R3.cr;if(C&&C.pvp){if(m.k==='w')C.sw={t:0,h:m.heavy};else C.cast=.5}
@@ -4525,8 +4549,8 @@ function pvpOn(e2,m){const f=fight&&fight.pvp?fight:null;
     else if(m.dm>0){txt(f,b.x+(Math.random()*24-12),b.y,''+m.dm,'bone');b.hurt=.12;if(R3&&R3.cr&&R3.cr.pvp)R3.cr.hurt=.25}else txt(f,b.x,b.y,'Bloqué','dim')}
   else if(e2==='dead'){if(!f.over){f.bhp=0;endFight(true)}}}
 /* personnage tiré au sort, identique sur les deux écrans (même graine) */
-function pvpChar(seed,role){const sv=run,svU=meta.up,R0=Math.random;meta.up=Object.assign({},PVUP);Math.random=mulberry(seed*13+7);
-  try{const cls=pick(Object.keys(CLASSES)),race=pick(Object.keys(RACES));
+function pvpChar(seed,role,fc){const sv=run,svU=meta.up,R0=Math.random;meta.up=Object.assign({},PVUP);Math.random=mulberry(seed*13+7+(fc?Object.keys(CLASSES).indexOf(fc)*7919:0));
+  try{const c0=pick(Object.keys(CLASSES)),cls=CLASSES[fc]?fc:c0,race=pick(Object.keys(RACES));
     run={cls,race,lvl:7,pts:0,stats:Object.assign({},CLASSES[cls].base),items:{},spellLv:{},carried:0,floor:6,flasks:2,wpn:3,spPts:0,node:null,hpPct:220,bonus:0,pacts:[],asc:0,tal:[],pvp:1,order:[0,1,2,3,4,5,6,7,8],paths:{},dmgSrc:{},daily:seed%100000+7};
     {const RR=RC();for(const k in RR.stats||{})run.stats[k]=(run.stats[k]||0)+RR.stats[k]}
     const els=clsEls().map(e=>EL[e].s),main=pick(els);let pts=40;
@@ -4540,15 +4564,27 @@ function pvpChar(seed,role){const sv=run,svU=meta.up,R0=Math.random;meta.up=Obje
   finally{run=sv;meta.up=svU;Math.random=R0}}
 function withRun(r,fn){const sv=run,svU=meta.up;run=r;meta.up=Object.assign({},PVUP);try{return fn()}finally{run=sv;meta.up=svU}}
 const PVARENAS=['bouftou','tofu','scara','wa','craq','krala','kimbo','obsi','hare'];
-function pvpHostStart(reset){if(PV.role!=='A'||!PV.opp)return;if(reset)PV.score=[0,0];const m={seed:1+Math.floor(Math.random()*9e8),round:reset?1:PV.round+1,score:PV.score.slice(),arena:pick(PVARENAS)};pvpSend('start',m);pvpRound(m)}
+function pvpHostStart(reset){if(PV.role!=='A'||!PV.opp)return;if(reset)PV.score=[0,0];const m={seed:1+Math.floor(Math.random()*9e8),round:reset?1:PV.round+1,score:PV.score.slice(),arena:pick(PVARENAS),opts:shuffle(Object.keys(CLASSES)).slice(0,3)};pvpSend('start',m);pvpPickStart(m)}
+/* avant chaque manche : 3 classes tirées au sort, les mêmes pour les deux joueurs, chacun choisit la sienne */
+function pvpPickStart(m){PV.round=m.round;PV.score=m.score.slice();PV.pk={m,mine:null,theirs:PV.pkEarly&&PV.pkEarly.r===m.round?PV.pkEarly.c:null,t:15};PV.pkEarly=null;PV.last=performance.now();try{document.exitPointerLock&&document.exitPointerLock()}catch(e){}
+  clearInterval(PV.pkT);PV.pkT=setInterval(()=>{const P=PV.pk;if(!P){clearInterval(PV.pkT);return}P.t--;if(P.t<=0&&!P.mine)pvpPickCls(pick(P.m.opts));pvpPickPaint()},1000);pvpPickPaint()}
+function pvpPickCls(k){const P=PV.pk;if(!P||P.mine||!P.m.opts.includes(k))return;P.mine=k;pvpSend('pick',{c:k,r:P.m.round});pvpPickPaint();pvpPickGo()}
+function pvpPickGo(){const P=PV.pk;if(!P||!P.mine||!P.theirs)return;clearInterval(PV.pkT);PV.pk=null;pvpPickPaint();const m=Object.assign({},P.m,{mine:P.mine,theirs:P.theirs});pvpRound(m)}
+function pvpPickPaint(){let el=id('pvpk');const P=PV.pk;if(!P){if(el)el.remove();return}
+  if(!el){el=document.createElement('div');el.id='pvpk';el.className='rushp pvpk';document.body.appendChild(el)}
+  const opn=esc(PV.opp?PV.opp.pseudo:'Adversaire'),me=pvpMe();
+  el.innerHTML=`<div class="rpin"><span class="label">Arène de chaos · manche ${P.m.round} · ${P.m.score[me]} – ${P.m.score[1-me]}</span><h2>Choisis ta classe</h2><p class="dim" style="margin:-4px 0 10px">Les mêmes 3 classes pour vous deux, même niveau et équipement tiré au sort. ${opn} choisit en même temps que toi.</p>
+    <div class="rpc">${P.m.opts.map(k=>{const C=CLASSES[k];return `<button class="rpcard ${P.mine===k?'on':''} ${P.mine&&P.mine!==k?'off':''}" data-a="pvppick" data-v="${k}" ${P.mine?'disabled':''}><span class="rpi">${KKMAP[k]?'⚔':'✦'}</span><b>${esc(C.name)}</b><small>${esc(C.tag||'')}</small></button>`}).join('')}</div>
+    <p class="dim">${P.mine?(P.theirs?'Les deux ont choisi : combat !':`En attente de ${opn}…`):`Choix automatique dans ${P.t} s`}${P.theirs&&!P.mine?` · ${opn} a choisi`:''}</p></div>`}
+
 function pvpRound(m){PV.round=m.round;PV.score=PV.role==='A'?m.score.slice():m.score.slice();PV.st='fight';PV.os=null;PV.last=performance.now();
   if(!PV.saved)PV.saved={run,up:meta.up};
-  const me=pvpChar(m.seed,PV.role),op=pvpChar(m.seed,PV.role==='A'?'B':'A');PV.me=me;PV.oppRun=op;
+  const me=pvpChar(m.seed,PV.role,m.mine),op=pvpChar(m.seed,PV.role==='A'?'B':'A',m.theirs);PV.me=me;PV.oppRun=op;
   run=me;meta.up=Object.assign({},PVUP);run.hp=maxHp();
   const oMax=withRun(op,()=>maxHp());
   THEMES.pvp=THEMES[m.arena]||THEMES.hare;GRADES.pvp=GRADES[m.arena]||GRADES.hare;
   const opn=PV.opp?PV.opp.pseudo:'Adversaire';
-  run.pvpB={id:'pvp',name:opn,de:'de '+opn,zone:'Arène de chaos',lore:`Manche ${m.round} · ${PV.score[pvpMe()]} – ${PV.score[1-pvpMe()]}. Miroir : vous avez tous les deux le même ${RACES[me.race].n} ${CLASSES[me.cls].name}, avec le même équipement. Premier à deux manches.`,hp:oMax,r:PR,spd:0,keep:0,res:{terre:0,feu:0,air:0,eau:0},atks:{},loot:['vit','vit'],pvp:1};
+  run.pvpB={id:'pvp',name:opn+(PV.opp&&PV.opp.title?' « '+PV.opp.title+' »':''),de:'de '+opn,zone:'Arène de chaos',lore:`Manche ${m.round} · ${PV.score[pvpMe()]} – ${PV.score[1-pvpMe()]}. Toi : ${CLASSES[me.cls].name} · ${opn} : ${CLASSES[op.cls].name}. Premier à deux manches.`,hp:oMax,r:PR,spd:0,keep:0,res:{terre:0,feu:0,air:0,eau:0},atks:{},loot:['vit','vit'],pvp:1};
   ui.screen='fight';ui.hub='arena';if(fight&&R3&&R3.scene)teardown3D();fight=null;startFight()}
 /* duel trop long : la zone se resserre comme dans un battle royale */
 const PVZ={start:45,dur:45,min:70};
@@ -4602,11 +4638,12 @@ CREATURES.pvp=creaturePvp;
    L'hôte détecte les coups qui touchent le partenaire et les lui envoie ; le partenaire les subit (esquive et parade décidées chez lui).
    Les dégâts du partenaire sont cumulés et envoyés avec sa position, 12 fois par seconde. */
 const CO={st:'idle',ws:null,code:'',role:'',mate:null,ref:1,topic:'',last:0,sendT:0,syncT:0,err:'',ready:null,mateReady:null,acc:null,bs:null,joined:0,hb:null};
-const COEV=new Set(['strike','bland','zhit','astrike','phase','break','stagger','storm','stormEnd','quake','roar']);
+const COEV=new Set(['blink','vanish','strike','bland','zhit','astrike','phase','break','stagger','storm','stormEnd','quake','roar']);
 const coLive=()=>!!(CO.ws&&CO.joined&&CO.mate);
 const coRun=()=>!!(run&&run.coop&&coLive());
 function coSend(e,pl){const w=CO.ws;if(!w||w.readyState!==1)return;try{w.send(JSON.stringify({topic:CO.topic,event:'broadcast',payload:{type:'broadcast',event:e,payload:pl||{}},ref:String(CO.ref++)}))}catch(_){}}
-function coChar(){const r=run&&!run.pvp&&!run.tut?run:null;return {pseudo:pvpName(),cls:r?r.cls:meta.sel,race:r?r.race:meta.race,items:r?r.items:{},inf:r?r.inf:null,wsel:r?r.wsel:null,busy:!!(run&&!run.coop&&!run.pvp&&!run.tut)}}
+const myFlex=()=>({aura:cosOk(meta.aura)?meta.aura:'',title:myTitle(),wins:meta.secretWins||0,pvpW:meta.pvpW||0});
+function coChar(){const r=run&&!run.pvp&&!run.tut?run:null;return {...myFlex(),pseudo:pvpName(),cls:r?r.cls:meta.sel,race:r?r.race:meta.race,items:r?r.items:{},inf:r?r.inf:null,wsel:r?r.wsel:null,busy:!!(run&&!run.coop&&!run.pvp&&!run.tut)}}
 function coConnect(code,role){coClose();Object.assign(CO,{code,role,mate:null,err:'',st:role==='A'?'wait':'joining',topic:'realtime:sablier-coop-'+code,ref:1,ready:null,mateReady:null,joined:0});
   let ws;try{ws=new WebSocket(LADDER_API.url.replace(/^http/,'ws').replace(/\/+$/,'')+'/realtime/v1/websocket?apikey='+encodeURIComponent(LADDER_API.key)+'&vsn=1.0.0')}catch(e){CO.st='err';CO.err='Connexion impossible.';coPaint();return}
   CO.ws=ws;
@@ -4664,12 +4701,12 @@ function coOn(e,m){const f=fight&&fight.co?fight:null;CO.last=performance.now();
   if(e==='cend'&&CO.role==='B'){f.coEnd=1;if(!f.over){if(m.won&&f.p.down)run.hp=Math.max(1,Math.round(maxHp()*.3));endFight(!!m.won)}return}
 }
 /* départ synchronisé : chacun attend que l'autre ait fini de charger l'arène */
-const coKey=()=>run&&run.rush?'r'+run.rush.w:'f'+(run?run.floor:0)+(run&&run.secret?'s':'');
-function coWaitTick(f,dt){const W=f.coWait,nm=f.co&&f.co.mate||'ton partenaire';if(!W.me)return false;W.t+=dt;
-  W.s-=dt;if(W.s<=0){W.s=.5;coSend('cld',{k:W.k})}
+const coKey=()=>run&&run.pvp?'p'+PV.round:run&&run.rush?'r'+run.rush.w:'f'+(run?run.floor:0)+(run&&run.secret?'s':'');
+function coWaitTick(f,dt){const W=f.coWait,P=!!f.pvp,nm=P?(PV.opp?PV.opp.pseudo:'ton adversaire'):(f.co&&f.co.mate||'ton partenaire'),send=P?pvpSend:coSend,live=P?!!PV.opp:coLive();if(!W.me)return false;W.t+=dt;
+  W.s-=dt;if(W.s<=0){W.s=.5;send('cld',{k:W.k})}
   if(!W.mate){f.msg={txt:'En attente de '+nm+'…',t:.5,big:1};
-    if(W.t>25||!coLive()){f.coWait=null;f.msg={txt:f.B.name,t:2,big:1};return true}return false}
-  W.go-=dt;f.msg={txt:W.go>.6?'Prêts…':'Combat !',t:.5,big:1};if(W.go<=0){f.coWait=null;f.msg={txt:f.B.name+' · à deux',t:2,big:1};return true}return false}
+    if(W.t>25||!live){f.coWait=null;f.msg={txt:f.B.name,t:2,big:1};return true}return false}
+  W.go-=dt;f.msg={txt:W.go>1.2?'3':W.go>.6?(W.go>.9?'2':'1'):'Combat !',t:.5,big:1};if(W.go<=0){f.coWait=null;if(P)PV.last=performance.now();f.msg={txt:P?'Manche '+PV.round:f.B.name+' · à deux',t:1.6,big:1};return true}return false}
 /* hôte : lance le combat quand les deux sont prêts au même étage */
 function coTryGo(){if(CO.role!=='A'||!run||!run.coop)return;const R=CO.ready,M=CO.mateReady;if(!R||!M||R.floor!==M.floor||!!R.sec!==!!M.sec)return;
   const m={floor:run.floor,order:run.order,paths:run.paths||{},mut:run.mut,sec:R.sec?1:0};CO.ready=null;CO.mateReady=null;coSend('cgo',m);ui.confirm=null;startFight()}
@@ -4715,7 +4752,7 @@ function coTick(f,dt){if(!f.co)return;const A=f.ally;coRevive(f,dt);
     const q=CO.acc;CO.acc=null;coSend('s',{x:Math.round(p.x),y:Math.round(p.y),fa:+(p.face||0).toFixed(2),hp:run.hp,mx:maxHp(),r:p.roll>0?1:0,g:p.guard?1:0,d:p.drink>0?1:0,l:p.leap?1:0,a:f.swing&&f.swing.t<.15?1:0,c:p.cast>0?1:0,dn:p.down?1:0,du:run.duo||undefined,acc:q||undefined})}
   if(f.co.role==='A'){CO.syncT-=dt;if(CO.syncT<=0){CO.syncT=1/15;coSend('cb',coSnap(f))}}}
 const coD=d=>{const o={};for(const k in d){const v=d[k];if(typeof v!=='function')o[k]=v}return o};
-function coSnap(f){const b=f.b,a=b.atk,J=b.jump,c=f.co;const S={x:Math.round(b.x),y:Math.round(b.y),fa:+(b.face||0).toFixed(2),hp:Math.round(f.bhp),mx:f.bmax,po:Math.round(f.post||0),br:+(f.brokenT||0).toFixed(2),vu:b.vuln>0?1:0,fz:f.frz>0?+f.frz.toFixed(2):0,tg:c.tgt==='ally'?'B':'A',ms:{par:f.ms.par,parT:f.ms.parT,evade:f.ms.evade,clock:f.ms.clock,win:f.ms.win,p2:f.ms.p2,webT:f.ms.webT}};
+function coSnap(f){const b=f.b,a=b.atk,J=b.jump,c=f.co;const S={x:Math.round(b.x),y:Math.round(b.y),fa:+(b.face||0).toFixed(2),hp:Math.round(f.bhp),mx:f.bmax,po:Math.round(f.post||0),br:+(f.brokenT||0).toFixed(2),vu:b.vuln>0?1:0,fz:f.frz>0?+f.frz.toFixed(2):0,tg:c.tgt==='ally'?'B':'A',ms:{hide:f.ms.hide>0?+f.ms.hide.toFixed(2):0,par:f.ms.par,parT:f.ms.parT,evade:f.ms.evade,clock:f.ms.clock,win:f.ms.win,p2:f.ms.p2,webT:f.ms.webT}};
   if(a&&a.d){if(!a._cid)a._cid=(c.cid=(c.cid||0)+1);S.at={i:a._cid,k:a.key,t:+a.t.toFixed(2),w:+a.wind.toFixed(2),an:+(a.ang||0).toFixed(3),tg:a.tgt?{x:Math.round(a.tgt.x),y:Math.round(a.tgt.y)}:null,ts:a.tgts?a.tgts.map(t=>({x:Math.round(t.x),y:Math.round(t.y)})):null,rk:a.rk||0};if(c.sentD!==a._cid){c.sentD=a._cid;S.at.d=coD(a.d)}}
   if(J)S.ju={fx:J.fx,fy:J.fy,tx:J.tx,ty:J.ty,t:+J.t.toFixed(2),du:J.dur,r:J.d&&J.d.r};
   if(b.dash)S.da={vx:Math.round(b.dash.vx),vy:Math.round(b.dash.vy)};
@@ -4777,7 +4814,7 @@ function coAllyRender(R,f,dt){const A=f.ally,Y=R.ally;if(!A||!Y)return;const pg=
   else{Y.ph+=dt*Math.min(1,sp/120)*10;const s=Math.sin(Y.ph)*.5;if(Y.ch.legL){Y.ch.legL.rotation.x=s;Y.ch.legR.rotation.x=-s}pg.rotation.z=A.down?Math.PI/2:0}}
 function coHud(f){const el=id('coop');if(!el||!f.co||!f.ally)return;const A=f.ally,k=Math.round(A.hp)+'|'+A.mx+'|'+(A.down?1:0)+'|'+(f.co.tgt)+'|'+(run.duo||[]).join()+'|'+(A.duo||[]).join();if(el.dataset.k===k)return;el.dataset.k=k;
   const pc=A.mx>0?Math.max(0,Math.min(100,A.hp/A.mx*100)):0;
-  el.innerHTML=`<div class="between"><b>${esc(f.co.mate||'Partenaire')}</b><span class="num">${A.down?'À terre':Math.max(0,Math.round(A.hp))+' / '+A.mx}</span></div><div class="bar ${A.down?'':'ok'}"><i style="width:${A.down?0:pc}%"></i></div>${f.co.role==='A'&&!A.down&&f.co.tgt==='ally'?'<small>Le gardien le vise</small>':''}${(run.duo||[]).length||(A.duo||[]).length?`<div class="duoi">${(run.duo||[]).map(k=>`<span title="${DUO[k].n}">${DUO[k].i}</span>`).join('')}${(A.duo||[]).length?' · '+(A.duo||[]).filter(k=>DUO[k]).map(k=>`<span title="${DUO[k].n}">${DUO[k].i}</span>`).join(''):''}</div>`:''}`}
+  const MT=CO.mate&&CO.mate.title;el.innerHTML=`<div class="between"><b>${esc(f.co.mate||'Partenaire')}${MT?` <small class="ttl">« ${esc(MT)} »</small>`:''}</b><span class="num">${A.down?'À terre':Math.max(0,Math.round(A.hp))+' / '+A.mx}</span></div><div class="bar ${A.down?'':'ok'}"><i style="width:${A.down?0:pc}%"></i></div>${f.co.role==='A'&&!A.down&&f.co.tgt==='ally'?'<small>Le gardien le vise</small>':''}${(run.duo||[]).length||(A.duo||[]).length?`<div class="duoi">${(run.duo||[]).map(k=>`<span title="${DUO[k].n}">${DUO[k].i}</span>`).join('')}${(A.duo||[]).length?' · '+(A.duo||[]).filter(k=>DUO[k]).map(k=>`<span title="${DUO[k].n}">${DUO[k].i}</span>`).join(''):''}</div>`:''}`}
 /* écrans */
 function coBanner(){if(!run||!run.coop)return '';const M=CO.mate;if(!coLive())return `<div class="coban warn"><b>Ascension à deux</b><span>Connexion avec ton partenaire perdue : tu continues seul.</span></div>`;
   const R=CO.ready,MR=CO.mateReady,fl=run.floor;
@@ -4901,6 +4938,7 @@ function act(a,v){
     case 'pvpnew': {const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<4;i++)c+=A[Math.floor(Math.random()*A.length)];pvpConnect(c,'A')} break;
     case 'pvpjoin': {const el=id('pvpcode'),c=((el&&el.value)||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);if(c.length===4)pvpConnect(c,'B');else{ui.toast='Le code fait 4 caractères.';render()}} break;
     case 'pvpgo': pvpHostStart(true); break;
+    case 'pvppick': pvpPickCls(v); break;
     case 'pvpquit': pvpQuit(); break;
     case 'pvpcopy': try{(navigator.clipboard.writeText(PV.code).catch(()=>{}));ui.toast='Code copié : '+PV.code}catch(e){}render(); break;
     case 'tal': {const k=meta.sel;if(!k||run)break;const T=meta.tal||(meta.tal={}),sel=talSel(k);const [b,t]=v.split('-').map(Number);
@@ -4929,6 +4967,8 @@ function act(a,v){
     case 'coopun': if(CO.ready){CO.ready=null;coSend('cun',{});render()} break;
     case 'coopcopy': try{(navigator.clipboard.writeText(CO.code).catch(()=>{}));ui.toast='Code copié : '+CO.code}catch(e){}render(); break;
     case 'endless': startEndless(); break;
+    case 'endlessgo': if(ui.endRun){run=ui.endRun;ui.endRun=null;run.secret=1;startEndless()} break;
+    case 'endlessno': ui.endRun=null;render(); break;
     case 'secretno': if(run&&run.secret){ui.end=ui.end||{souls:0,cycle:meta.cycle,cls:RC().n+' '+CLS().name,sheet:makeSheet(true)};ui.end.secret={won:-1};run=null;ui.screen='win';save();render()} break;
     case 'pact':{const L=meta.pacts||(meta.pacts=[]);const i=L.indexOf(v);if(i>=0)L.splice(i,1);else L.push(v);save();render()} break;
     case 'again': ui.screen='home';ui.hub='play';ui.pstep=meta.sel&&meta.unlocked[meta.sel]?(talFree()>0?2:3):0;ui.confirm=null;render();window.scrollTo(0,0); break;
@@ -5393,7 +5433,7 @@ function rWin(){const e=ui.end;return `<section class="end win"><span class="lab
   <p>Cycle ${ROMAN[e.cycle+1]||e.cycle+1} : les gardiens ont +35% de PV et de dégâts, et frappent plus vite.</p>
   ${e.ascUp?`<p class="nch" style="font-size:clamp(22px,3.4vw,34px)">${SEALS[e.ascUp].n} débloqué</p><p class="dim">${SEALS[e.ascUp].d} Chaque sceau s’ajoute aux précédents et donne +12% de grains.</p>`:''}
   ${e.lad!=null?`<p class="ladres">Score : <b class="num">${Number(e.lad).toLocaleString('fr-FR')}</b> · <span id="ladst" class="dim">${esc(e.ladSt||'')}</span></p>`:''}${rMast(e.mast)}
-  <div class="endbtns"><button class="btn primary big" data-a="again">Nouvelle ascension${talFree()?` <span class="pbadge">${talFree()} talent${talFree()>1?"s":""}</span>`:""}</button><button class="btn big" data-a="home">Menu principal</button></div>${ui.screen==='dead'&&!e.endless?`<p class="etip">💡 ${TIPS[(meta.runs||0)%TIPS.length]}</p>`:''}
+  ${e.secret&&e.secret.won===1&&ui.endRun?`<div class="endless-ask"><p class="nch" style="font-size:clamp(20px,3vw,30px)">Et maintenant ?</p><p class="dim">Tu peux t’arrêter ici, ou continuer avec ce héros dans la Tour sans fin : gardiens de plus en plus forts, score sans limite.</p><div class="endbtns"><button class="btn primary big" data-a="endlessgo">Gravir la Tour sans fin</button><button class="btn big" data-a="endlessno">M’arrêter là</button></div></div>`:`<div class="endbtns"><button class="btn primary big" data-a="again">Nouvelle ascension${talFree()?` <span class="pbadge">${talFree()} talent${talFree()>1?"s":""}</span>`:""}</button><button class="btn big" data-a="home">Menu principal</button></div>`}${ui.screen==='dead'&&!e.endless?`<p class="etip">💡 ${TIPS[(meta.runs||0)%TIPS.length]}</p>`:''}
   <details class="esheet"><summary>Fiche de l’ascension</summary>${rSheet(e.sheet)}</details></section>`}
 function render(){
   tickClock();

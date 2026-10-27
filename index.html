@@ -169,6 +169,7 @@ kbd{display:inline-block;min-width:24px;text-align:center;font:600 12.5px var(--
 #bhpT{color:var(--bone);opacity:.85;text-shadow:0 1px 3px #000}.skb.lock b,.skb.lock small{opacity:.22}
 .etip{max-width:56ch;font-size:14.5px;color:var(--bone);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 14px;text-align:left}
 .esheet{width:100%}.esheet summary{cursor:pointer;color:var(--dim);font-size:14px;text-align:center;padding:6px}.esheet[open] summary{margin-bottom:8px}
+.cload{padding:60px 16px;text-align:center;animation:cl 1.2s ease-in-out infinite alternate}@keyframes cl{from{opacity:.4}to{opacity:1}}
 .prog{padding-top:6px}
 .ptabs{display:flex;border-bottom:1px solid var(--line);margin:0 -2px 12px}.ptabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;padding:10px 6px;color:var(--dim);font-size:15px;display:flex;gap:8px;align-items:center;justify-content:center}.ptabs button.on{color:var(--bone);border-bottom-color:var(--ember)}.ptabs button:hover{color:var(--bone)}
 .pbadge{background:var(--ember);color:#1a1208;font-size:12px;font-weight:700;border-radius:10px;padding:0 7px;line-height:18px;font-variant-numeric:tabular-nums}
@@ -2118,7 +2119,7 @@ function monKeyOf(B){return B&&MONB[B.id]&&MONB[B.id].key}
 const MONX={scara:['spiderling'],hare:['skeleton'],secret:['skeleton']};
 function monKeysOf(B){if(!B)return [];const L=[];const k=monKeyOf(B);if(k)L.push(k);(MONX[B.id]||[]).forEach(x=>L.push(x));return L}
 function monPrefetch(){if(!run)return;const ids=[BOSSAT(run.floor)];if(needPath()&&run.order){ids.push(BOSSES[run.floor-1],BOSSES[run.floor])}ids.forEach(B=>monKeysOf(B).forEach(k=>{if(!MON[k])kkNeed('m:'+k)}))}
-function kkLoad(){Promise.all([kkNeed('anim1'),kkNeed('anim2')]).then(r=>{KK.ready=r.every(Boolean);const c=(run&&run.cls)||meta.sel;return kkHero(c)}).then(()=>{kkRefresh();monPrefetch()})}
+function kkLoad(){Promise.all([kkNeed('anim1'),kkNeed('anim2')]).then(r=>{KK.ready=r.every(Boolean);if(!KK.ready)KK.giveup=1;const c=(run&&run.cls)||meta.sel;return kkHero(c)}).then(()=>{kkRefresh();monPrefetch()})}
 /* tourne un os pour que son enfant (la main) vise une cible en coordonnées monde */
 function aimBone(bone,tip,target,w){const T=THREE,b=bone.getWorldPosition(new T.Vector3()),c=tip.getWorldPosition(new T.Vector3()),cur=c.sub(b).normalize(),want=target.clone().sub(b).normalize();
   const q=new T.Quaternion().setFromUnitVectors(cur,want);if(w!==undefined&&w<1)q.slerp(new T.Quaternion(),1-w);const bq=bone.getWorldQuaternion(new T.Quaternion()),pq=bone.parent.getWorldQuaternion(new T.Quaternion()).invert();
@@ -2310,6 +2311,7 @@ function buildCharacter(rn){
 let PORT={key:'',url:''};
 function portraitKey(rn){return (rn.race||meta.race||'')+'|'+rn.cls+'|'+(rn.wsel||'')+'|'+(rn.wpn||1)+'|'+(rn.inf||'')+'|'+Object.values(rn.items||{}).map(i=>i.name).join(',')+'|'+rn.floor}
 function renderPortrait(rn,w,h){
+  {const kk=KKMAP[rn.cls];if(kk&&!(KK.ready&&KK.chars[kk])&&!KK.giveup){if(KK.ready)kkHero(rn.cls);return ''}}
   try{if(!ensureRenderer())return '';loadCols();
     const T=THREE,S=new T.Scene(),th=THEMES[(rn===run?BOSSAT(Math.min(rn.floor,9)):BOSSES[Math.min(rn.floor,9)-1]).id]||THEMES.hare;
     const sg=new T.SphereGeometry(40,24,12),cols=[],ct=new T.Color(th.sky[0]),cb=new T.Color(th.sky[1]),pa=sg.attributes.position;
@@ -2328,8 +2330,8 @@ function renderPortrait(rn,w,h){
     const r=R3.renderer;r.setSize(w,h,false);r.render(S,cam);const url=r.domElement.toDataURL('image/png');disposeObj(S);if(R3.camera)resize3D();return url}catch(e){return ''}
 }
 let PREV={key:'',url:''};
-function renderPreview(){const k=meta.race+'|'+meta.sel;if(PREV.key!==k){PREV={key:k,url:renderPortrait({race:meta.race,cls:meta.sel,items:{},floor:1,wpn:1,ref:1},560,420)}}return PREV.url}
-function portrait(rn){const k=portraitKey(rn);if(PORT.key!==k){PORT={key:k,url:renderPortrait(rn,420,520)}}return PORT.url}
+function renderPreview(){const k=meta.race+'|'+meta.sel;if(PREV.key!==k||!PREV.url){PREV={key:k,url:renderPortrait({race:meta.race,cls:meta.sel,items:{},floor:1,wpn:1,ref:1},560,420)}}return PREV.url}
+function portrait(rn){const k=portraitKey(rn);if(PORT.key!==k||!PORT.url){PORT={key:k,url:renderPortrait(rn,420,520)}}return PORT.url}
 /* Créatures originales (remplacent les formes abstraites, boss par boss) */
 function hideTex(base,dark,seed,rx,ry){
   const c=document.createElement('canvas');c.width=c.height=512;const g=c.getContext('2d'),r=srand(seed);
@@ -3074,8 +3076,8 @@ function buildScene(f){
   {const bx=new T.Box3().setFromObject(cr?cr.g:core);R3.bossH=Math.max(2,((cr&&cr.g.userData.hT)||(bx.max.y-Math.min(0,bx.min.y)))*(B.big||1));}
   Object.assign(R3,{kk:ch.kk||null,scene:S,camera,wp,pg,pm,egg,rig,head,legL,legR,armL,armR,capeP,pmats,addM:new Map(),tmark:null,walkPh:0,amp:0,lastP:{x:f.p.x,y:f.p.y},parts:[],shocks:[],flinch:0,pflinch:0,lunge:0,stagger:0,leapAnim:null,dead:null,pdead:null,drink,charge,bg,holder,core,cm:cr?cr.mat:cm,cr:cr?Object.assign(cr,{walk:0}):null,blast:{x:f.b.x,y:f.b.y},extras,rc,shield,vuln,R,pools:{bp:[],pp:[]},pm2:new Map(),vfx:[],petM:new Map(),trapM:new Map(),slashes:new Map()});
   R3.cam={yaw:-Math.PI/2,pitch:.42,lock:true,off:0};
-  TEL.clear();PG.clear();PGEO=null;R3.fxp=[];R3.decals=[];R3.flashes=[];FXQ=GFXQ()?1:.55;R3.axeM=null;R3.pbub=null;R3.trail=null;R3.tchev=null;R3.bulb=null;R3.bulbOn=false;R3.pfx=null;R3.waura=null;if(R3.wp)R3.wp.lastD=R3.wp.lastZ=null;
-  gfxSetup(S,camera,f);
+  TEL.clear();PG.clear();PGEO=null;R3.fxp=[];R3.decals=[];FXQ=GFXQ()?1:.55;R3.axeM=null;R3.pbub=null;R3.trail=null;R3.tchev=null;R3.bulb=null;R3.bulbOn=false;R3.pfx=null;R3.waura=null;if(R3.wp)R3.wp.lastD=R3.wp.lastZ=null;
+  gfxSetup(S,camera,f);fxPrewarm(S,camera);
   prewarm(f,S,camera);
 }
 /* précompile les shaders des invocations et des effets de phase pour éviter le gel à leur apparition */
@@ -3349,8 +3351,8 @@ function fxEmit(P,pos,k,o){const R=R3;if(!R||!R.scene||!P)return;const T=THREE;k
     q.m.color.set(o.col||P.col[Math.floor(Math.random()*P.col.length)]);q.a0=(P.a??1)*(o.a??1);
     const a=Math.random()*Math.PI*2,sp=rr(P.spd)*(o.spd||1)*FXV,sr=(P.spread||0)*(o.spread||1)*1.6;
     q.s.position.set(pos.x+Math.cos(a)*sr*Math.random(),pos.y+(Math.random()-.5)*sr*.5,pos.z+Math.sin(a)*sr*Math.random());
-    q.v=new T.Vector3(Math.cos(a)*sp,(Math.random()*(P.up??1)+(o.lift||0))*sp,Math.sin(a)*sp);if(o.dir){q.v.addScaledVector(o.dir,sp)}
-    q.life=rr(P.life);q.t=0;q.s0=rr(P.size)*(o.size||1)*(.75+.25*Math.min(k,2.5))*FXS;q.s1=q.s0*(P.end??1);q.g=P.grav||0;q.dr=P.drag||0;q.sw=P.swirl||0;q.c0={x:pos.x,z:pos.z};q.m.rotation=Math.random()*6.28;q.vr=(P.spin||0)*(Math.random()-.5)*2}}
+    (q.v||(q.v=new T.Vector3())).set(Math.cos(a)*sp,(Math.random()*(P.up??1)+(o.lift||0))*sp,Math.sin(a)*sp);if(o.dir){q.v.addScaledVector(o.dir,sp)}
+    q.life=rr(P.life);q.t=0;q.s0=rr(P.size)*(o.size||1)*(.75+.25*Math.min(k,2.5))*FXS;q.s1=q.s0*(P.end??1);q.g=P.grav||0;q.dr=P.drag||0;q.sw=P.swirl||0;q.c0=q.c0||{};q.c0.x=pos.x;q.c0.z=pos.z;q.m.rotation=Math.random()*6.28;q.vr=(P.spin||0)*(Math.random()-.5)*2}}
 function fxUpd(dt){const R=R3;if(!R)return;(R.fxp||[]).forEach(q=>{if(!q.on)return;q.t+=dt;const k=q.t/q.life;if(k>=1){q.on=false;q.s.visible=false;return}
     if(q.sw){const dx=q.s.position.x-q.c0.x,dz=q.s.position.z-q.c0.z;q.v.x+=-dz*q.sw*dt;q.v.z+=dx*q.sw*dt}
     q.v.y-=q.g*dt;if(q.dr)q.v.multiplyScalar(Math.max(0,1-q.dr*dt));q.s.position.addScaledVector(q.v,dt);if(q.s.position.y<.04&&q.g>0){q.s.position.y=.04;q.v.y*=-.25;q.v.x*=.6;q.v.z*=.6}
@@ -3360,7 +3362,7 @@ function fxUpd(dt){const R=R3;if(!R)return;(R.fxp||[]).forEach(q=>{if(!q.on)retu
 function fxDecal(tex,pos,size,life,col,o){const R=R3;if(!R||!R.scene)return;o=o||{};size*=1.8;const T=THREE,m=new T.Mesh(new T.PlaneGeometry(size*2,size*2),new T.MeshBasicMaterial({map:fxTex(tex),color:new T.Color(col),transparent:true,opacity:0,depthWrite:false,blending:o.add?T.AdditiveBlending:T.NormalBlending,toneMapped:false,polygonOffset:true,polygonOffsetFactor:-2}));
   m.rotation.x=-Math.PI/2;m.rotation.z=Math.random()*6.28;m.position.set(pos.x,.06+Math.random()*.01,pos.z);m.renderOrder=1;R.scene.add(m);(R.decals||(R.decals=[])).push({m,t:0,life,a:o.a??.85,grow:o.grow||0,spin:o.spin||0})}
 function fxRing(pos,col,rad,life,o){fxDecal('ring',pos,.5,life||.45,col,Object.assign({add:1,grow:rad*2,a:.95},o||{}))}
-function fxFlash(pos,col,inten,life){const R=R3;if(!R||!R.scene||!GFXQ())return;R.flashes=R.flashes||[];let L=R.flashes.find(x=>x.intensity<=0);if(!L){if(R.flashes.length>=3)L=R.flashes[0];else{L=new THREE.PointLight('#ffffff',0,14,2);R.scene.add(L);R.flashes.push(L)}}
+function fxFlash(pos,col,inten,life){const R=R3;if(!R||!R.scene||!R.flashes||!R.flashes.length)return;let L=R.flashes.find(x=>x.intensity<=0)||R.flashes[0];
   L.color.set(col);L.position.set(pos.x,(pos.y||0)+1.2,pos.z);L.intensity=inten;L.userData.dec=inten/(life||.2)}
 const FE=(n,p,k,o)=>fxEmit(FXP[n],p,k,o);
 const STY={
@@ -3380,6 +3382,13 @@ const STY={
  dualite:{c:'#d6bcff',imp(p,k){FE('holy',p,.6*k);FE('vsp',p,.6*k);FE('shadow',p,.4*k)},cast(p){fxDecal('rune',W0(p),1.5,1,'#d6bcff',{add:1,spin:2})},trail(p){FE(Math.random()<.5?'holy':'vsp',p,.12)},aura(p){FE(Math.random()<.5?'holy':'vsp',p,.1)}},
  arcane:{c:'#b48cff',imp(p,k){FE('vsp',p,k);FE('core',p,.5*k,{col:'#d6bcff',size:.5})},cast(p){fxDecal('rune',W0(p),1.3,.9,'#b48cff',{add:1,spin:2,a:.85});FE('vsp',W0(p,.4),.6)},trail(p){FE('vsp',p,.12)},aura(p){FE('vsp',p,.1)}}
 };
+function fxPrewarm(S,cam){const T=THREE,R=R3,r=R.renderer;R.flashes=[];if(GFXQ())for(let i=0;i<3;i++){const L=new T.PointLight('#ffffff',0,14,2);L.position.set(0,-30,0);S.add(L);R.flashes.push(L)}
+  const keep=[],put=(o,i)=>{o.position.set(i*.1,-60,0);o.frustumCulled=false;S.add(o);keep.push(o)},pg=new T.PlaneGeometry(.1,.1);
+  ['glow','spark','smoke','drop','shard','leaf','feather','gear','ring','crack','frost','rune','clock','ripple','scorch','leafbed'].forEach((k,i)=>{const tx=fxTex(k);if(r.initTexture)try{r.initTexture(tx)}catch(e){}
+    [0,1].forEach(ad=>{put(new T.Sprite(new T.SpriteMaterial({map:tx,transparent:true,depthWrite:false,toneMapped:false,blending:ad?T.AdditiveBlending:T.NormalBlending})),i);
+      put(new T.Mesh(pg,new T.MeshBasicMaterial({map:tx,transparent:true,depthWrite:false,toneMapped:false,side:T.DoubleSide,blending:ad?T.AdditiveBlending:T.NormalBlending,polygonOffset:!ad,polygonOffsetFactor:-2})),i)})});
+  [[0,0],[1,0],[0,1],[1,1]].forEach(([ad,ds],i)=>put(new T.Mesh(pg,new T.MeshBasicMaterial({transparent:true,depthWrite:false,toneMapped:false,side:ds?T.DoubleSide:T.FrontSide,blending:ad?T.AdditiveBlending:T.NormalBlending})),i));
+  try{r.compile(S,cam)}catch(e){}keep.forEach(o=>o.visible=false)}
 function W0(p,y){return new THREE.Vector3(p.x,y||0,p.z)}
 const ELSTY={terre:'terre',feu:'feu',air:'air',eau:'eau'};
 const CLSTY={iop:'feu',rog:'ombre',gard:'feu',chrono:'temps',beast:'nature',bers:'feu',pal:'sacre',cra:'air',eni:'nature'};
@@ -3394,7 +3403,7 @@ function burst(pos,color,n,spd,size,up){
   const R=R3;if(!PGEO)PGEO=new THREE.BoxGeometry(1,1,1);
   for(let i=0;i<n;i++){let m=R.parts.find(q=>!q.alive);if(!m){if(R.parts.length>220)return;m={mesh:new THREE.Mesh(PGEO,partMat(color))};R.scene.add(m.mesh);R.parts.push(m)}
     m.alive=true;m.mesh.visible=true;m.mesh.material=partMat(color);m.mesh.position.copy(pos);
-    const a=Math.random()*Math.PI*2,e=Math.random()*(up??1);m.v=new THREE.Vector3(Math.cos(a)*spd*(.4+Math.random()*.6),(.3+e)*spd,Math.sin(a)*spd*(.4+Math.random()*.6));
+    const a=Math.random()*Math.PI*2,e=Math.random()*(up??1);(m.v||(m.v=new THREE.Vector3())).set(Math.cos(a)*spd*(.4+Math.random()*.6),(.3+e)*spd,Math.sin(a)*spd*(.4+Math.random()*.6));
     m.life=.45+Math.random()*.4;m.t=0;m.size=size*(.6+Math.random()*.7);m.mesh.rotation.set(Math.random()*3,Math.random()*3,0)}
 }
 function shock(pos,color,rad,life){const m=new THREE.Mesh(flat(new THREE.RingGeometry(.86,1,56)),bmat(color,.8));m.position.set(pos.x,.08,pos.z);R3.scene.add(m);R3.shocks.push({m,rad,t:0,life:life||.45})}
@@ -4432,7 +4441,7 @@ function act(a,v){
     case 'pact':{const L=meta.pacts||(meta.pacts=[]);const i=L.indexOf(v);if(i>=0)L.splice(i,1);else L.push(v);save();render()} break;
     case 'again': ui.screen='home';ui.hub='play';ui.pstep=meta.sel&&meta.unlocked[meta.sel]?3:0;ui.confirm=null;render();window.scrollTo(0,0); break;
     case 'home': ui.screen='home';ui.hub='menu';ui.confirm=null;render(); break;
-    case 'hub': ui.hub=v;ui.confirm=null;if(v==='play'&&ui.pstep==null)ui.pstep=meta.sel&&meta.unlocked[meta.sel]?1:0;render();window.scrollTo(0,0); break;
+    case 'hub': ui.hub=v;ui.confirm=null;if(v==='play'&&ui.pstep==null)ui.pstep=0;render();window.scrollTo(0,0); break;
     case 'pstep': ui.pstep=+v;render();window.scrollTo(0,0); break;
     case 'path':{const O=run.pathOff;if(!O||!needPath())break;const o=O.opts[+v],q=O.opts[1-v],fl=run.floor;run.order[fl-1]=o.i;run.order[fl]=q.i;run.paths[fl]=o.perk;run.pathOff=null;
       let m=`${PERKS[o.perk].n} : tu affrontes ${BOSSES[o.i].name}.`;if(o.perk==='soin'){run.hp=maxHp();run.flasks=Math.max(run.flasks,flaskMax())}if(o.perk==='savoir')run.spPts=(run.spPts??1)+2;if(o.perk==='mut')run.mut=fl;ui.toast=m;save();render()} break;
@@ -4496,7 +4505,7 @@ const HUBS={
  codex:{t:'Codex',k:'Gardiens, objets, secrets'},
  options:{t:'Options',k:'Son, touches, graphismes'},
  guide:{t:'Comment jouer',k:'Les bases en deux minutes'}};
-const PSTEPS=['Peuple','Classe','Talents','Difficulté'];
+const PSTEPS=['Classe','Peuple','Talents','Difficulté'];
 function rHome(){const h=ui.hub||'menu';if(h==='menu'||!HUBS[h])return rMenu();const P=HUBS[h];
   return `<header class="hubh"><button class="hback" data-a="hub" data-v="menu" aria-label="Retour au menu">←<span>Menu</span></button><div><span class="kicker">${P.k}</span><h1>${P.t}</h1></div><span class="hwal num" title="Grains au temple">⏳ ${meta.souls}</span></header>
   ${({play:rPlay,defis:rDefis,arena:rArenaHub,ladder:rLadder,temple:rTemple,guide:rGuide,codex:()=>`<section class="panel">${codexHtml()}</section>`,options:rOptions})[h]()}`}
@@ -4507,7 +4516,7 @@ function rMenu(){const st=meta.stain,tp=meta.sel&&meta.unlocked[meta.sel]&&TAL[m
     <div class="mhero">${meta.sel&&meta.unlocked[meta.sel]?(()=>{const u=renderPreview();return u?`<img src="${u}" alt="Ton héros">`:''})():'<div class="mempty">Neuf gardiens, une seule ascension.<br>Le Régent des Heures attend au sommet.</div>'}
       <div class="mstats num"><span><small>Grains</small><b>${meta.souls}</b></span><span><small>Record</small><b>${meta.best?'Étage '+ROMAN[meta.best]:'—'}</b></span><span><small>Cycle</small><b>${ROMAN[meta.cycle+1]||meta.cycle+1}</b></span></div></div>
     <nav class="mnav">
-      ${run?B('start','',run.weekly?'Reprendre le défi':run.daily?'Reprendre l’ascension du jour':'Reprendre l’ascension',`${CLS().name} niv. ${run.lvl} · étage ${ROMAN[run.floor]} : ${esc(BOSSAT(run.floor).name)}`,'prim'):B('hub','play','Nouvelle ascension',meta.sel&&meta.unlocked[meta.sel]?`${(RACES[meta.race]||RACES.plainois).n} · ${CLASSES[meta.sel].name}`:'Choisis ton peuple et ta classe','prim',tp>0?tp:'')}
+      ${run?B('start','',run.weekly?'Reprendre le défi':run.daily?'Reprendre l’ascension du jour':'Reprendre l’ascension',`${CLS().name} niv. ${run.lvl} · étage ${ROMAN[run.floor]} : ${esc(BOSSAT(run.floor).name)}`,'prim'):B('hub','play','Nouvelle ascension',meta.sel&&meta.unlocked[meta.sel]?`${(RACES[meta.race]||RACES.plainois).n} · ${CLASSES[meta.sel].name}`:'Choisis ta classe et ton peuple','prim',tp>0?tp:'')}
       ${!run&&!meta.runs?`<button class="mnew" data-a="hub" data-v="guide"><b>Première fois ?</b> Les bases en deux minutes →</button>`:''}
       ${B('hub','defis','Défis','Ascension du jour · défi de la semaine','',(dOk||wOk)&&!run?'!':'')}
       ${B('hub','arena','Arène de chaos','1 contre 1 en ligne, héros aléatoires','')}
@@ -4532,15 +4541,15 @@ function rGuide(){const K=a=>`<kbd>${esc(ka(a))}</kbd>`,mv=TOUCH?'<kbd>Joystick<
   ${S(5,'Ensuite',`<ul class="gtips"><li><b>Défis</b> du jour et de la semaine : la même partie pour tout le monde, avec son classement.</li><li><b>Tour sans fin</b> après le Régent, et <b>Arène de chaos</b> pour affronter tes amis.</li></ul>
     <div class="row" style="margin-top:12px;gap:8px"><button class="btn primary" data-a="hub" data-v="play">Commencer une ascension</button><button class="btn" data-a="hub" data-v="menu">Retour au menu</button></div>`)}`}
 function rPlay(){if(run)return `<section class="panel"><p>Une ascension est déjà en cours.</p><div class="row" style="margin-top:10px"><button class="btn primary" data-a="start">Reprendre</button><button class="btn" data-a="confirm" data-v="abandon">Abandonner</button></div>${ui.confirm==='abandon'?`<div class="confirm"><p>Abandonner compte comme une mort.</p><div class="row"><button class="btn danger" data-a="abandon">Abandonner</button><button class="btn" data-a="cancel">Continuer</button></div></div>`:''}</section>`;
-  const ok=meta.sel&&meta.unlocked[meta.sel],stp=Math.min(ui.pstep||0,ok?3:1);
-  const body=[()=>RACEP(),()=>CLSP(),()=>rTalents()||'<section class="panel"><p class="dim">Pas de talents pour cette classe.</p></section>',()=>PACTP()][stp]();
-  return `<div class="steps">${PSTEPS.map((n,i)=>`<button class="${i===stp?'on':''} ${i<stp?'done':''}" data-a="pstep" data-v="${i}" ${i>1&&!ok?'disabled':''}><i>${i+1}</i>${n}</button>`).join('')}</div>
+  const ok=meta.sel&&meta.unlocked[meta.sel],stp=Math.min(ui.pstep||0,ok?3:0);
+  const body=[()=>CLSP(),()=>RACEP(),()=>rTalents()||'<section class="panel"><p class="dim">Pas de talents pour cette classe.</p></section>',()=>PACTP()][stp]();
+  return `<div class="steps">${PSTEPS.map((n,i)=>`<button class="${i===stp?'on':''} ${i<stp?'done':''}" data-a="pstep" data-v="${i}" ${i>0&&!ok?'disabled':''}><i>${i+1}</i>${n}</button>`).join('')}</div>
   <div class="pgrid"><div class="pside">${HEROP()}</div><div class="pmain">${body}</div></div>
   <div class="pbar">${stp>0?`<button class="btn" data-a="pstep" data-v="${stp-1}">← ${PSTEPS[stp-1]}</button>`:'<span></span>'}
-    ${stp<3?`<button class="btn ${ok&&stp>=1?'':'primary'}" data-a="pstep" data-v="${stp+1}" ${stp>=1&&!ok?'disabled':''}>${PSTEPS[stp+1]} →</button>`:''}
+    ${stp<3?`<button class="btn ${ok?'':'primary'}" data-a="pstep" data-v="${stp+1}" ${!ok?'disabled':''}>${PSTEPS[stp+1]} →</button>`:''}
     ${ok?`<button class="btn primary big" data-a="start">Commencer l’ascension</button>`:''}</div>`}
 const HEROP=()=>`<section class="panel create"><div class="between"><span class="label">Ton héros</span><span class="dim">${(RACES[meta.race]||RACES.plainois).n} · ${meta.sel?CLASSES[meta.sel].name:'classe à choisir'}</span></div>
-    <div class="cprev">${meta.sel?(()=>{const u=renderPreview();return u?`<img src="${u}" alt="Aperçu du héros">`:'<p class="dim">Aperçu indisponible sans WebGL.</p>'})():'<p class="dim" style="padding:40px 16px;text-align:center">Choisis ton peuple puis ta première classe : elle sera gratuite.</p>'}</div></section>`;
+    <div class="cprev">${meta.sel?(()=>{const u=renderPreview();return u?`<img src="${u}" alt="Aperçu du héros">`:'<p class="dim cload">Chargement du héros…</p>'})():'<p class="dim" style="padding:40px 16px;text-align:center">Choisis ta première classe : elle sera gratuite.</p>'}</div></section>`;
 const RACEP=()=>`<section class="panel"><div class="between"><span class="label">Peuple</span><button class="btn sm" data-a="race" data-v="__rand">Au hasard</button></div>
     <div class="races">${Object.entries(RACES).map(([k,R])=>`<button class="race ${meta.race===k?'on':''}" data-a="race" data-v="${k}" style="--sk:${R.skin}">
       <div class="between"><h3>${R.n}</h3><span class="rpip"></span></div><small style="color:var(--ember)">${R.tag}</small><small>${R.d}</small>
@@ -4552,7 +4561,7 @@ const CLSP=()=>`<section class="panel"><span class="label">Classe</span>
       :(()=>{const cc=clsCost(k),fp=firstPick(),ok=meta.souls>=cc,ask=ui.confirm==='buy:'+k;return `<div class="cls lockd ${ok?'can':'cant'} ${ask?'ask':''}" ${ok&&!ask?`data-a="buyask" data-v="${k}" role="button" tabindex="0"`:''}>
         <h3>${c.name}</h3><small>${c.tag}</small><small style="color:var(--ember)">${c.wpn.n}</small><small>${c.desc}</small>
         ${ask?`<div class="buyc"><small>${fp?`Prendre <b>${c.name}</b> comme première classe ? Les autres se débloqueront avec des grains.`:`Débloquer ${c.name} pour <b>${cc} grains</b> ? Il t’en restera ${meta.souls-cc}.`}</small><div class="row" style="gap:6px"><button class="btn sm primary" data-a="unlock" data-v="${k}">${fp?'Choisir':'Acheter'}</button><button class="btn sm" data-a="cancel">Annuler</button></div></div>`
-          :fp?`<small style="color:var(--ok)">Gratuite : ta première classe</small><span class="buy">Choisir</span>`:ok?`<small style="color:var(--ember)">Verrouillée · ${cc} grains</small><span class="buy">Acheter</span>`:`<small class="down">Débloquer : ${cc} grains · il en manque ${cc-meta.souls}</small>`}</div>`})()}`}).join('')}</div></section>`;
+          :fp?`<small style="color:var(--ok)">Gratuite : ta première classe</small><span class="buy">Choisir</span>`:ok?(cc?`<small style="color:var(--ember)">Verrouillée · ${cc} grains</small><span class="buy">Acheter</span>`:`<small style="color:var(--ok)">Gratuite</small><span class="buy">Prendre</span>`):`<small class="down">Débloquer : ${cc} grains · il en manque ${cc-meta.souls}</small>`}</div>`})()}`}).join('')}</div></section>`;
 const PACTP=()=>`${run?'':`<section class="panel"><div class="between"><span class="label">Pactes d’ascension</span><span style="color:var(--ember)">Chaleur ${heatOf(meta.pacts)} · grains +${heatOf(meta.pacts)*15}%</span></div>
     <p class="dim" style="font-size:13px;margin:4px 0 8px">Rends l’ascension plus dure pour gagner plus de grains par gardien. Record de chaleur battue : ${meta.heatBest||0}.</p>
     <div class="pacts">${Object.entries(PACTS).map(([k,P])=>`<button class="pact ${(meta.pacts||[]).includes(k)?'on':''}" data-a="pact" data-v="${k}"><span class="between"><b>${P.n}</b><span class="chip">+${P.heat}</span></span><small>${P.d}</small></button>`).join('')}</div></section>`}

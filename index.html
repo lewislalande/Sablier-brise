@@ -89,6 +89,9 @@ button:focus-visible{outline:2px solid var(--ember);outline-offset:2px}
 .cprev{display:grid;place-items:center;background:#0e1114;border-radius:8px;overflow:hidden}.cprev img{width:100%;max-width:560px;display:block}
 .pacts,.achs{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px}
 .pact{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:3px;padding:9px 11px;border:1px solid var(--line);border-radius:8px}.pact:hover{border-color:var(--dim)}.pact.on{border-color:var(--blood);background:color-mix(in srgb,var(--blood) 10%,transparent)}.pact small,.ach small{font-size:12.5px;color:var(--dim)}.pact:focus-visible{outline:2px solid var(--ember)}
+.lookrow{display:flex;gap:10px;align-items:flex-start;margin:6px 0}.lookrow .lk{min-width:46px;color:var(--dim);font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;padding-top:7px}.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chipb{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;font-size:13px}.chipb:hover{border-color:var(--dim)}.chipb.on{border-color:var(--ember);color:var(--ember);background:color-mix(in srgb,var(--ember) 10%,transparent)}.chipb:focus-visible{outline:2px solid var(--ember)}
+.arw{display:flex;flex-wrap:wrap;gap:4px 8px}.ttlc{color:var(--bone)}.aurc{color:var(--c)}.ladrow .nm .ttl{display:block;font-size:11px;color:var(--dim);font-style:italic;overflow:hidden;text-overflow:ellipsis}
 .ach{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;opacity:.7}.ach.done{opacity:1;border-color:var(--ok)}.ach.done b{color:var(--ok)}
 .daily{border-color:var(--ember)}
 .weekly{border-color:#b48cff}.wmods{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:8px}.wmod{border:1px solid color-mix(in srgb,#b48cff 45%,var(--line));border-radius:6px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;background:color-mix(in srgb,#b48cff 7%,var(--panel))}.wmod b{color:#d6bcff;font-weight:600}.wmod small{font-size:12.5px;color:var(--bone);opacity:.85}.wmod.pact{border-color:color-mix(in srgb,var(--ember) 40%,var(--line));background:color-mix(in srgb,var(--ember) 6%,var(--panel))}.wmod.pact b{color:var(--ember)}
@@ -1010,24 +1013,52 @@ const PACTS={
 const PK=k=>!!(run&&run.pacts&&run.pacts.includes(k));
 const heatOf=L=>(L||[]).reduce((a,k)=>a+(PACTS[k]?PACTS[k].heat:0),0);
 const ACH={
- floor5:{n:'À mi-hauteur',d:'Atteindre l’étage V.',r:80},
- win:{n:'Le temps reprend',d:'Vaincre le Régent des Heures.',r:300},
- nohit3:{n:'Intouchable',d:'Battre 3 gardiens sans dégâts dans la même ascension.',r:250},
- parry10:{n:'Mur d’acier',d:'Réussir 10 parades parfaites dans un seul combat.',r:150},
- brk:{n:'Briseur',d:'Briser la posture d’un gardien.',r:60},
- echo:{n:'Chasseur d’échos',d:'Vaincre un Écho.',r:100},
- set:{n:'Panoplie complète',d:'Porter les 4 pièces d’une panoplie.',r:150},
- arsenal:{n:'Arsenal divin',d:'Posséder les deux armes légendaires de ta classe.',r:200},
- heat5:{n:'Pacte de sang',d:'Vaincre le Régent avec une chaleur de 5 ou plus.',r:500},
- tri:{n:'Polyvalent',d:'Vaincre le Régent avec 3 classes différentes.',r:400},
- secret:{n:'Hors du temps',d:'Vaincre le boss caché.',r:600},
- secretnh:{n:'Parfait',d:'Vaincre le boss caché sans prendre un coup.',r:1500},
- daily:{n:'Rendez-vous quotidien',d:'Terminer une ascension du jour.',r:100},
- gob:{n:'Petit mais costaud',d:'Vaincre le Régent avec un Gobelin.',r:250}
+ tuto:{n:'Premiers pas',d:'Terminer le combat tutoriel.',r:20,t:'Apprenti'},
+ floor5:{n:'À mi-hauteur',d:'Atteindre l’étage V.',r:80,t:'Grimpeur'},
+ nohit1:{n:'Sans une égratignure',d:'Battre un gardien sans prendre de dégâts.',r:60,t:'Esquiveur'},
+ brk:{n:'Briseur',d:'Briser la posture d’un gardien.',r:60,t:'Briseur'},
+ echo:{n:'Chasseur d’échos',d:'Vaincre un Écho.',r:100,t:'Chasseur d’échos',cos:'echo'},
+ parry10:{n:'Mur d’acier',d:'Réussir 10 parades parfaites dans un seul combat.',r:150,t:'Mur d’acier',cos:'acier'},
+ set:{n:'Panoplie complète',d:'Porter les 4 pièces d’une panoplie.',r:150,t:'Collectionneur'},
+ arsenal:{n:'Arsenal divin',d:'Posséder les deux armes légendaires de ta classe.',r:200,t:'Porte-légende'},
+ win:{n:'Le temps reprend',d:'Vaincre le Régent des Heures.',r:300,t:'Rompt-les-Heures',cos:'givre'},
+ nohit3:{n:'Intouchable',d:'Battre 3 gardiens sans dégâts dans la même ascension.',r:250,t:'l’Intouchable',cos:'ombre'},
+ daily:{n:'Rendez-vous quotidien',d:'Terminer une ascension du jour.',r:100,t:'Fidèle',cos:'feuilles'},
+ week:{n:'Défi relevé',d:'Vaincre le Régent pendant un défi de la semaine.',r:200,t:'Audacieux'},
+ gob:{n:'Petit mais costaud',d:'Vaincre le Régent avec un Gobelin.',r:250,t:'Petit mais costaud'},
+ fast:{n:'Fulgurant',d:'Vaincre le Régent en moins de 20 minutes de jeu.',r:400,t:'le Fulgurant',cos:'foudre'},
+ heat5:{n:'Pacte de sang',d:'Vaincre le Régent avec une chaleur de 5 ou plus.',r:500,t:'Lié par le sang',cos:'sang'},
+ tri:{n:'Polyvalent',d:'Vaincre le Régent avec 3 classes différentes.',r:400,t:'Polyvalent'},
+ allcls:{n:'Maître d’armes',d:'Vaincre le Régent avec toutes les classes.',r:1000,t:'Maître d’armes',cos:'aube'},
+ seal8:{n:'Huitième sceau',d:'Vaincre le Régent sous le Sceau VIII.',r:800,t:'Scellé'},
+ arena1:{n:'Premier sang',d:'Gagner un duel dans l’arène.',r:60,t:'Gladiateur'},
+ arena10:{n:'Champion de l’arène',d:'Gagner 10 duels dans l’arène.',r:300,t:'Champion',cos:'braise'},
+ end15:{n:'Vertige',d:'Atteindre l’étage XV de la Tour sans fin.',r:300,t:'Funambule',cos:'astre'},
+ end25:{n:'Au-delà des nuages',d:'Atteindre l’étage XXV de la Tour sans fin.',r:800,t:'Céleste'},
+ secret:{n:'Hors du temps',d:'Vaincre le boss caché.',r:600,t:'Hors du temps',cos:'sable'},
+ secretnh:{n:'Parfait',d:'Vaincre le boss caché sans prendre un coup.',r:1500,t:'le Parfait',cos:'couronne'}
 };
-function achieve(id){if(!ACH[id]||(meta.ach||(meta.ach={}))[id])return;meta.ach[id]=1;meta.souls+=ACH[id].r;const m=`Défi réussi : ${ACH[id].n} (+${ACH[id].r} grains au temple)`;
+/* apparences : auras portées en combat, débloquées par les exploits */
+const COS={
+ braise:{n:'Braises',c:'#ff8a3a',fx:'ember'},givre:{n:'Givre',c:'#bfe8ff',fx:'snow'},sable:{n:'Sable du temps',c:'#e8c070',fx:'sand'},
+ ombre:{n:'Ombre',c:'#9a86c8',fx:'shadow'},sang:{n:'Sang',c:'#c4483d',fx:'blood'},echo:{n:'Écho',c:'#a9b8ff',fx:'mist'},
+ acier:{n:'Acier',c:'#d8dee8',fx:'tspark'},feuilles:{n:'Feuilles',c:'#8fd07a',fx:'leaf'},foudre:{n:'Foudre',c:'#fff1a8',fx:'tspark'},
+ astre:{n:'Astres',c:'#c9a8ff',fx:'prism'},aube:{n:'Aube',c:'#ffe6a8',fx:'holy'},couronne:{n:'Couronne d’or',c:'#ffd36a',fx:'holy',ring:1}
+};
+const TITLES=()=>Object.values(ACH).map(A=>A.t).filter(Boolean);
+const myTitle=()=>{const A=ACH[meta.title];return A&&A.t&&(meta.ach||{})[meta.title]?A.t:''};
+const cosOk=k=>k&&COS[k]&&Object.keys(ACH).some(a=>ACH[a].cos===k&&(meta.ach||{})[a]);
+function cosAura(f,R){const k=meta.aura;if(!R||!R.pg||!R.scene)return;const on=cosOk(k)&&!f.over;
+  if(!on){if(R.cosRing)R.cosRing.visible=false;return}const C=COS[k],T=THREE,p=R.pg.position;R.cosT=(R.cosT||0)+1;
+  if(!R.cosRing){const m=new T.Mesh(new T.PlaneGeometry(3.2,3.2),new T.MeshBasicMaterial({map:fxTex('ring'),transparent:true,depthWrite:false,blending:T.AdditiveBlending,toneMapped:false}));m.rotation.x=-Math.PI/2;m.renderOrder=1;R.scene.add(m);R.cosRing=m}
+  const g=R.cosRing;g.visible=true;g.material.color.set(C.c);g.material.opacity=.32+.12*Math.sin(R.cosT*.08);g.position.set(p.x,.08,p.z);g.rotation.z+=.01;
+  if(Math.random()<.7*FXQ){const a=R.cosT*.21+Math.random()*.6,rr=.55+Math.random()*.35,P=new T.Vector3(p.x+Math.cos(a)*rr,.1+Math.random()*.4,p.z+Math.sin(a)*rr);
+    FE(C.fx,P,.3,{col:C.c,size:.9,spd:.25,lift:1.4})}
+  if(C.ring&&R.cosT%45===0)fxRing(new T.Vector3(p.x,0,p.z),C.c,1.4,.9,{a:.55})}
+
+function achieve(id){if(!ACH[id]||(meta.ach||(meta.ach={}))[id])return;meta.ach[id]=1;meta.souls+=ACH[id].r;const A=ACH[id],m=`Exploit : ${A.n} (+${A.r} grains${A.t?', titre « '+A.t+' »':''}${A.cos?', aura '+COS[A.cos].n:''})`;
   if(fight){(fight.achMsg||(fight.achMsg=[])).push(m);txt(fight,fight.p.x,fight.p.y-30,ACH[id].n,'ember')}else ui.toast=(ui.toast?ui.toast+' · ':'')+m;save()}
-function checkAch(){if(!run)return;if(run.floor>=5)achieve('floor5');const c=setCounts();if(Object.values(c).some(n=>n>=4))achieve('set');
+function checkAch(){if(!run)return;if(run.floor>=5)achieve('floor5');if(run.endless){if(run.floor>=15)achieve('end15');if(run.floor>=25)achieve('end25')}const c=setCounts();if(Object.values(c).some(n=>n>=4))achieve('set');
   if(Object.keys(WEAPONS).filter(k=>WEAPONS[k].cls===run.cls).every(k=>(run.arsenal||[]).includes(k)))achieve('arsenal')}
 /* aléatoire à graine pour l'ascension du jour */
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -1341,7 +1372,7 @@ function tutTick(f,dt){const T=f.tut,p=f.p;if(T.lx!==undefined)T.mv+=Math.hypot(
 function tutHud(f){const el=id('tutp');if(!el||!f.tut)return;const T=f.tut,S=TUTS[T.step];if(!S)return;const k=T.step+'|'+(S.c?T[S.c]:'')+'|'+(T.flash>0?1:0);if(el.dataset.k===k)return;el.dataset.k=k;
   el.innerHTML=`<div class="tutdots">${TUTS.map((x,i)=>`<i class="${i<T.step?'ok':i===T.step?'on':''}"></i>`).join('')}</div><span class="label">Étape ${T.step+1} / ${TUTS.length}${T.flash>0?' · <b style="color:var(--ok)">réussie !</b>':''}</span><b class="tutt">${S.t}${S.n?` <small>${Math.min(S.n,T[S.c]||0)} / ${S.n}</small>`:''}</b><p>${S.d()}</p>`}
 function tutLeave(won){fight=null;if(PV.saved){run=PV.saved.run;meta.up=PV.saved.up;PV.saved=null}else run=null;teardown3D();document.body.style.overflow='';
-  if(won){const first=!meta.tutDone;meta.tutDone=1;if(first)meta.souls+=60;ui.toast=first?'Tutoriel terminé ! +60 grains au temple.':'Tutoriel terminé !'}
+  if(won){const first=!meta.tutDone;meta.tutDone=1;achieve('tuto');if(first)meta.souls+=60;ui.toast=(first?'Tutoriel terminé ! +60 grains au temple.':'Tutoriel terminé !')+(ui.toast?' · '+ui.toast:'')}
   ui.screen='home';ui.hub='menu';save();render()}
 function startTraining(){if(!run)return;run.train={hp:run.hp,flasks:run.flasks};ui.trainHit=ui.trainHit||false;startFight()}
 function endTraining(){if(!run||!run.train)return;run.hp=run.train.hp;run.flasks=run.train.flasks;run.train=null;fight=null;ui.screen='map';save();render()}
@@ -3877,6 +3908,7 @@ function render3D(dt){
   lholdTick();const f=fight,R=R3;if(!R||!R.scene)return;const T=THREE,p=f.p,b=f.b,t=f.t;
   handleEvents(f);
   R.pg.position.copy(W3(p,p.leap?Math.sin(Math.min(1,p.leap.t/p.leap.life)*Math.PI)*3.2:0));
+  cosAura(f,R);
   R.pg.rotation.y=-(p.roll>0?Math.atan2(p.rdy,p.rdx):p.face);
   animPlayer(f,dt);if(R.egg)R.egg.rotation.y+=dt*1.4;
   if(!R.gsh){const gm=new T.MeshBasicMaterial({color:new T.Color('#9fd8f5'),transparent:true,opacity:0,depthWrite:false,side:T.DoubleSide,blending:T.AdditiveBlending,toneMapped:false});
@@ -4250,7 +4282,7 @@ function win(){if(run&&run.tut){tutLeave(true);return}
   ui.mutWon=mutd;
   {const bid=BOSSAT(run.floor).id;const k=Object.keys(INF).find(x=>INF[x].boss===bid);ui.newInf=null;if(k&&!meta.infU[k]){meta.infU[k]=true;ui.newInf=k}}
   const nohit=fight&&!fight.hits,lid=BOSSLEG[BOSSAT(run.floor).id],has=Object.values(run.items).some(x=>x.leg===lid);
-  if(nohit){run.nohits=(run.nohits||0)+1;if(run.nohits>=3)achieve('nohit3')}if(fight&&(fight.ms.parries||0)>=10)achieve('parry10');
+  if(nohit){achieve('nohit1');run.nohits=(run.nohits||0)+1;if(run.nohits>=3)achieve('nohit3')}if(fight&&(fight.ms.parries||0)>=10)achieve('parry10');
   const wg=run.wager;run.wager=0;const gg=(nohit?g*2:g)*(wg?2:1);run.carried+=gg;meta.best=Math.max(meta.best,run.floor);fight=null;ui.nohit=nohit?(has?'owned':lid):null;if(nohit&&lid==='sablier')meta.sablier=true;
   if(run.floor===9){
     const bonus=Math.round(150*(1+meta.cycle*.5));
@@ -4260,7 +4292,7 @@ function win(){if(run&&run.tut){tutLeave(true);return}
     if(!run.daily&&(run.asc||0)>=(meta.ascMax||0)&&(meta.ascMax||0)<8){meta.ascMax=(meta.ascMax||0)+1;meta.ascSel=meta.ascMax;ui.end.ascUp=meta.ascMax}
     {const T0=run.time||0,bt=meta.bestTime||{},k=run.cls;ui.end.sheet.best=bt[k];if(!bt[k]||T0<bt[k]){bt[k]=T0;ui.end.sheet.newBest=1}meta.bestTime=bt}
     meta.souls+=run.carried+bonus;meta.cycle++;meta.wins++;meta.runs++;meta.best=9;
-    achieve('win');if(heatOf(run.pacts)>=5)achieve('heat5');if(run.race==='gobelin')achieve('gob');(meta.winCls||(meta.winCls={}))[run.cls]=1;if(Object.keys(meta.winCls).length>=3)achieve('tri');
+    achieve('win');if(heatOf(run.pacts)>=5)achieve('heat5');if(run.race==='gobelin')achieve('gob');(meta.winCls||(meta.winCls={}))[run.cls]=1;if(Object.keys(meta.winCls).length>=3)achieve('tri');if(Object.keys(CLASSES).every(k=>meta.winCls[k]))achieve('allcls');if((run.time||0)>0&&run.time<1200)achieve('fast');if((run.asc||0)>=8)achieve('seal8');if(run.weekly)achieve('week');
     if(run.daily){const sc=dailyScore(true);runRec(sc,true);ui.end.daily=sc;ui.end.dLbl=run.weekly?'du défi de la semaine':'de l’ascension du jour'}
     meta.heatBest=Math.max(meta.heatBest||0,heatOf(run.pacts));
     run.carried=0;run.secret=1;run.floor=10;run.hp=Math.max(run.hp,Math.round(maxHp()*.6));run.flasks=Math.max(run.flasks,flaskMax());run.node=null;run.ev=null;ui.screen='challenger';save();render();return;
@@ -4299,7 +4331,7 @@ function ladLocal(){try{const L=JSON.parse(localStorage.getItem('sablier_ladder'
 function ladLocalSave(L){try{localStorage.setItem('sablier_ladder',JSON.stringify(L.slice(0,120)))}catch(e){}}
 function runScore(won,sec,nh,cyc){const cl=won?9:Math.max(0,run.floor-1),t=run.time||0;
   return cl*1000+(run.nohits||0)*300+heatOf(run.pacts)*150+(run.asc||0)*500+Math.min(cyc||0,10)*500+(won?2000+Math.max(0,Math.round((5400-t)/3)):0)+(sec?2500+(nh?1000:0):0)}
-function ladEntry(won,sec,nh,cyc){const d=run.daily||null;return {pseudo:ladName(meta.pseudo),score:d?dailyScore(won):runScore(won,sec,nh,cyc),cls:run.cls,race:run.race||'plainois',floor:won?9:run.floor,won:!!won,sec:sec?1:0,seal:run.asc||0,heat:heatOf(run.pacts),secs:Math.round(run.time||0),day:d,wk:run.weekly?1:0,at:Date.now()}}
+function ladEntry(won,sec,nh,cyc){const d=run.daily||null;return {pseudo:ladName(meta.pseudo),score:d?dailyScore(won):runScore(won,sec,nh,cyc),cls:run.cls,race:run.race||'plainois',floor:won?9:run.floor,won:!!won,sec:sec?1:0,seal:run.asc||0,heat:heatOf(run.pacts),secs:Math.round(run.time||0),day:d,wk:run.weekly?1:0,at:Date.now(),title:myTitle()||null}}
 function ladStatus(t){if(ui.end)ui.end.ladSt=t;const el=id('ladst');if(el)el.textContent=t}
 const ladH=()=>({apikey:LADDER_API.key,Authorization:'Bearer '+LADDER_API.key});
 const ladBase=()=>LADDER_API.url.replace(/\/+$/,'')+'/rest/v1/scores';
@@ -4310,7 +4342,7 @@ function ladInit(){if(ladReady)return ladReady;return ladReady=(async()=>{
     LAD.db=db;LAD.uid=u?await u.id():null;LAD.canW=u?await u.can('data.write'):null;LAD.mode='claude';
     db.collection('ladder').onSnapshot(sn=>{LAD.rows=sn.docs.map(d=>Object.assign({uid:d.id},d.data()));LAD.st='';ladPaint()},()=>{LAD.st='Classement partagé indisponible';ladPaint()})}catch(e){}
   ladPaint()})()}
-async function ladFetch(){if(LAD.mode!=='api')return;const q='?select=pseudo,score,cls,race,floor,won,sec,seal,heat,secs,day&order=score.desc&limit=300';
+async function ladFetch(){if(LAD.mode!=='api')return;if(LAD.noTitle===undefined){try{const t=await fetch(ladBase()+'?select=title&limit=1',{headers:ladH()});LAD.noTitle=!t.ok}catch(e){}}const q='?select=pseudo,score,cls,race,floor,won,sec,seal,heat,secs,day'+(LAD.noTitle===false?',title':'')+'&order=score.desc&limit=300';
   try{const [g,d,w]=await Promise.all([fetch(ladBase()+q+'&day=is.null',{headers:ladH()}),fetch(ladBase()+q+'&day=eq.'+todaySeed(),{headers:ladH()}),fetch(ladBase()+q+'&day=eq.'+weekSeed(),{headers:ladH()})]);if(!g.ok||!d.ok)throw 0;
     LAD.api={gen:await g.json(),day:await d.json(),week:w.ok?await w.json():[]};LAD.st=''}catch(e){LAD.st='Serveur du classement injoignable'}ladPaint()}
 async function ladSubmit(E){
@@ -4318,10 +4350,10 @@ async function ladSubmit(E){
   if(!E.pseudo){ladStatus('Choisis un pseudo dans « Classement » pour y apparaître.');return}
   ladStatus('Envoi au classement…');await ladInit();
   try{
-    if(LAD.mode==='api'){const r=await fetch(ladBase(),{method:'POST',headers:Object.assign({'Content-Type':'application/json',Prefer:'return=minimal'},ladH()),body:JSON.stringify({pseudo:E.pseudo,score:E.score,cls:E.cls,race:E.race,floor:E.floor,won:E.won,sec:E.sec,seal:E.seal,heat:E.heat,secs:E.secs,day:E.day})});
+    if(LAD.mode==='api'){const r=await fetch(ladBase(),{method:'POST',headers:Object.assign({'Content-Type':'application/json',Prefer:'return=minimal'},ladH()),body:JSON.stringify(Object.assign({pseudo:E.pseudo,score:E.score,cls:E.cls,race:E.race,floor:E.floor,won:E.won,sec:E.sec,seal:E.seal,heat:E.heat,secs:E.secs,day:E.day},E.title&&LAD.noTitle===false?{title:E.title}:{}))});
       if(!r.ok)throw 0;ladStatus('Score envoyé au classement.');ladFetch();return}
     if(LAD.mode==='claude'&&LAD.uid&&LAD.canW!==false){const mine=LAD.rows.find(r=>r.uid===LAD.uid)||{},rec={score:E.score,cls:E.cls,race:E.race,floor:E.floor,won:E.won,sec:E.sec,seal:E.seal,heat:E.heat,secs:E.secs,at:E.at};
-      const doc={pseudo:E.pseudo,best:mine.best||null,day:mine.day||null,wk:mine.wk||null};let better=false;
+      const doc={pseudo:E.pseudo,title:E.title||mine.title||null,best:mine.best||null,day:mine.day||null,wk:mine.wk||null};let better=false;
       if(E.wk){if(!doc.wk||doc.wk.d!==E.day||E.score>doc.wk.score){doc.wk=Object.assign({d:E.day},rec);better=true}}else if(E.day){if(!doc.day||doc.day.d!==E.day||E.score>doc.day.score){doc.day=Object.assign({d:E.day},rec);better=true}}else if(!doc.best||E.score>doc.best.score){doc.best=rec;better=true}
       await LAD.db.doc('ladder/'+LAD.uid).set(doc);ladStatus(better?'Score enregistré au classement.':'Ton record au classement reste meilleur.');return}
     if(LAD.mode==='claude')LAD.canW=false;
@@ -4331,13 +4363,13 @@ function ladDedupe(A){const seen=new Set();return A.filter(r=>{const k=String(r.
 function ladRows(){const me=ladName(meta.pseudo).toLowerCase(),today=todaySeed(),loc=ladLocal();let A;
   if(LAD.tab==='me')A=loc.filter(x=>!x.day).map(x=>Object.assign({},x,{me:0}));
   else if(LAD.mode==='api'&&LAD.api)A=ladDedupe((LAD.tab==='day'?LAD.api.day:LAD.tab==='week'?LAD.api.week:LAD.api.gen).slice()).map(r=>Object.assign({},r,{me:me&&String(r.pseudo).toLowerCase()===me}));
-  else if(LAD.mode==='claude')A=LAD.rows.map(r=>{const x=LAD.tab==='day'?(r.day&&r.day.d===today?r.day:null):LAD.tab==='week'?(r.wk&&r.wk.d===weekSeed()?r.wk:null):r.best;return x&&Object.assign({},x,{pseudo:r.pseudo,me:r.uid===LAD.uid})}).filter(Boolean);
+  else if(LAD.mode==='claude')A=LAD.rows.map(r=>{const x=LAD.tab==='day'?(r.day&&r.day.d===today?r.day:null):LAD.tab==='week'?(r.wk&&r.wk.d===weekSeed()?r.wk:null):r.best;return x&&Object.assign({},x,{pseudo:r.pseudo,title:r.title,me:r.uid===LAD.uid})}).filter(Boolean);
   else A=ladDedupe(loc.filter(x=>LAD.tab==='day'?x.day===today:LAD.tab==='week'?x.day===weekSeed():!x.day).filter(x=>x.pseudo)).map(x=>Object.assign({},x,{me:1}));
   return A.filter(r=>typeof r.score==='number').sort((a,b)=>b.score-a.score).slice(0,25)}
 function ladPaint(){const box=id('ladlist');if(!box)return;const md=id('ladmode');
   if(md)md.textContent=LAD.st||(LAD.mode==='api'?'En ligne':LAD.mode==='claude'?(LAD.canW===false?'Partagé · lecture seule':'Partagé'):'Sur cet appareil');
   const R=ladRows(),clsN=k=>CLASSES[k]?CLASSES[k].name:k;
-  box.innerHTML=R.length?`<div class="ladrow hd"><span>#</span><span>${LAD.tab==='me'?'Pseudo':'Joueur'}</span><span class="cl">Classe</span><span class="rs">Résultat</span><span class="tm">Temps</span><span class="sc">Score</span></div>`+R.map((r,i)=>`<div class="ladrow ${r.me?'me':''} ${i===0?'top1':''}"><span class="r num">${i+1}</span><span class="nm">${esc(r.pseudo||'—')}</span><span class="cl">${esc(clsN(r.cls))}</span><span class="rs">${r.won?(r.floor>9?'Tour · étage '+(ROMAN[r.floor]||r.floor):r.sec?'Sablier vaincu':'Victoire'):'Étage '+(ROMAN[r.floor]||r.floor)}${r.seal?' · sceau '+ROMAN[r.seal]:''}</span><span class="tm">${fmtT(r.secs)}</span><span class="sc">${Number(r.score).toLocaleString('fr-FR')}</span></div>`).join('')
+  box.innerHTML=R.length?`<div class="ladrow hd"><span>#</span><span>${LAD.tab==='me'?'Pseudo':'Joueur'}</span><span class="cl">Classe</span><span class="rs">Résultat</span><span class="tm">Temps</span><span class="sc">Score</span></div>`+R.map((r,i)=>`<div class="ladrow ${r.me?'me':''} ${i===0?'top1':''}"><span class="r num">${i+1}</span><span class="nm">${esc(r.pseudo||'—')}${r.title&&TITLES().includes(r.title)?`<span class="ttl">${esc(r.title)}</span>`:''}</span><span class="cl">${esc(clsN(r.cls))}</span><span class="rs">${r.won?(r.floor>9?'Tour · étage '+(ROMAN[r.floor]||r.floor):r.sec?'Sablier vaincu':'Victoire'):'Étage '+(ROMAN[r.floor]||r.floor)}${r.seal?' · sceau '+ROMAN[r.seal]:''}</span><span class="tm">${fmtT(r.secs)}</span><span class="sc">${Number(r.score).toLocaleString('fr-FR')}</span></div>`).join('')
     :`<div class="ladempty">${LAD.tab==='week'?'Personne n’a encore tenté le défi de la semaine.':LAD.tab==='day'?'Personne n’a encore tenté l’ascension du jour.':LAD.tab==='me'?'Aucune ascension terminée sur cet appareil.':'Aucun score pour l’instant : termine une ascension pour ouvrir le classement.'}</div>`}
 function rLadder(){return `<section class="panel"><div class="between"><span class="label">Classement des Veilleurs</span><span class="dim" id="ladmode"></span></div>
   <div class="ladme"><label class="dim" for="ladname">Ton pseudo</label><input id="ladname" maxlength="16" placeholder="Ex. Veilleuse" value="${esc(ui.ladDraft??meta.pseudo??'')}" autocomplete="off" spellcheck="false"><button class="btn sm" data-a="ladname">Enregistrer</button></div>
@@ -4427,6 +4459,7 @@ function pvpAct(k,o){if(!fight||!fight.pvp)return;const f=fight;pvpSend('act',Ob
 function pvpRoundOver(won){const f=fight;const i=pvpMe();if(won)PV.score[i]++;else{PV.score[1-i]++;pvpSend('dead',{})}
   f.msg={txt:won?'Manche gagnée !':'Manche perdue',t:3,big:1};
   const done=PV.score[0]>=2||PV.score[1]>=2;
+  if(done&&PV.score[i]>=2){meta.pvpW=(meta.pvpW||0)+1;achieve('arena1');if(meta.pvpW>=10)achieve('arena10');save()}
   setTimeout(()=>{if(!fight||fight!==f)return;if(done){PV.st='end';PV.res={won:PV.score[i]>=2,score:PV.score.slice()};pvpLeaveFight()}else if(PV.role==='A')pvpHostStart(false)},3200)}
 function pvpLeaveFight(){fight=null;if(PV.saved){run=PV.saved.run;meta.up=PV.saved.up;PV.saved=null}teardown3D&&teardown3D();ui.screen='home';ui.hub='arena';if(PV.st==='fight')PV.st=PV.opp?'ready':'err';document.body.style.overflow='';render()}
 function pvpQuit(){pvpClose();PV.st='idle';PV.opp=null;PV.code='';if(fight&&fight.pvp)pvpLeaveFight();else render()}
@@ -4497,6 +4530,8 @@ function act(a,v){
       let m=`${PERKS[o.perk].n} : tu affrontes ${BOSSES[o.i].name}.`;if(o.perk==='soin'){run.hp=maxHp();run.flasks=Math.max(run.flasks,flaskMax())}if(o.perk==='savoir')run.spPts=(run.spPts??1)+2;if(o.perk==='mut')run.mut=fl;ui.toast=m;save();render()} break;
     case 'fullscreen':{try{const d=document.documentElement;(d.requestFullscreen||d.webkitRequestFullscreen).call(d);setTimeout(()=>{try{screen.orientation.lock('landscape').catch(()=>{})}catch(_){}},300)}catch(_){}} break;
     case 'gfx': meta.gfx=v==='basse'?'basse':'haute';save();render(); break;
+    case 'title': meta.title=v&&ACH[v]&&(meta.ach||{})[v]?v:'';save();render(); break;
+    case 'aura': meta.aura=cosOk(v)?v:'';save();render(); break;
     case 'asc': meta.ascSel=Math.max(0,Math.min(meta.ascMax||0,+v));save();render(); break;
     case 'fight': if(needPath()){render();break}if(unspent()&&ui.confirm!=='unspent'){ui.confirm='unspent';render();break}ui.confirm=null;startFight(); break;
     case 'autopts':{const k=topStat();run.stats[k]=(run.stats[k]||0)+run.pts;run.pts=0;save();render()} break;
@@ -4637,8 +4672,14 @@ function rTemple(){const st=meta.stain;return `<section class="panel"><div class
   <section class="panel"><div class="between"><span class="label">Forge divine</span><span class="dim">Infusions d\u2019arme</span></div>
     <div>${Object.entries(INF).map(([k,I])=>{const u=meta.infU[k];return `<div class="upg"><div><div class="row" style="gap:8px"><span class="pip" style="--c:${I.col}"></span>${I.n} <span class="dim" style="font-size:13px">· ${EL[I.el].n}</span></div><small>${I.d}</small><small style="color:var(--dim);display:block">Ou gratuit : bats ${BOSSES.find(x=>x.id===I.boss).name}.</small></div>
       ${u?'<span class="chip good">Débloquée</span>':`<button class="btn sm primary" data-a="infbuy" data-v="${k}" ${meta.souls<I.cost?`disabled title="Il manque ${I.cost-meta.souls} grains au temple"`:''}>${I.cost} grains${meta.souls<I.cost?` · −${I.cost-meta.souls}`:''}</button>`}</div>`}).join('')}</div></section>
-  <section class="panel"><div class="between"><span class="label">Exploits</span><span class="dim">${Object.keys(meta.ach||{}).length} / ${Object.keys(ACH).length}</span></div>
-    <div class="achs">${Object.entries(ACH).map(([k,A])=>`<div class="ach ${(meta.ach||{})[k]?'done':''}"><b>${A.n}</b><small>${A.d}</small><small class="num">${(meta.ach||{})[k]?'Réussi':'+'+A.r+' grains'}</small></div>`).join('')}</div></section>`}
+  ${rLook()}
+  <section class="panel"><div class="between"><span class="label">Exploits</span><span class="dim">${Object.keys(meta.ach||{}).filter(k=>ACH[k]).length} / ${Object.keys(ACH).length}</span></div>
+    <div class="achs">${Object.entries(ACH).map(([k,A])=>{const ok=(meta.ach||{})[k];return `<div class="ach ${ok?'done':''}"><b>${A.n}</b><small>${A.d}</small><small class="arw">${A.t?`<span class="ttlc">Titre « ${A.t} »</span>`:''}${A.cos?`<span class="aurc" style="--c:${COS[A.cos].c}">Aura ${COS[A.cos].n}</span>`:''}</small><small class="num">${ok?'Réussi':'+'+A.r+' grains'}</small></div>`}).join('')}</div></section>`}
+function rLook(){const got=Object.keys(ACH).filter(k=>(meta.ach||{})[k]),tt=got.filter(k=>ACH[k].t),aur=Object.keys(COS).filter(cosOk);
+  return `<section class="panel look" id="sec-look"><div class="between"><span class="label">Apparence</span><span class="dim">${tt.length} titre${tt.length>1?'s':''} · ${aur.length} aura${aur.length>1?'s':''}</span></div>
+  <p class="dim" style="font-size:13px;margin:4px 0 8px">Ton titre s’affiche sous ton pseudo dans le classement. L’aura t’entoure pendant les combats. Les exploits ci-dessous en débloquent d’autres.</p>
+  <div class="lookrow"><span class="lk">Titre</span><div class="chips"><button class="chipb ${!myTitle()?'on':''}" data-a="title" data-v="">Aucun</button>${tt.map(k=>`<button class="chipb ${meta.title===k?'on':''}" data-a="title" data-v="${k}">${ACH[k].t}</button>`).join('')}</div></div>
+  <div class="lookrow"><span class="lk">Aura</span><div class="chips"><button class="chipb ${!cosOk(meta.aura)?'on':''}" data-a="aura" data-v="">Aucune</button>${aur.map(k=>`<button class="chipb ${meta.aura===k?'on':''}" data-a="aura" data-v="${k}"><span class="pip" style="--c:${COS[k].c}"></span>${COS[k].n}</button>`).join('')}${aur.length?'':'<span class="dim" style="font-size:12.5px;align-self:center">Aucune aura encore : vaincs le Régent pour la première.</span>'}</div></div></section>`}
 function rOptions(){return `<section class="panel"><span class="label">Son et touches</span>${ctrlHtml()}</section>
   <p class="dim" style="font-size:11.5px;text-align:center;margin:4px 0">Bruitages d’impact : Kenney (kenney.nl, CC0) · Modèles 3D : héros KayKit Adventurers (Kay Lousberg, CC0) · Grondecorne : Mixamo (Adobe) · Basalte : Armored Stone Golem (Alexander Lenski, Fab) · Hiverne : « Wyvern animated » par Charlie catling (Fab, CC-BY) · Vifplume « Animated Cockatrice » par Marko J (Fab) · Orbelithe « Spiders » par Mixall (Fab, CC-BY) · Régent « Vampire » par Khornes (Fab) · sbires « Stylized Low Poly Skeleton » par SazenGames (Fab)</p>
 <footer><span>${meta.runs} ascension${meta.runs>1?'s':''} · ${meta.wins} victoire${meta.wins>1?'s':''}</span>

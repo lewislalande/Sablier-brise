@@ -642,9 +642,9 @@ const AR=600,CX=300,CY=300,ARR=285;let PR=13;
 
 /* Sorts : pa = coût (×5 en endurance, et parité pour l'Arbitre), cd en secondes, rng = portée bord à bord */
 const CLASSES={
- iop:{name:'Fendeur',tag:'Corps à corps · Force',hp:125,base:{vit:0,for:20,int:0,agi:0,cha:0},cost:0,
+ iop:{name:'Fendeur',tag:'Corps à corps · Force',hp:138,base:{vit:0,for:20,int:0,agi:0,cha:0},cost:0,
   desc:'Au contact : bondit sur le gardien et l\u2019écrase.',
-  wpn:{n:'Fendeciel',god:'Orvane',el:'terre',min:10,max:13,rng:70,cd:.3,st:9,heavy:{m:2.3,wind:.5,st:24,cd:1.6},combo:1,glow:'ember',melee:1,
+  wpn:{n:'Fendeciel',god:'Orvane',el:'terre',min:12,max:15,rng:70,cd:.3,st:9,heavy:{m:2.3,wind:.5,st:24,cd:1.6},combo:1,glow:'ember',melee:1,
    fx:'Le 3e coup d\u2019un enchaînement inflige +60%.',lore:'Épée divine trempée dans la colère d\u2019Orvane. Plus haute qu\u2019un homme, elle fend la pierre comme la chair.'},
   spells:[
    {id:'bond',n:'Saut de brèche',s:'Brèche',role:'Rapprochement',el:'terre',pa:3,min:12,max:16,cds:[6,5.5,5,4.5,4],rng:320,t:'leap',unlock:1,
@@ -657,7 +657,7 @@ const CLASSES={
     d:'Augmente tous tes dégâts pendant 6 s.',l5:'Récupération d\u2019endurance +50% pendant l\u2019effet.'},
    {id:'epee',n:'Lame de ciel',s:'Lame',role:'Distance',el:'air',pa:4,min:20,max:26,cds:[5,4.5,4,3.5,3],rng:300,proj:1,t:'dmg',unlock:7,
     d:'Projette une lame d\u2019énergie à distance.',l5:'Critique garanti sur un boss en ouverture.'}]},
- rog:{name:'Ombrelame',tag:'Corps à corps · Chance',hp:112,base:{vit:0,for:0,int:0,agi:0,cha:20},cost:220,
+ rog:{name:'Ombrelame',tag:'Corps à corps · Chance',hp:118,base:{vit:0,for:0,int:0,agi:0,cha:20},cost:220,
   desc:'Au contact, vite : marque le gardien puis l\u2019exécute.',
   wpn:{n:'Crocs d\u2019Ilvaine',god:'Ilvaine',el:'eau',min:7,max:9,rng:58,cd:.18,st:6,heavy:{m:1.8,wind:.32,st:18,cd:1.1},crit:12,glow:'frost',melee:1,marks:1,dual:1,
    fx:'Chaque coup léger pose une Marque (5 au plus). Le coup lourd les consomme : +30% par Marque. Frapper le gardien dans le dos : +50%.',lore:'Deux crocs d\u2019argent noir offerts par Ilvaine, la déesse du crépuscule. Ils ne brillent qu\u2019une fois plantés.'},
@@ -687,9 +687,9 @@ const CLASSES={
     d:'Te soigne et charge 2 Ressentiments.',l5:'Soigne aussi 3% de tes PV par seconde pendant 5 s.'},
    {id:'jugement',n:'Jugement',s:'Jugement',role:'Gros dégâts',el:'feu',pa:5,min:36,max:44,cds:[11,10.5,10,9.5,9],rng:70,t:'dmg',fx:'judge',wind:[.8,.75,.7,.65,.55],unlock:7,
     d:'Un coup de masse colossal. Consomme les Ressentiments : +40% par charge.',l5:'À 5 charges, le gardien est figé 1 s.'}]},
- chrono:{name:'Horloger',tag:'Distance · Chance',hp:100,base:{vit:0,for:0,int:0,agi:0,cha:20},cost:260,
+ chrono:{name:'Horloger',tag:'Distance · Chance',hp:116,base:{vit:0,for:0,int:0,agi:0,cha:20},cost:260,
   desc:'Ralentit, fige et rembobine le temps.',
-  wpn:{n:'Pendule d’Aurel',god:'Aurel',el:'eau',min:8,max:10,rng:380,proj:1,cd:.62,st:8,heavy:{m:2.2,wind:.6,st:20,cd:1.6},glow:'frost',chrono:1,
+  wpn:{n:'Pendule d’Aurel',god:'Aurel',el:'eau',min:10,max:12,rng:380,proj:1,cd:.62,st:8,heavy:{m:2.2,wind:.6,st:20,cd:1.6},glow:'frost',chrono:1,
    fx:'Chaque coup d’arme qui touche réduit de 0,3 s la recharge de tous tes sorts.',lore:'Le pendule d’Aurel, dieu des heures. Il ne bat jamais au même rythme que ton cœur.'},
   spells:[
    {id:'eclat',n:'Éclat d’heure',s:'Éclat',role:'Dégâts',el:'eau',pa:3,min:15,max:19,cds:[3,2.8,2.6,2.4,2.2],rng:400,proj:1,t:'dmg',fx:'slowbonus',unlock:1,
@@ -732,24 +732,24 @@ const CLASSES={
     d:'Un cri qui frappe tout autour de toi et affaiblit le gardien pendant 4 s. Te libère du gel et des ralentissements.',l5:'Repousse aussi les invocations.'},
    {id:'crep',n:'Crépuscule des haches',s:'Crépuscule',role:'Ultime',el:null,pa:4,cds:[30,28,26,24,22],t:'buff',v:[20,25,30,35,40],dur:7,unstop:1,unlock:7,
     d:'Pendant 7 s : plus de dégâts, et plus rien ne t’arrête (ni gel, ni ralentissement, ni garde brisée, ni projection). Se lance même figé et te libère.',l5:'Tes roulades ne coûtent plus d’endurance pendant l’effet.'}]},
- pal:{name:'Paladin',tag:'Corps à corps · Intelligence',hp:132,base:{vit:0,for:0,int:20,agi:0,cha:0},cost:250,
+ pal:{name:'Paladin',tag:'Corps à corps · Intelligence',hp:116,base:{vit:0,for:0,int:20,agi:0,cha:0},cost:250,
   desc:'Marteau et lumière : accumule la Ferveur, frappe le Verdict, protège et soigne.',
   wpn:{n:'Marteau de Solenne',god:'Solenne',el:'feu',min:9,max:12,rng:64,cd:.34,st:9,heavy:{m:2.2,wind:.5,st:22,cd:1.5},glow:'ember',glowHex:'#ffe08a',melee:1,mace:1,holy:1,
-   fx:'Chaque coup léger qui touche le gardien charge une Ferveur (5 au plus). Ton coup lourd devient un Verdict : +30% de dégâts par Ferveur, et te soigne de 2% de tes PV max par Ferveur.',lore:'Le marteau de Solenne, déesse de l’aube. Sa tête est forgée dans la première lumière du jour ; elle ne refroidit jamais.'},
+   fx:'Chaque coup léger qui touche le gardien charge une Ferveur (5 au plus). Ton coup lourd devient un Verdict : +30% de dégâts par Ferveur, et te soigne de 1,5% de tes PV max par Ferveur.',lore:'Le marteau de Solenne, déesse de l’aube. Sa tête est forgée dans la première lumière du jour ; elle ne refroidit jamais.'},
   spells:[
    {id:'jugaube',n:'Jugement de l’aube',s:'Jugement',role:'Distance',el:'feu',pa:3,min:15,max:19,cds:[6,5.5,5,4.5,4],rng:400,proj:1,t:'dmg',fx:'holy2',unlock:1,
     d:'Lance un marteau de lumière sur le gardien. Charge 2 Ferveur.',l5:'Charge 3 Ferveur.'},
-   {id:'consac',n:'Consécration',s:'Consécration',role:'Zone',el:'feu',pa:3,min:4,max:5,r:140,dur:6,cds:[12,11,10,9,8],t:'zone',unlock:1,
-    d:'Sanctifie le sol autour de toi pendant 6 s : tout ennemi dans la zone brûle toutes les 0,5 s.',l5:'Tant que tu restes dans la zone, tu récupères 1% de tes PV par tick.'},
-   {id:'lumsac',n:'Lumière sacrée',s:'Lumière',role:'Soin',el:'feu',pa:3,min:16,max:22,cds:[12,11,10,9,8],t:'heal',fx:'holyheal',unlock:3,
-    d:'Te soigne. Consomme ta Ferveur : +25% de soin par charge.',l5:'Soigne aussi 3% de tes PV par seconde pendant 5 s.'},
-   {id:'bdiv',n:'Bouclier divin',s:'Bouclier',role:'Survie',el:null,pa:3,cds:[30,28,26,24,22],t:'buff',def:1,v:[100,100,100,100,100],dur:3,unlock:5,
-    d:'Une bulle de lumière te rend insensible à tous les dégâts pendant 3 s et te libère du gel et des ralentissements.',l5:'Charge aussi 3 Ferveur.'},
+   {id:'consac',n:'Consécration',s:'Consécration',role:'Zone',el:'feu',pa:3,min:3,max:4,r:125,dur:5,cds:[14,13,12,11,10],t:'zone',unlock:1,
+    d:'Sanctifie le sol autour de toi pendant 5 s : tout ennemi dans la zone brûle toutes les 0,5 s.',l5:'Tant que tu restes dans la zone, tu récupères 0,6% de tes PV par tick.'},
+   {id:'lumsac',n:'Lumière sacrée',s:'Lumière',role:'Soin',el:'feu',pa:3,min:14,max:19,cds:[14,13,12,11,10],t:'heal',fx:'holyheal',unlock:3,
+    d:'Te soigne. Consomme ta Ferveur : +15% de soin par charge.',l5:'Soigne aussi 3% de tes PV par seconde pendant 5 s.'},
+   {id:'bdiv',n:'Bouclier divin',s:'Bouclier',role:'Survie',el:null,pa:3,cds:[34,32,30,28,26],t:'buff',def:1,v:[100,100,100,100,100],dur:2,unlock:5,
+    d:'Une bulle de lumière te rend insensible à tous les dégâts pendant 2 s et te libère du gel et des ralentissements.',l5:'Charge aussi 3 Ferveur.'},
    {id:'ailes',n:'Ailes de l’aube',s:'Ailes',role:'Ultime',el:null,pa:4,cds:[30,28,26,24,22],t:'buff',v:[20,25,30,35,40],dur:8,unlock:7,
     d:'Pendant 8 s : plus de dégâts, et chaque coup léger charge 2 Ferveur au lieu d’une.',l5:'Tes coups d’arme te soignent aussi de 8% de leurs dégâts.'}]},
- cra:{name:'Guette-Astre',tag:'Distance · Agilité',hp:105,base:{vit:0,for:0,int:0,agi:20,cha:0},cost:80,
+ cra:{name:'Guette-Astre',tag:'Distance · Agilité',hp:113,base:{vit:0,for:0,int:0,agi:20,cha:0},cost:80,
   desc:'À distance : repousse, ralentit, monte en puissance.',
-  wpn:{n:'Arc des Astres',god:'Lysse',el:'air',min:7,max:9,rng:430,proj:1,cd:.6,st:10,heavy:{m:2.4,wind:.55,st:22,cd:1.8},crit:10,glow:'frost',
+  wpn:{n:'Arc des Astres',god:'Lysse',el:'air',min:8,max:10,rng:430,proj:1,cd:.6,st:10,heavy:{m:2.4,wind:.55,st:22,cd:1.8},crit:10,glow:'frost',
    fx:'+10% de coups critiques en permanence.',lore:'Arc divin tendu par Lysse elle-même. Sa corde vibre d\u2019une lumière d\u2019étoile.'},
   spells:[
    {id:'punitive',n:'Flèche patiente',s:'Patiente',role:'Montée en puissance',el:'terre',pa:4,min:10,max:12,cds:[3.5,3.2,3,2.8,2.5],rng:460,proj:1,t:'dmg',fx:'stack',v:[4,6,8,10,12],unlock:1,
@@ -831,7 +831,7 @@ const BOSSES=[
   piail:{n:'Piaillement strident',k:'circle',r:165,wind:.8,dmg:10,slow:2},
   tempete:{n:'Tempête de plumes',k:'proj',count:5,spread:.9,speed:310,dmg:7,wind:.9,repeat:3,gap:.35,heavy:1}},
  chips:f=>f.ms.evade>0?[{t:'Esquive 40%',w:1}]:[]},
-{id:'scara',name:'Orbelithe',de:'d’Orbelithe',zone:'Plaine d’Ocre',hp:260,r:44,spd:75,keep:80,res:{terre:15,feu:15,air:15,eau:15},loot:['res','vit'],
+{id:'scara',name:'Orbelithe',de:'d’Orbelithe',zone:'Plaine d’Ocre',hp:245,r:44,spd:75,keep:80,res:{terre:15,feu:15,air:15,eau:15},loot:['res','vit'],
  lore:'Une tortue-prisme : le cristal allumé sur sa carapace indique l’élément qu’elle encaisse, et il change toutes les 8 secondes. Elle bondit sur toi : sors du cercle.',
  tick:(f,dt)=>{f.ms.shellT=(f.ms.shellT||0)-dt;if(f.ms.shellT<=0){f.ms.shellT=f.ms.shellFast?5:8;const els=Object.keys(EL).filter(e=>e!==f.ms.shell);f.ms.shell=pick(els);say(f,`Cristal ${EL[f.ms.shell].n} : +35% de résistance`)}},
  resMod:(f,el)=>el===f.ms.shell?35:0,
@@ -839,7 +839,7 @@ const BOSSES=[
  seq:['pince','pince','dore','ecrase'],
  atks:{pince:{n:'Coup de bec',k:'cone',r:140,half:.45,wind:.65,dmg:18},dore:{n:'Repli du prisme',k:'special',fx:f=>bossShield(f,.035,4)},
   ecrase:{n:'Écrasement',k:'leap',r:115,wind:1.25,dmg:42,heavy:1}}},
-{id:'wa',name:'La Mandragore Mère',de:'de la Mandragore',zone:'Îles Vertes',hp:300,r:36,spd:115,keep:110,res:{terre:0,feu:10,air:10,eau:0},loot:['cha','soin'],
+{id:'wa',name:'La Mandragore Mère',de:'de la Mandragore',zone:'Îles Vertes',hp:330,r:36,spd:115,keep:110,res:{terre:0,feu:10,air:10,eau:0},loot:['cha','soin'],
  lore:'Elle plante un bulbe dans le sable : tu as 6 secondes pour lui infliger assez de dégâts, sinon elle le mange et se soigne.',
  tick:(f,dt)=>{const c=f.ms.caw;if(!c)return;c.t-=dt;if(c.t<=0){if(c.dealt<c.need){const h=healBoss(f,Math.round(f.bmax*.06));say(f,`Elle mange le bulbe : +${h} PV`)}else say(f,'Bulbe écrasé');f.ms.caw=null}},
  onDealt:(f,d)=>{if(f.ms.caw)f.ms.caw.dealt+=d},
@@ -848,13 +848,13 @@ const BOSSES=[
  atks:{cawotte:{n:'Plante un bulbe',k:'special',fx:f=>{f.ms.caw={t:6,need:Math.round(f.bmax*.045),dealt:0}}},
   coup:{n:'Coup d’oreilles',k:'line',len:210,w:60,wind:.6,dmg:22},bond:{n:'Bond',k:'leap',r:90,wind:.8,dmg:22,pool:'thorn'},
   wak:{n:'Rayon de sève',k:'line',len:620,w:95,wind:1.4,dmg:50,heavy:1}}},
-{id:'craq',name:'Basalte',de:'de Basalte',zone:'La Faille',hp:380,r:50,spd:60,keep:80,res:{terre:40,feu:0,air:-15,eau:10},loot:['vit','res'],
+{id:'craq',name:'Basalte',de:'de Basalte',zone:'La Faille',hp:420,r:50,spd:60,keep:80,res:{terre:40,feu:0,air:-15,eau:10},loot:['vit','res'],
  lore:'La Terre ne lui fait presque rien, l’Air le fissure. Son Séisme frappe en anneau : colle-toi à lui ou fuis tout au bord.',
  seq:['poing','ebou','poing','seisme'],
  atks:{poing:{n:'Poing de roche',k:'cone',r:150,half:.55,wind:.8,dmg:28},
   ebou:{n:'Éboulement',k:'drops',count:4,onP:2,spread:110,r:62,wind:1,dmg:18,slow:2,pool:'magma'},
   seisme:{n:'Séisme',k:'ring',r1:95,r2:255,wind:1.5,dmg:62,heavy:1}}},
-{id:'krala',name:'Mâchevase',de:'de Mâchevase',zone:'Les Vasières',hp:420,r:46,spd:65,keep:140,res:{terre:0,feu:-10,air:10,eau:35},loot:['agi','dmg'],
+{id:'krala',name:'Mâchevase',de:'de Mâchevase',zone:'Les Vasières',hp:460,r:46,spd:65,keep:140,res:{terre:0,feu:-10,air:10,eau:35},loot:['agi','dmg'],
  lore:'Il plonge et devient intouchable pendant que ses tentacules jaillissent sous tes pieds. Ne reste pas immobile.',
  tick:(f,dt)=>{if(f.b.inv>0){f.ms.tentT=(f.ms.tentT||0)-dt;if(f.ms.tentT<=0){f.ms.tentT=.85;addZone(f,f.p.x,f.p.y,55,.75,9,'ink')}}},
  chips:f=>f.b.inv>0?[{t:`Immergé : invulnérable · ${Math.ceil(f.b.inv)} s`,w:1}]:[],
@@ -1646,7 +1646,7 @@ function castSpell(i,free){
     if(sp.proj){const n=sp.count?(lv>=5?5:sp.count):1;for(let k=0;k<n;k++){const off=n>1?(k/(n-1)-.5)*1.1:0;f.pproj.push({x:p.x+Math.cos(p.face+Math.PI/2)*off*30,y:p.y+Math.sin(p.face+Math.PI/2)*off*30,sp,base:n>1?rnd(sp.min,sp.max):base,life:2,tgt:b})}}
     else if(w){p.cast=w;f.pending.push({t:w,sp,base,tgt:b})}
     else{if(sp.rng<120)f.fx.push({k:'slash',x:p.x,y:p.y,a:p.face,t:0,life:.18,r:sp.rng+PR+10,el:sp.el});applyDmg(f,sp,base,b)}
-  }else if(sp.t==='heal'){if(sp.res)f.resent=Math.min(5,(f.resent||0)+sp.res);let hb=healCalc(sp,rnd(sp.min,sp.max));if(sp.fx==='holyheal'&&f.holy){const m=f.holy;hb=Math.round(hb*(1+.25*m));f.holy=0;txt(f,p.x,p.y-30,'Ferveur ×'+m,'ember')}const h=healP(hb);txt(f,p.x,p.y,'+'+h,'ok');if(lv>=5)f.ms.hot=5}
+  }else if(sp.t==='heal'){if(sp.res)f.resent=Math.min(5,(f.resent||0)+sp.res);let hb=healCalc(sp,rnd(sp.min,sp.max));if(sp.fx==='holyheal'&&f.holy){const m=f.holy;hb=Math.round(hb*(1+.15*m));f.holy=0;txt(f,p.x,p.y-30,'Ferveur ×'+m,'ember')}const h=healP(hb);txt(f,p.x,p.y,'+'+h,'ok');if(lv>=5)f.ms.hot=5}
   else if(sp.t==='zone'){f.consac={x:p.x,y:p.y,r:sp.r,t:sp.dur,sp,base:rnd(sp.min,sp.max),tick:0,l5:lv>=5};ev(f,'consac',{x:p.x,y:p.y,r:sp.r,life:sp.dur})}
   else if(sp.t==='buff'){if(sp.id==='bdiv'){p.frozen=0;p.slow=0;f.gel=0;p.kb=null;if(lv>=5)f.holy=Math.min(5,(f.holy||0)+3)}if(sp.unstop){p.frozen=0;p.slow=0;f.gel=0;f.shake=Math.max(f.shake,.3);ev(f,'nova',{x:p.x,y:p.y,r:90})}const v=at(sp.v,lv);f.buffs.push({n:sp.n,id:sp.id,v,t:sp.dur,l5:lv>=5,def:sp.def});txt(f,p.x,p.y,sp.def?`−${v}% dégâts subis`:`+${v}%`,'ember');if(sp.id==='cri'&&lv>=5&&f.pet){f.pet.hp=f.pet.max}}
   else if(sp.t==='nova'){if(sp.id==='hurle'){p.slow=0;f.gel=0}const base=rnd(sp.min,sp.max);ev(f,'nova',{x:p.x,y:p.y,r:sp.r});enemies(f).forEach(o=>{if(dist(o,p)<sp.r+o.r){applyDmg(f,sp,base,o);if(o!==b&&lv>=5){const a=angTo(p,o);o.x+=Math.cos(a)*90;o.y+=Math.sin(a)*90;clampArena(o,o.r)}}})}
@@ -1756,7 +1756,7 @@ function applyDmg(f,sp,base,T){sp._b=base;
   if(WPN().shield&&f.resent&&(sp.id==='wh'||sp.fx==='judge')){const m=f.resent;d=Math.round(d*(1+(sp.fx==='judge'?.4:.35)*m));f.resent=0;txt(f,b.x,b.y-40,'Ressentiment ×'+m,'ember');ev(f,'marks',{n:m});if(sp.fx==='judge'&&m>=5&&lv>=5&&!f.storm){f.frz=Math.max(f.frz||0,1);b.atk=null;b.rec=Math.max(b.rec,1);ev(f,'freeze')}}
   if(WPN().holy&&!sp.chain&&!sp.echoA){if(sp.id==='wl'){f.holy=Math.min(5,(f.holy||0)+(f.buffs.some(x=>x.id==='ailes')?2:1))}
     else if(sp.fx==='holy2'){f.holy=Math.min(5,(f.holy||0)+(lv>=5?3:2))}
-    else if(sp.id==='wh'&&f.holy&&!sp.wave&&!sp.splashed){const m=f.holy;d=Math.round(d*(1+.3*m));f.holy=0;const h=healP(Math.round(maxHp()*.02*m));txt(f,b.x,b.y-40,'Verdict ×'+m,'ember');if(h)txt(f,f.p.x,f.p.y-20,'+'+h,'ok');ev(f,'marks',{n:m})}}
+    else if(sp.id==='wh'&&f.holy&&!sp.wave&&!sp.splashed){const m=f.holy;d=Math.round(d*(1+.3*m));f.holy=0;const h=healP(Math.round(maxHp()*.015*m));txt(f,b.x,b.y-40,'Verdict ×'+m,'ember');if(h)txt(f,f.p.x,f.p.y-20,'+'+h,'ok');ev(f,'marks',{n:m})}}
   if(!sp.chain&&kOn('exec',sp.id)&&f.bhp<f.bmax*.3)d=Math.round(d*1.4);
   if(sp.id==='wh'&&f.ms.nh>f.t){f.ms.nh=0;d=Math.round(d*1.5);txt(f,b.x,b.y-48,'Embuscade','ember')}
   if(sp.fx==='slowbonus'&&(f.ms.slowB>0||f.frz>0))d=Math.round(d*(lv>=5?1.8:1.4));
@@ -1783,7 +1783,7 @@ function applyDmg(f,sp,base,T){sp._b=base;
   if(f.pvp){pvpHit(f,sp,d-abs);ev(f,'hit',{el:sp.el,col:sp.col,crit,sid:sp.id,cls:run.cls});if(crit||sp.id==='wh')f.hitstop=Math.max(f.hitstop||0,.06);if(sp.inf)infProc(f,sp,d,b,sp.id==='wh');altAfter(f,sp,base,d,b);if(sp.fx==='push'||sp.fx==='slowB'){}return}
   f.bhp=Math.max(0,f.bhp-(d-abs));b.hurt=.12;if(B.train){f.tdmg=(f.tdmg||0)+d;f.tmax=Math.max(f.tmax||0,d);if(f.bhp<f.bmax*.1)f.bhp=f.bmax;if(R3&&R3.cr)R3.cr.wob=.5}wpnPow(f,sp,d,b);
   if(sp.id==='wh'&&sp.tier>=3&&!sp.wave){interrupt(f,false);ev(f,'chwave',{x:b.x,y:b.y});f.adds.forEach(o=>{if(o.alive&&dist(o,b)<b.r+150)applyDmg(f,Object.assign({},sp,{wave:1,inf:null,tier:0}),base*.5,o)})}
-  {const hv2=sp.id==='wh'||['colere','jugement','exec','arret'].includes(sp.id)||sp.fx==='judge'||sp.fx==='exec';addPosture(f,(hv2?16:sp.id==='wl'?2.5:sp.id==='pet'?1.5:5)*(sp.id==='wh'?[1,1.6,2.2,3][sp.tier||0]:1));if(hv2)ev(f,'heavyhit')}
+  {const hv2=sp.id==='wh'||['colere','jugement','exec','arret'].includes(sp.id)||sp.fx==='judge'||sp.fx==='exec';addPosture(f,(hv2?16:sp.id==='wl'?2.5:sp.id==='pet'?1.5:sp.tick?1:5)*(sp.id==='wh'?[1,1.6,2.2,3][sp.tier||0]:1));if(hv2)ev(f,'heavyhit')}
   f.hist.push({t:f.t,d});B.onDealt&&B.onDealt(f,d);
   ev(f,'hit',{el:sp.el,col:sp.col,crit,boom:sp.fx==='boom',sid:sp.id,cls:run.cls});if(sp.inf)infProc(f,sp,d,b,sp.id==='wh');if(crit||sp.id==='wh'||sp.id==='colere'||sp.fx==='boom')f.hitstop=Math.max(f.hitstop||0,.08);
   txt(f,b.x+(Math.random()*30-15),b.y,(crit?d+'!':''+d),crit?'ember':'bone');altAfter(f,sp,base,d,b);
@@ -1866,7 +1866,7 @@ function update(f,dt){
   else if(p.frozen<=0){const v=moveVec();const spd=175*(RC().spd||1)*(p.charge?.5:1)*(p.slow>0?.55:1)*(p.drink>0?.35:1)*(p.cast>0?.4:1)*(p.guard?.45:1);p.x+=v.x*spd*dt;p.y+=v.y*spd*dt;if(R3&&R3.cam&&R3.cam.lock)p.face=angTo(p,curT(f));else if(v.x||v.y)p.face=Math.atan2(v.y,v.x)}
   clampArena(p,PR);
   if(f.ptr)altTick(f,dt);
-  if(f.consac){const z=f.consac;z.t-=dt;z.tick-=dt;if(z.tick<=0){z.tick=.5;enemies(f).forEach(o=>{if(dist(z,o)<z.r+o.r)applyDmg(f,Object.assign({},z.sp,{chain:1,tick:1}),z.base,o)});if(z.l5&&dist(z,f.p)<z.r){const h=healP(Math.max(1,Math.round(maxHp()*.01)));if(h)txt(f,f.p.x,f.p.y,'+'+h,'ok')}}if(z.t<=0||f.over)f.consac=null}
+  if(f.consac){const z=f.consac;z.t-=dt;z.tick-=dt;if(z.tick<=0){z.tick=.5;enemies(f).forEach(o=>{if(dist(z,o)<z.r+o.r)applyDmg(f,Object.assign({},z.sp,{chain:1,tick:1}),z.base,o)});if(z.l5&&dist(z,f.p)<z.r){const h=healP(Math.max(1,Math.round(maxHp()*.006)));if(h)txt(f,f.p.x,f.p.y,'+'+h,'ok')}}if(z.t<=0||f.over)f.consac=null}
   if(f.axe){f.axe.t+=dt;if(f.axe.t>.3&&dist(p,f.axe)<PR+22){f.cds.hache=0;txt(f,p.x,p.y-20,'Hache reprise','ember');if(lvOf({id:'hache'})>=5)p.mp=Math.min(mpMax(),(p.mp||0)+25);ev(f,'click');f.axe=null}else if(f.axe.t>9)f.axe=null}
   f.pending=f.pending.filter(q=>{q.t-=dt;if(q.t>0)return true;
     const T=q.tgt&&(q.tgt===b||q.tgt.alive)?q.tgt:b;

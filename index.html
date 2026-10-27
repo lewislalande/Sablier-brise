@@ -1501,8 +1501,8 @@ function startPhase(f,P){const b=f.b,p=f.p;
   P.fx&&P.fx(f);
   if(P.storm)startStorm(f,P.storm);
 }
-function updAdds(f,dt){const p=f.p,b=f.b;
-  f.adds.forEach(a=>{if(!a.alive)return;a.hurt-=dt;const A=a.A;
+function updAdds(f,dt){const p0=f.p,b=f.b;
+  f.adds.forEach(a=>{if(!a.alive)return;const p=coAddT(f,a,p0);a.hurt-=dt;const A=a.A;
     a.vx=a.vx||0;a.vy=a.vy||0;
     if(a.atk){a.vx*=Math.max(0,1-dt*10);a.vy*=Math.max(0,1-dt*10);a.x+=a.vx*dt;a.y+=a.vy*dt;
       a.atk.t+=dt;if(A.atk==='shot'&&a.atk.t<a.atk.wind*.55)a.atk.ang=angTo(a,p);if(a.atk.t>=a.atk.wind){resolveAdd(f,a);a.atk=null;a.cool=A.cd*.7*(.8+Math.random()*.4)}return}
@@ -1616,7 +1616,7 @@ function doGuard(on){const f=fight;if(!f||f.over||f.paused)return;const p=f.p;
 function addPosture(f,v){if(f.coG){coAcc(0,v);return}if(f.post+v/(f.B.big||1)>=100&&!(f.brokenT>0))setTimeout(()=>achieve('brk'),0);const b=f.b;if(f.storm||b.jump||f.over||f.brokenT>0)return;f.post=Math.min(100,(f.post||0)+v/(f.B.big||1));f.postT=2.5;
   if(f.post>=100){f.post=0;f.brokenT=2.6;b.atk=null;b.dash=null;b.rec=Math.max(b.rec,2.6);b.vuln=Math.max(b.vuln,2.6);b.cool=Math.max(b.cool,3);f.hitstop=Math.max(f.hitstop||0,.18);f.shake=Math.max(f.shake,.5);
     f.msg={txt:'Posture brisée',t:2,big:1};ev(f,'break')}}
-function perfectParry(f){addPosture(f,30);if(f.tut)f.tut.parry++;const p=f.p,b=f.b;if(WM('parade')&&!f.storm){const A=altSp(2);applyDmg(f,Object.assign(A.sp,{n:'Contre-temps'}),A.base,b)}if(WPN().shield)f.resent=Math.min(5,(f.resent||0)+1);f.hitstop=Math.max(f.hitstop||0,.12);f.shake=Math.max(f.shake,.25);ev(f,'parry');f.ms.parries=(f.ms.parries||0)+1;
+function perfectParry(f){addPosture(f,30);if(f.coG)coFx('par',0);if(f.tut)f.tut.parry++;const p=f.p,b=f.b;if(WM('parade')&&!f.storm){const A=altSp(2);applyDmg(f,Object.assign(A.sp,{n:'Contre-temps'}),A.base,b)}if(WPN().shield)f.resent=Math.min(5,(f.resent||0)+1);f.hitstop=Math.max(f.hitstop||0,.12);f.shake=Math.max(f.shake,.25);ev(f,'parry');f.ms.parries=(f.ms.parries||0)+1;
   txt(f,p.x,p.y-24,'Parade parfaite','ember');if(hasL('glaces')&&!f.storm&&!(f.frz>0)){f.frz=.9;b.rec=Math.max(b.rec,.9);ev(f,'freeze')}p.st=Math.min(stMax(),p.st+20);f.ms.riposte=2.5;p.parry=0;
   if(hasA('contre')&&f.lastSpell!=null)castSpell(f.lastSpell,true);if(hasS('bastion')){const h=healP(Math.round(maxHp()*.1));if(h)txt(f,p.x,p.y-40,'+'+h,'ok')}
   if(dist(p,b)<b.r+260&&!b.jump&&!f.storm){const rep=f.t-(f.ms.lastParry??-99)<6,k=rep?.5:1;f.ms.lastParry=f.t;b.atk=null;b.dash=null;b.rec=Math.max(b.rec,.55*k);b.vuln=Math.max(b.vuln,.8*k);b.cool=Math.max(b.cool,.75*k);ev(f,'stagger')}}
@@ -1668,7 +1668,7 @@ function castSpell(i,free){
   else if(sp.t==='pack'){const n=lv>=5?3:2;for(let k=0;k<n;k++)spawnPet(f,1,true,sp.dur)}
   else if(sp.t==='stim'){p.st=stMax();f.ms.stim=at(sp.dur,lv);f.ms.stimL5=lv>=5;txt(f,p.x,p.y,'Stimulé','ok')}
 }
-function interrupt(f,heavyToo){const b=f.b;if(b.atk&&(heavyToo||!b.atk.d.heavy)){b.atk=null;ev(f,'stagger');b.rec=.7;b.cool=1.5;say(f,'Interrompu');txt(f,b.x,b.y,'Interrompu','frost');return true}return false}
+function interrupt(f,heavyToo){const b=f.b;if(f.coG&&b.atk&&(heavyToo||!b.atk.d.heavy))coFx('int',heavyToo?1:0);if(b.atk&&(heavyToo||!b.atk.d.heavy)){b.atk=null;ev(f,'stagger');b.rec=.7;b.cool=1.5;say(f,'Interrompu');txt(f,b.x,b.y,'Interrompu','frost');return true}return false}
 const SWINGS={
  GA:{life:.44,lock:.28,hit:.15,half:1.3,lunge:80},
  GH:{life:.95,lock:.72,hit:.52,half:1.7,lunge:120,reach:8,slam:1},
@@ -3566,6 +3566,7 @@ function handleEvents(f){
     else if(e.k==='land'){shock(W3(p),COL.ember,3.5);burst(W3(p,.2),COL.dim,14,6,.3)}
     else if(e.k==='heal'){burst(W3(p,1),COL.ok,12,3,.18,2)}
     else if(e.k==='bdeath'){R.dead=0;const c=W3(f.b,R.holder.position.y);bstyOf(f).imp(c.clone().setY(1.5),3);fxFlash(c,bstyOf(f).c,7,.8);burst(c,'#3b4149',30,11,.6);burst(c,COL.ember,24,9,.3);shock(W3(f.b),COL.ember,12,.9);f.shake=.6;setTimeout(()=>endCard('ENNEMI VAINCU','win'),1500)}
+    else if(e.k==='pdown'){R.pdead=0;burst(W3(p,1.4),COL.blood,14,5,.2)}
     else if(e.k==='pdeath'){R.pdead=0;burst(W3(p,1.4),COL.blood,22,6,.25);endCard('TU ES MORT','dead')}
   }
 }
@@ -4545,9 +4546,13 @@ function coOn(e,m){const f=fight&&fight.co?fight:null;CO.last=performance.now();
     if(A.x===undefined){A.x=m.x;A.y=m.y}
     if(CO.role==='A'&&m.acc&&!f.over){const q=m.acc;if(q.d>0){f.bhp=Math.max(0,f.bhp-q.d);f.b.hurt=.12;f.co.dA+=q.d;checkPhase(f)}if(q.po>0)addPosture(f,q.po);
       if(q.ad)for(const k in q.ad){const a=f.adds.find(x=>x.id===+k);if(a&&a.alive){a.hp-=q.ad[k];a.hurt=.12;if(a.hp<=0)killAdd(f,a)}}
+      const b=f.b;if(q.fz>(f.frz||0)){f.frz=q.fz;b.atk=null;b.dash=null;b.jump=null;b.rec=Math.max(b.rec,q.fz);b.cool=Math.max(b.cool,q.fz+.4);ev(f,'freeze')}
+      if(q.vu)b.vuln=Math.max(b.vuln,q.vu);if(q.sl)f.ms.slowB=Math.max(f.ms.slowB||0,q.sl);
+      (q.fx||[]).forEach(x=>{if(x[0]==='int')interrupt(f,!!x[1]);else if(x[0]==='par'&&dist(b,f.ally)<b.r+280&&!b.jump&&!f.storm){b.atk=null;b.dash=null;b.rec=Math.max(b.rec,.55);b.vuln=Math.max(b.vuln,.8);b.cool=Math.max(b.cool,.75);ev(f,'stagger');txt(f,b.x,b.y-30,'Paré par '+(f.co.mate||'ton allié'),'ember')}});
       if(f.bhp<=0)endFight(true)}return}
   if(e==='cb'&&CO.role==='B'){CO.bs=m;coGuestApply(f,m);return}
   if(e==='chit'&&CO.role==='B'){if(f.over||f.p.down)return;hurtP(f,m.raw,{heavy:m.h,unblock:m.u,slow:m.sl,gel:m.gel,n:m.n});return}
+  if(e==='crev'){const p=f.p;if(p.down&&!f.over){p.down=false;run.hp=Math.max(1,Math.round(maxHp()*.3));p.iframe=2;if(R3)R3.pdead=null;f.msg={txt:(f.co.mate||'Ton partenaire')+' t’a relevé',t:2.4,big:1};ev(f,'revive')}return}
   if(e==='cdn'){if(f.ally)f.ally.down=true;if(f.p.down&&!f.over){if(CO.role==='A'){endFight(false)}}return}
   if(e==='cend'&&CO.role==='B'){f.coEnd=1;if(!f.over){if(m.won&&f.p.down)run.hp=Math.max(1,Math.round(maxHp()*.3));endFight(!!m.won)}return}
 }
@@ -4586,16 +4591,17 @@ function atkHitP(f,a,P){const d=a.d,b=f.b;switch(d.k){
 function coAtkOther(f,a,raw){const o=coOther(f);if(o&&atkHitP(f,a,o))coHurtOther(f,o,raw,a.d)}
 /* à terre : le partenaire peut encore gagner le combat */
 function coDown(f){if(!f.co||!f.ally||f.ally.down||f.over)return false;const p=f.p;p.down=true;run.hp=0;p.iframe=0;p.roll=0;p.guard=false;p.cast=0;f.swing=null;f.pending=[];
-  coSend('cdn',{});f.msg={txt:'À terre · '+(f.co.mate||'ton partenaire')+' peut encore gagner',t:4,big:1};ev(f,'pdeath');return true}
+  coSend('cdn',{});f.msg={txt:'À terre · '+(f.co.mate||'ton partenaire')+' peut te relever (3 s à côté de toi)',t:4,big:1};ev(f,'pdown');return true}
 /* envois réguliers : position, état et dégâts cumulés (les deux) ; état du gardien (hôte) */
-function coTick(f,dt){if(!f.co)return;const A=f.ally;
+function coTick(f,dt){if(!f.co)return;const A=f.ally;coRevive(f,dt);
   if(A&&A.tx!==undefined){const k=Math.min(1,dt*14);A.x+=(A.tx-A.x)*k;A.y+=(A.ty-A.y)*k;A.iframe-=dt;A.roll-=dt;A.atkT-=dt;A.castT-=dt}
   if(performance.now()-CO.last>45000&&!f.over&&coLive()){CO.mate=null;coSolo('Plus de nouvelles de ton partenaire : tu continues seul.');return}
-  CO.sendT-=dt;if(CO.sendT<=0){CO.sendT=1/12;const p=f.p,q=CO.acc;CO.acc=null;
-    coSend('s',{x:Math.round(p.x),y:Math.round(p.y),fa:+(p.face||0).toFixed(2),hp:run.hp,mx:maxHp(),r:p.roll>0?1:0,g:p.guard?1:0,d:p.drink>0?1:0,l:p.leap?1:0,a:f.swing&&f.swing.t<.15?1:0,c:p.cast>0?1:0,dn:p.down?1:0,acc:q||undefined})}
+  CO.sendT-=dt;if(CO.sendT<=0){CO.sendT=1/12;const p=f.p;
+    if(f.coG){const b=f.b,c=f.co,q2=CO.acc||(CO.acc={d:0,po:0});if(f.frz>(c.lfz||0)+.05){q2.fz=+f.frz.toFixed(2)}c.lfz=f.frz>0?f.frz:0;if(b.vuln>.3)q2.vu=+b.vuln.toFixed(2);if(f.ms.slowB>.3)q2.sl=+f.ms.slowB.toFixed(2)}
+    const q=CO.acc;CO.acc=null;coSend('s',{x:Math.round(p.x),y:Math.round(p.y),fa:+(p.face||0).toFixed(2),hp:run.hp,mx:maxHp(),r:p.roll>0?1:0,g:p.guard?1:0,d:p.drink>0?1:0,l:p.leap?1:0,a:f.swing&&f.swing.t<.15?1:0,c:p.cast>0?1:0,dn:p.down?1:0,acc:q||undefined})}
   if(f.co.role==='A'){CO.syncT-=dt;if(CO.syncT<=0){CO.syncT=1/15;coSend('cb',coSnap(f))}}}
 const coD=d=>{const o={};for(const k in d){const v=d[k];if(typeof v!=='function')o[k]=v}return o};
-function coSnap(f){const b=f.b,a=b.atk,J=b.jump,c=f.co;const S={x:Math.round(b.x),y:Math.round(b.y),fa:+(b.face||0).toFixed(2),hp:Math.round(f.bhp),mx:f.bmax,po:Math.round(f.post||0),br:+(f.brokenT||0).toFixed(2),vu:b.vuln>0?1:0};
+function coSnap(f){const b=f.b,a=b.atk,J=b.jump,c=f.co;const S={x:Math.round(b.x),y:Math.round(b.y),fa:+(b.face||0).toFixed(2),hp:Math.round(f.bhp),mx:f.bmax,po:Math.round(f.post||0),br:+(f.brokenT||0).toFixed(2),vu:b.vuln>0?1:0,fz:f.frz>0?+f.frz.toFixed(2):0};
   if(a&&a.d){if(!a._cid)a._cid=(c.cid=(c.cid||0)+1);S.at={i:a._cid,k:a.key,t:+a.t.toFixed(2),w:+a.wind.toFixed(2),an:+(a.ang||0).toFixed(3),tg:a.tgt?{x:Math.round(a.tgt.x),y:Math.round(a.tgt.y)}:null,ts:a.tgts?a.tgts.map(t=>({x:Math.round(t.x),y:Math.round(t.y)})):null,rk:a.rk||0};if(c.sentD!==a._cid){c.sentD=a._cid;S.at.d=coD(a.d)}}
   if(J)S.ju={fx:J.fx,fy:J.fy,tx:J.tx,ty:J.ty,t:+J.t.toFixed(2),du:J.dur,r:J.d&&J.d.r};
   if(b.dash)S.da={vx:Math.round(b.dash.vx),vy:Math.round(b.dash.vy)};
@@ -4606,7 +4612,7 @@ function coSnap(f){const b=f.b,a=b.atk,J=b.jump,c=f.co;const S={x:Math.round(b.x
   if(c.evq&&c.evq.length){S.ev=c.evq;c.evq=[]}
   return S}
 /* partenaire : applique l'état envoyé par l'hôte */
-function coGuestApply(f,m){const b=f.b;f.bhp=m.hp;f.bmax=m.mx;f.post=m.po;f.brokenT=m.br;b.vuln=m.vu?1:0;b.tx=m.x;b.ty=m.y;b.tfa=m.fa;
+function coGuestApply(f,m){const b=f.b;f.bhp=m.hp;f.bmax=m.mx;f.post=m.po;f.brokenT=m.br;b.vuln=Math.max(b.vuln>0?b.vuln:0,m.vu?.2:0);if(m.fz>(f.frz||0))f.frz=m.fz;b.tx=m.x;b.ty=m.y;b.tfa=m.fa;
   if(m.at){const A=f.atkX&&f.atkX[m.at.k]||f.B.atks[m.at.k];if(!b.atk||b.atk._cid!==m.at.i){const d=m.at.d||A||{k:'circle',r:60};b.atk={_cid:m.at.i,key:m.at.k,d,t:m.at.t,wind:m.at.w,ang:m.at.an,tgt:m.at.tg,tgts:m.at.ts||[],rk:m.at.rk,gen:m.at.i*100+m.at.rk}}
     else{const a=b.atk;if(m.at.d)a.d=m.at.d;if(m.at.rk!==a.rk){a.rk=m.at.rk;a.gen=m.at.i*100+m.at.rk;a.tgts=m.at.ts||a.tgts;a.tgt=m.at.tg||a.tgt}a.t=Math.max(a.t,m.at.t);a.wind=m.at.w;a.ang=m.at.an}}
   else b.atk=null;
@@ -4625,6 +4631,13 @@ function coGuestProj(f,dt){f.proj=f.proj.filter(q=>{q.life-=dt;q.x+=q.vx*dt;q.y+
   f.zones=f.zones.filter(z=>{z.t+=dt;if(z.t>=z.wind&&!z.fired){z.fired=1}return z.t<z.wind+(z.lin||0)})}
 /* dégâts du partenaire : cumulés puis envoyés */
 function coAcc(d,po,T){const q=CO.acc||(CO.acc={d:0,po:0});if(T&&T.id){(q.ad||(q.ad={}))[T.id]=(q.ad[T.id]||0)+Math.round(d)}else{q.d+=Math.round(d||0);q.po+=po||0}}
+function coFx(k,v){const q=CO.acc||(CO.acc={d:0,po:0});(q.fx||(q.fx=[])).push([k,v])}
+/* les invocations s'en prennent au joueur le plus proche */
+function coAddT(f,a,p0){const A=f.ally;if(!f.co||f.co.role!=='A'||!A||A.down)return p0;if(p0.down)return A;return dist(a,A)<dist(a,p0)?A:p0}
+/* relever son partenaire : rester 3 s à côté de lui */
+function coRevive(f,dt){const A=f.ally,p=f.p,c=f.co;if(!c||!A||f.over)return;
+  if(A.down&&!p.down&&dist(p,A)<PR*2+40){c.rev=(c.rev||0)+dt;if(Math.floor(c.rev*4)!==Math.floor((c.rev-dt)*4))txt(f,A.x,A.y-30,'Relève… '+Math.min(100,Math.round(c.rev/3*100))+'%','ok');
+    if(c.rev>=3){c.rev=0;A.down=false;A.hp=1;coSend('crev',{});txt(f,A.x,A.y-40,'Relevé !','ok');ev(f,'revive')}}else c.rev=Math.max(0,(c.rev||0)-dt*2)}
 /* rendu : le héros du partenaire */
 function coAllyBuild(S,f){const M=CO.mate||{};let ch;try{ch=buildCharacter({cls:CLASSES[M.cls]?M.cls:'iop',race:RACES[M.race]?M.race:'plainois',items:M.items||{},inf:M.inf,wsel:M.wsel})}catch(e){return null}
   S.add(ch.pg);const ring=new THREE.Mesh(new THREE.RingGeometry(1.05,1.25,40),new THREE.MeshBasicMaterial({color:'#7fd3ff',transparent:true,opacity:.5,depthWrite:false}));ring.rotation.x=-Math.PI/2;S.add(ring);return {ch,ring,ph:0}}

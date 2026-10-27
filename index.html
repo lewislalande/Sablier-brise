@@ -170,6 +170,7 @@ kbd{display:inline-block;min-width:24px;text-align:center;font:600 12.5px var(--
 .etip{max-width:56ch;font-size:14.5px;color:var(--bone);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 14px;text-align:left}
 .esheet{width:100%}.esheet summary{cursor:pointer;color:var(--dim);font-size:14px;text-align:center;padding:6px}.esheet[open] summary{margin-bottom:8px}
 .cload{padding:60px 16px;text-align:center;animation:cl 1.2s ease-in-out infinite alternate}@keyframes cl{from{opacity:.4}to{opacity:1}}
+.talnew{color:#d6bcff;font-weight:600}
 .prog{padding-top:6px}
 .ptabs{display:flex;border-bottom:1px solid var(--line);margin:0 -2px 12px}.ptabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;padding:10px 6px;color:var(--dim);font-size:15px;display:flex;gap:8px;align-items:center;justify-content:center}.ptabs button.on{color:var(--bone);border-bottom-color:var(--ember)}.ptabs button:hover{color:var(--bone)}
 .pbadge{background:var(--ember);color:#1a1208;font-size:12px;font-weight:700;border-radius:10px;padding:0 7px;line-height:18px;font-variant-numeric:tabular-nums}
@@ -4439,9 +4440,9 @@ function act(a,v){
     case 'endless': startEndless(); break;
     case 'secretno': if(run&&run.secret){ui.end=ui.end||{souls:0,cycle:meta.cycle,cls:RC().n+' '+CLS().name,sheet:makeSheet(true)};ui.end.secret={won:-1};run=null;ui.screen='win';save();render()} break;
     case 'pact':{const L=meta.pacts||(meta.pacts=[]);const i=L.indexOf(v);if(i>=0)L.splice(i,1);else L.push(v);save();render()} break;
-    case 'again': ui.screen='home';ui.hub='play';ui.pstep=meta.sel&&meta.unlocked[meta.sel]?3:0;ui.confirm=null;render();window.scrollTo(0,0); break;
+    case 'again': ui.screen='home';ui.hub='play';ui.pstep=meta.sel&&meta.unlocked[meta.sel]?(talFree()>0?2:3):0;ui.confirm=null;render();window.scrollTo(0,0); break;
     case 'home': ui.screen='home';ui.hub='menu';ui.confirm=null;render(); break;
-    case 'hub': ui.hub=v;ui.confirm=null;if(v==='play'&&ui.pstep==null)ui.pstep=0;render();window.scrollTo(0,0); break;
+    case 'hub': ui.hub=v;ui.confirm=null;if(v==='play')ui.pstep=meta.sel&&meta.unlocked[meta.sel]?(talFree()>0?2:(ui.pstep??0)):0;render();window.scrollTo(0,0); break;
     case 'pstep': ui.pstep=+v;render();window.scrollTo(0,0); break;
     case 'path':{const O=run.pathOff;if(!O||!needPath())break;const o=O.opts[+v],q=O.opts[1-v],fl=run.floor;run.order[fl-1]=o.i;run.order[fl]=q.i;run.paths[fl]=o.perk;run.pathOff=null;
       let m=`${PERKS[o.perk].n} : tu affrontes ${BOSSES[o.i].name}.`;if(o.perk==='soin'){run.hp=maxHp();run.flasks=Math.max(run.flasks,flaskMax())}if(o.perk==='savoir')run.spPts=(run.spPts??1)+2;if(o.perk==='mut')run.mut=fl;ui.toast=m;save();render()} break;
@@ -4506,6 +4507,7 @@ const HUBS={
  options:{t:'Options',k:'Son, touches, graphismes'},
  guide:{t:'Comment jouer',k:'Les bases en deux minutes'}};
 const PSTEPS=['Classe','Peuple','Talents','Difficulté'];
+const talFree=()=>{const k=meta.sel;return k&&meta.unlocked[k]&&TAL[k]?Math.max(0,talPts(k)-talSel(k).length):0};
 function rHome(){const h=ui.hub||'menu';if(h==='menu'||!HUBS[h])return rMenu();const P=HUBS[h];
   return `<header class="hubh"><button class="hback" data-a="hub" data-v="menu" aria-label="Retour au menu">←<span>Menu</span></button><div><span class="kicker">${P.k}</span><h1>${P.t}</h1></div><span class="hwal num" title="Grains au temple">⏳ ${meta.souls}</span></header>
   ${({play:rPlay,defis:rDefis,arena:rArenaHub,ladder:rLadder,temple:rTemple,guide:rGuide,codex:()=>`<section class="panel">${codexHtml()}</section>`,options:rOptions})[h]()}`}
@@ -4543,7 +4545,7 @@ function rGuide(){const K=a=>`<kbd>${esc(ka(a))}</kbd>`,mv=TOUCH?'<kbd>Joystick<
 function rPlay(){if(run)return `<section class="panel"><p>Une ascension est déjà en cours.</p><div class="row" style="margin-top:10px"><button class="btn primary" data-a="start">Reprendre</button><button class="btn" data-a="confirm" data-v="abandon">Abandonner</button></div>${ui.confirm==='abandon'?`<div class="confirm"><p>Abandonner compte comme une mort.</p><div class="row"><button class="btn danger" data-a="abandon">Abandonner</button><button class="btn" data-a="cancel">Continuer</button></div></div>`:''}</section>`;
   const ok=meta.sel&&meta.unlocked[meta.sel],stp=Math.min(ui.pstep||0,ok?3:0);
   const body=[()=>CLSP(),()=>RACEP(),()=>rTalents()||'<section class="panel"><p class="dim">Pas de talents pour cette classe.</p></section>',()=>PACTP()][stp]();
-  return `<div class="steps">${PSTEPS.map((n,i)=>`<button class="${i===stp?'on':''} ${i<stp?'done':''}" data-a="pstep" data-v="${i}" ${i>0&&!ok?'disabled':''}><i>${i+1}</i>${n}</button>`).join('')}</div>
+  return `<div class="steps">${PSTEPS.map((n,i)=>`<button class="${i===stp?'on':''} ${i<stp?'done':''}" data-a="pstep" data-v="${i}" ${i>0&&!ok?'disabled':''}><i>${i+1}</i>${n}${i===2&&ok&&talFree()?`<span class="pbadge">${talFree()}</span>`:''}</button>`).join('')}</div>
   <div class="pgrid"><div class="pside">${HEROP()}</div><div class="pmain">${body}</div></div>
   <div class="pbar">${stp>0?`<button class="btn" data-a="pstep" data-v="${stp-1}">← ${PSTEPS[stp-1]}</button>`:'<span></span>'}
     ${stp<3?`<button class="btn ${ok?'':'primary'}" data-a="pstep" data-v="${stp+1}" ${!ok?'disabled':''}>${PSTEPS[stp+1]} →</button>`:''}
@@ -4841,20 +4843,20 @@ function rChallenger(){return `<section class="end challenger"><span class="labe
   <p class="dim">PV remontés à 60% au moins, fioles remplies.</p>
   <div class="row" style="justify-content:center;gap:10px"><button class="btn primary big" data-a="secretgo">Affronter le Sablier Vivant</button><button class="btn big" data-a="endless">Gravir la Tour sans fin</button><button class="btn" data-a="secretno">Rentrer au temple</button></div>
   <p class="dim" style="margin-top:10px;font-size:13.5px"><b style="color:var(--bone)">Tour sans fin</b> : les gardiens reviennent dans le désordre, +20% de PV et de dégâts à chaque étage, souvent corrompus. Tu gardes ton personnage, tes grains gagnés là-haut sont à toi même si tu tombes, et chaque étage franchi vaut +1500 au classement.</p></section>`}
-function rMast(M){if(!M)return '';const C=CLASSES[M.cls],lv=M.lv1,nx=MAST[lv];return `<div class="mastend"><span class="label">Maîtrise · ${C.name}</span><p><b style="color:var(--ember)">+${M.xp} XP</b> · niveau ${ROMAN[lv]||0}${nx?` · ${M.tot}/${nx.xp} vers : ${nx.d}`:' · maîtrise complète'}</p>${M.news.length?`<p class="up">Niveau de maîtrise atteint ! Débloqué : ${M.news.join(' · ')}</p>`:''}</div>`}
+function rMast(M){if(!M)return '';const C=CLASSES[M.cls],lv=M.lv1,nx=MAST[lv];return `<div class="mastend"><span class="label">Maîtrise · ${C.name}</span><p><b style="color:var(--ember)">+${M.xp} XP</b> · niveau ${ROMAN[lv]||0}${nx?` · ${M.tot}/${nx.xp} vers : ${nx.d}`:' · maîtrise complète'}</p>${M.news.length?`<p class="up">Niveau de maîtrise atteint ! Débloqué : ${M.news.join(' · ')}</p>`:''}${M.lv1>M.lv0&&M.lv0<TALMAX?`<p class="talnew">✦ +${Math.min(M.lv1,TALMAX)-M.lv0} point${Math.min(M.lv1,TALMAX)-M.lv0>1?'s':''} de talent pour ${esc(C.name)} : place-${Math.min(M.lv1,TALMAX)-M.lv0>1?'les':'le'} avant ta prochaine ascension.</p>`:''}</div>`}
 const TIPS=['Une roulade rend invulnérable un court instant : roule à travers l’attaque, pas en arrière.','Après une grosse attaque, le gardien reste ouvert : c’est le moment de frapper fort.','Regarde les faiblesses du gardien avant d’entrer : un élément qu’il encaisse mal fait bien plus mal.','Garde de l’endurance pour esquiver : ne la vide jamais complètement.','Une parade au dernier moment (parfaite) ne coûte rien et déséquilibre le gardien.','Le Feu de camp met tes grains à l’abri : utile avant un gardien difficile.','La moitié de tes grains reste à l’étage où tu tombes : reviens la chercher.'];
 function rDead(){const e=ui.end;if(e.endless)return `<section class="end dead"><span class="label">Tour sans fin</span><h1>ÉTAGE ${ROMAN[e.floor]}</h1>
   <p>${e.boss==='l’abandon'?'Tu redescends de la tour':'Tombé face à '+esc(e.boss)} après ${Math.max(0,e.floor-10)} étage${e.floor-10>1?'s':''} franchi${e.floor-10>1?'s':''} au-delà du Régent.${(meta.endBest||0)<=e.floor?' <b style="color:var(--ember)">Record personnel !</b>':''}</p>
   <p style="color:var(--ok)">Tes ${e.kept} grains gagnés dans la tour rejoignent le temple.</p>
   ${e.lad!=null?`<p class="ladres">Score : <b class="num">${Number(e.lad).toLocaleString('fr-FR')}</b> · <span id="ladst" class="dim">${esc(e.ladSt||'')}</span></p>`:''}${rMast(e.mast)}
-  <div class="endbtns"><button class="btn primary big" data-a="again">Nouvelle ascension</button><button class="btn big" data-a="home">Menu principal</button></div>${ui.screen==='dead'&&!e.endless?`<p class="etip">💡 ${TIPS[(meta.runs||0)%TIPS.length]}</p>`:''}
+  <div class="endbtns"><button class="btn primary big" data-a="again">Nouvelle ascension${talFree()?` <span class="pbadge">${talFree()} talent${talFree()>1?"s":""}</span>`:""}</button><button class="btn big" data-a="home">Menu principal</button></div>${ui.screen==='dead'&&!e.endless?`<p class="etip">💡 ${TIPS[(meta.runs||0)%TIPS.length]}</p>`:''}
   <details class="esheet"><summary>Fiche de l’ascension</summary>${rSheet(e.sheet)}</details></section>`;return `<section class="end dead"><h1>TU ES MORT</h1>
   <p>Tombé à l’étage ${ROMAN[e.floor]} face à ${esc(e.boss)}.</p>
   ${e.kept?`<p style="color:var(--ok)">La moitié de tes grains (${e.kept}) rejoint le temple : tu peux les dépenser dès maintenant.</p>`:''}
   ${e.souls?`<p>${e.souls} grains sont restés à l’étage ${ROMAN[e.floor]}. Atteins-le à nouveau pour les récupérer.</p>`:'<p>Tu n’avais aucun grain sur toi.</p>'}
   ${e.lost?`<p class="down">L’ancienne tache de grains (${e.lost}) est perdue.</p>`:''}${ui.dailyLast?`<p style="color:var(--ember)">Score ${ui.dailyLbl||'de l’ascension du jour'} : ${ui.dailyLast}</p>`:''}
   ${e.lad!=null?`<p class="ladres">Score : <b class="num">${Number(e.lad).toLocaleString('fr-FR')}</b> · <span id="ladst" class="dim">${esc(e.ladSt||'')}</span></p>`:''}${rMast(e.mast)}
-  <div class="endbtns"><button class="btn primary big" data-a="again">Nouvelle ascension</button><button class="btn big" data-a="home">Menu principal</button></div>${ui.screen==='dead'&&!e.endless?`<p class="etip">💡 ${TIPS[(meta.runs||0)%TIPS.length]}</p>`:''}
+  <div class="endbtns"><button class="btn primary big" data-a="again">Nouvelle ascension${talFree()?` <span class="pbadge">${talFree()} talent${talFree()>1?"s":""}</span>`:""}</button><button class="btn big" data-a="home">Menu principal</button></div>${ui.screen==='dead'&&!e.endless?`<p class="etip">💡 ${TIPS[(meta.runs||0)%TIPS.length]}</p>`:''}
   <details class="esheet"><summary>Fiche de l’ascension</summary>${rSheet(e.sheet)}</details></section>`}
 function rWin(){const e=ui.end;return `<section class="end win"><span class="label">Le Régent des Heures est tombé</span><h1>LE TEMPS REPREND</h1>${e.nohit?'<p style="color:var(--ember)">Sans dégâts : le Sablier du Régent est à toi. Il t’accompagnera à chaque nouvelle ascension.</p>':''}
   <p>${e.cls} a gravi les neuf étages. ${e.souls} grains rejoignent le temple.</p>${e.daily?`<p style="color:var(--ember)">Score ${e.dLbl||'de l’ascension du jour'} : ${e.daily}</p>`:''}
@@ -4862,7 +4864,7 @@ function rWin(){const e=ui.end;return `<section class="end win"><span class="lab
   <p>Cycle ${ROMAN[e.cycle+1]||e.cycle+1} : les gardiens ont +35% de PV et de dégâts, et frappent plus vite.</p>
   ${e.ascUp?`<p class="nch" style="font-size:clamp(22px,3.4vw,34px)">${SEALS[e.ascUp].n} débloqué</p><p class="dim">${SEALS[e.ascUp].d} Chaque sceau s’ajoute aux précédents et donne +12% de grains.</p>`:''}
   ${e.lad!=null?`<p class="ladres">Score : <b class="num">${Number(e.lad).toLocaleString('fr-FR')}</b> · <span id="ladst" class="dim">${esc(e.ladSt||'')}</span></p>`:''}${rMast(e.mast)}
-  <div class="endbtns"><button class="btn primary big" data-a="again">Nouvelle ascension</button><button class="btn big" data-a="home">Menu principal</button></div>${ui.screen==='dead'&&!e.endless?`<p class="etip">💡 ${TIPS[(meta.runs||0)%TIPS.length]}</p>`:''}
+  <div class="endbtns"><button class="btn primary big" data-a="again">Nouvelle ascension${talFree()?` <span class="pbadge">${talFree()} talent${talFree()>1?"s":""}</span>`:""}</button><button class="btn big" data-a="home">Menu principal</button></div>${ui.screen==='dead'&&!e.endless?`<p class="etip">💡 ${TIPS[(meta.runs||0)%TIPS.length]}</p>`:''}
   <details class="esheet"><summary>Fiche de l’ascension</summary>${rSheet(e.sheet)}</details></section>`}
 function render(){
   tickClock();

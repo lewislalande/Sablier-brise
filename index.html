@@ -97,6 +97,9 @@ button:focus-visible{outline:2px solid var(--ember);outline-offset:2px}
 .amodes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}.amode{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 12px 16px;border:1px solid var(--line);border-radius:14px;background:var(--panel);text-align:center;transition:border-color .15s,transform .15s}.amode:hover{border-color:var(--dim);transform:translateY(-2px)}.amode.on{border-color:var(--ember);background:color-mix(in srgb,var(--ember) 9%,var(--panel))}.amode:focus-visible{outline:2px solid var(--ember)}
 .amart{display:flex;justify-content:center;width:100%}.amart svg{width:min(170px,100%);height:auto;display:block}.amode b{font-family:var(--f-disp);font-weight:400;font-size:22px;color:var(--bone)}.amode.on b{color:var(--ember)}.amode small{font-size:13px;color:var(--dim)}
 @media (max-width:520px){.amart svg{width:110px}.amode b{font-size:18px}.amode{padding:10px 8px 12px}}
+.prest{margin:8px 0;padding:9px 12px;border:1px solid var(--ember);border-radius:10px;background:color-mix(in srgb,var(--ember) 7%,transparent)}.prest p{margin:4px 0 6px;font-size:13px}
+.satk{max-width:640px;margin:12px auto;padding:12px 14px;border:1px solid var(--line);border-radius:10px;text-align:left}.satkl{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px 12px;margin:8px 0}.satkl div{display:flex;flex-direction:column}.satkl b{font-size:14px;color:var(--bone)}.satkl small{font-size:12.5px;color:var(--dim)}
+.parity{position:absolute;right:max(22px,env(safe-area-inset-right,0px));top:calc(108px + env(safe-area-inset-top,0px));display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 16px;border-radius:12px;background:rgba(10,12,16,.82);border:2px solid #c58cff;pointer-events:none;text-align:center;max-width:min(300px,40vw)}.parity b{font-family:var(--f-disp);font-weight:400;font-size:24px;letter-spacing:.12em;color:#e2c8ff}.parity.pair{border-color:#7fd3ff}.parity.pair b{color:#bfe8ff}.parity span{font-size:13px;color:var(--bone)}.parity small{font-size:12px;color:var(--dim)}.touch .parity{top:calc(96px + env(safe-area-inset-top,0px));padding:4px 10px}.touch .parity b{font-size:18px}
 .coban{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin:0 0 12px;padding:9px 14px;border:1px solid #7fd3ff66;border-radius:10px;background:color-mix(in srgb,#7fd3ff 8%,transparent)}.coban b{color:#9fdcff}.coban span{font-size:13.5px;color:var(--dim)}.coban .cost{color:var(--bone);margin-left:auto}.coban.warn{border-color:var(--line)}
 .coopb{position:absolute;left:max(22px,env(safe-area-inset-left,0px));top:calc(124px + env(safe-area-inset-top,0px));width:min(230px,30vw);background:rgba(10,12,16,.8);border:1px solid #7fd3ff55;border-radius:10px;padding:7px 10px;font-size:13px;pointer-events:none}.coopb b{color:#9fdcff;font-weight:600}.coopb .bar{margin-top:4px;height:6px}.coopb small{display:block;margin-top:3px;color:var(--ember);font-size:11.5px}.touch .coopb{top:calc(70px + env(safe-area-inset-top,0px));width:min(180px,28vw);padding:5px 8px;font-size:12px}
 .lookrow{display:flex;gap:10px;align-items:flex-start;margin:6px 0}.lookrow .lk{min-width:46px;color:var(--dim);font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;padding-top:7px}.chips{display:flex;flex-wrap:wrap;gap:6px}
@@ -518,7 +521,8 @@ const SETS={
  craq:{n:'Panoplie de Basalte',col:'#8a8174',hat:'stone',stats:['vit','res'],b:{2:{vit:60},3:{res:6},4:{vit:150,pct:8}}},
  krala:{n:'Panoplie de Mâchevase',col:'#2f8a86',hat:'hood',stats:['agi','dmg'],b:{2:{dmg:4},3:{agi:35},4:{pct:18}}},
  kimbo:{n:'Panoplie de l\u2019Arbitre',col:'#a46ad0',hat:'halo',stats:['int','pct'],b:{2:{int:30},3:{pct:10},4:{pct:15,crit:8}}},
- obsi:{n:'Panoplie d\u2019Hiverne',col:'#8fd0ee',hat:'icecrown',stats:['res','int'],b:{2:{res:5},3:{int:40},4:{res:8,pct:15}}}
+ obsi:{n:'Panoplie d\u2019Hiverne',col:'#8fd0ee',hat:'icecrown',stats:['res','int'],b:{2:{res:5},3:{int:40},4:{res:8,pct:15}}},
+ hare:{n:'Panoplie des Heures',col:'#d8b45a',hat:'halo',stats:['pct','crit'],b:{2:{crit:5},3:{pct:10},4:{pct:15,crit:8}}}
 };
 const LEG=[
  /* légendaires : uniquement en battant le gardien sans prendre un coup. Chacun a un pouvoir unique. */
@@ -543,6 +547,10 @@ const hasL=id=>!!(run&&Object.values(run.items).some(x=>x.leg===id));
 /* ===================== ALTÉRATIONS : objets qui changent ta façon de jouer ===================== */
 const ALTCOL='#4fd1a5';
 const ALTS={
+ croc:{n:'Croc de sang-froid',slot:'Anneau',lock:'nohit3',d:'Tes coups critiques te soignent de 2% de tes PV max.'},
+ brassard:{n:'Brassard du veilleur',slot:'Ceinture',lock:'parry10',d:'Après une parade parfaite, tu subis 40% de dégâts en moins pendant 3 s.'},
+ vent:{n:'Bottes du vent',slot:'Bottes',lock:'end15',d:'+15% de vitesse de déplacement et tes roulades coûtent 5 endurance de moins.'},
+ rouage:{n:'Rouage du Régent',slot:'Relique',lock:'win',d:'Recharges de sorts −20%, mais tes fioles soignent 20% de moins.'},
  rebond:{n:'Glyphe d’écho',slot:'Amulette',d:'Chaque sort de dégâts frappe une seconde fois 0,4 s plus tard, pour 40% de ses dégâts.'},
  traverse:{n:'Bottes de comète',slot:'Bottes',d:'Rouler à travers un ennemi lui inflige 70% d’un coup d’arme.'},
  cendre:{n:'Ceinture de braise',slot:'Ceinture',d:'Ta roulade laisse une traînée de braise qui brûle les ennemis pendant 2,5 s.'},
@@ -559,6 +567,8 @@ const ALTS={
  ombre:{n:'Capuche d’ombre',slot:'Coiffe',d:'Après une roulade, ton coup d’arme suivant (dans les 1,5 s) est un critique garanti.'}
 };
 const SYNS={
+ veille:{a:['croc','brassard'],lock:'secret',n:'Veille sanglante',d:'Pendant la protection du Brassard, tes critiques soignent le double.'},
+ course:{a:['vent','rouage'],lock:'fast',n:'Course contre la montre',d:'Chaque roulade réduit de 0,5 s la recharge de tous tes sorts.'},
  hemo:{a:['rebond','sang'],n:'Hémorragie',d:'Les échos de sort te soignent de 25% de leurs dégâts.'},
  comete:{a:['traverse','cendre'],n:'Comète',d:'Traverser un ennemi en roulade laisse une large explosion de braise.'},
  rasoir:{a:['furie','verre'],n:'Fil du rasoir',d:'Sous 35% de PV : +25% de critique.'},
@@ -569,9 +579,10 @@ const SYNS={
  tourb:{a:['elan','traverse'],n:'Tourbillon',d:'Traverser un ennemi en roulade remet à zéro la recharge du coup lourd.'}
 };
 const hasA=id=>!!(run&&Object.values(run.items).some(x=>x&&x.alt===id));
-const hasS=id=>SYNS[id].a.every(hasA);
+const hasS=id=>SYNS[id].a.every(hasA)&&(!SYNS[id].lock||!!(meta.ach||{})[SYNS[id].lock]);
+const altOpen=k=>!ALTS[k].lock||!!(meta.ach||{})[ALTS[k].lock];
 function altItem(id){const A=ALTS[id],f=run?Math.min(run.floor,9):1,k=run?mainStat():'for';return {slot:A.slot,name:A.n,stats:{[k]:rnd(3+f*2,6+f*3)},alt:id,col:ALTCOL,d:'Pouvoir : '+A.d,tier:'alt'}}
-function randAlt(slot,excl){const own=new Set(Object.values(run.items).map(x=>x.alt).filter(Boolean).concat(excl||[]));const ks=Object.keys(ALTS).filter(k=>!own.has(k)&&(!slot||ALTS[k].slot===slot||(slot==='Anneau 2'&&ALTS[k].slot==='Anneau')));return ks.length?altItem(pick(ks)):null}
+function randAlt(slot,excl){const own=new Set(Object.values(run.items).map(x=>x.alt).filter(Boolean).concat(excl||[]));const ks=Object.keys(ALTS).filter(k=>altOpen(k)&&!own.has(k)&&(!slot||ALTS[k].slot===slot||(slot==='Anneau 2'&&ALTS[k].slot==='Anneau')));return ks.length?altItem(pick(ks)):null}
 /* codex : tout ce que le joueur a découvert, d'une ascension à l'autre */
 const cx=()=>{const C=meta.cx||(meta.cx={});['boss','alt','syn','wpn'].forEach(k=>C[k]=C[k]||{});return C};
 function checkSyn(){if(!run)return;const C=cx();Object.values(run.items).forEach(x=>{if(x&&x.alt)C.alt[x.alt]=1});(run.arsenal||[]).forEach(k=>C.wpn[k]=1);
@@ -607,7 +618,7 @@ const TAL={
   B3('Venin','Poison, exécution',[{n:'Toxine',d:'Lame vénéneuse : +20% de dégâts',e:{sp:'poison',dmg:20}},{n:'Œil froid',d:'+3% de critique',e:{crit:3}},{n:'Coup de grâce',k:'exec',sp:['exec','poison'],d:'Exécution et Lame vénéneuse : +40% quand le gardien a moins de 30% de PV.'}])],
  gard:[B3('Rempart','Tenir la ligne',[{n:'Mur',d:'Bastion : recharge −15%',e:{sp:'bastion',cd:-15}},{n:'Carrure',d:'+6% de PV max',e:{hp:6}},{n:'Mur vivant',k:'guard',sp:['charge'],d:'Charge au bouclier te protège : −30% de dégâts subis pendant 2 s.'}]),
   B3('Foyer','Flammes et soins',[{n:'Âtre',d:'Onde du foyer : +20% de dégâts',e:{sp:'onde',dmg:20}},{n:'Chaleur',d:'Soins : +12%',e:{heal:12}},{n:'Braise salvatrice',k:'soinc',sp:['onde'],d:'Onde du foyer te soigne de 5% de tes PV max.'}]),
-  B3('Sentence','Punir',[{n:'Verdict',d:'Jugement : +15% de dégâts',e:{sp:'jugement',dmg:15}},{n:'Masse',d:'Coup lourd : +8% de dégâts',e:{heavy:8}},{n:'Sans pitié',k:'exec',sp:['jugement','wh'],d:'Jugement et coups lourds : +40% quand le gardien a moins de 30% de PV.'}])],
+  B3('Sentence','Punir',[{n:'Verdict',d:'Rétribution : +15% de dégâts',e:{sp:'jugement',dmg:15}},{n:'Masse',d:'Coup lourd : +8% de dégâts',e:{heavy:8}},{n:'Sans pitié',k:'exec',sp:['jugement','wh'],d:'Rétribution et coups lourds : +40% quand le gardien a moins de 30% de PV.'}])],
  chrono:[B3('Aiguilles','Tirs du temps',[{n:'Tranchant',d:'Éclat d’heure : +15% de dégâts',e:{sp:'eclat',dmg:15}},{n:'Sablier fin',d:'Éclat d’heure : −25% de mana',e:{sp:'eclat',mana:-25}},{n:'Écho d’heure',k:'echo',sp:['eclat'],d:'Éclat d’heure frappe une seconde fois à 40% des dégâts.'}]),
   B3('Engrenages','Contrôle',[{n:'Grippage',d:'Lenteur : recharge −15%',e:{sp:'lenteur',cd:-15}},{n:'Réserve',d:'+20 mana max',e:{mp:20}},{n:'Rouage brisé',k:'vuln',sp:['lenteur'],d:'Lenteur ouvre la garde du gardien 1,5 s : il subit +25% de dégâts.'}]),
   B3('Paradoxe','Survie',[{n:'Boucle courte',d:'Retour : recharge −15%',e:{sp:'retour',cd:-15}},{n:'Souffle',d:'+15 endurance max',e:{st:15}},{n:'Seconde chance',k:'stam',sp:['retour'],d:'Retour rend aussi 35 d’endurance et 15 mana.'}])],
@@ -629,7 +640,7 @@ const TAL={
 };
 const TALMAX=6;
 const talId=(b,t)=>b+'-'+t;
-const talPts=k=>Math.min(TALMAX,mastLv(k));
+const talPts=k=>Math.min(TALMAX,mastLv(k))+((meta.prest||{})[k]||0);
 const talSel=k=>((meta.tal||{})[k]||[]).filter(x=>/^[0-2]-[0-2]$/.test(x));
 function talNode(cls,id){const [b,t]=id.split('-').map(Number);const B=(TAL[cls]||[])[b];return B&&B.t[t]?Object.assign({b,t},B.t[t]):null}
 function talCan(cls,id){const sel=talSel(cls),[b,t]=id.split('-').map(Number);if(sel.includes(id))return {ok:false,why:'Choisi'};
@@ -663,9 +674,9 @@ const CLASSES={
     d:'Charge un coup énorme au contact. Tu es vulnérable pendant la charge.',l5:'Charge très courte : 0,45 s.'},
    {id:'intim',n:'Cri d\u2019enclume',s:'Cri',role:'Défense',el:'terre',pa:2,min:6,max:8,cds:[8,7.5,7,6.5,6],rng:60,t:'dmg',fx:'weaken',v:[25,30,35,40,45],dur:4,unlock:3,
     d:'Un coup qui affaiblit le boss : ses attaques font moins mal pendant 4 s.',l5:'Interrompt aussi l\u2019attaque en préparation (sauf coups puissants).'},
-   {id:'puiss',n:'Forge intérieure',s:'Forge',role:'Renfort',el:null,pa:2,cds:[16,15,14,13,12],t:'buff',v:[20,25,30,37,45],dur:6,unlock:5,
+   {id:'puiss',n:'Forge intérieure',s:'Forge',role:'Renfort',el:null,pa:2,cds:[16,15,14,13,12],t:'buff',v:[20,25,30,37,45],dur:6,unlock:4,
     d:'Augmente tous tes dégâts pendant 6 s.',l5:'Récupération d\u2019endurance +50% pendant l\u2019effet.'},
-   {id:'epee',n:'Lame de ciel',s:'Lame',role:'Distance',el:'air',pa:4,min:20,max:26,cds:[5,4.5,4,3.5,3],rng:300,proj:1,t:'dmg',unlock:7,
+   {id:'epee',n:'Lame de ciel',s:'Lame',role:'Distance',el:'air',pa:4,min:20,max:26,cds:[5,4.5,4,3.5,3],rng:300,proj:1,t:'dmg',unlock:6,
     d:'Projette une lame d\u2019énergie à distance.',l5:'Critique garanti sur un boss en ouverture.'}]},
  rog:{name:'Ombrelame',tag:'Corps à corps · Chance',hp:118,base:{vit:0,for:0,int:0,agi:0,cha:20},cost:220,
   desc:'Au contact, vite : marque le gardien puis l\u2019exécute.',
@@ -678,14 +689,14 @@ const CLASSES={
     d:'Lance trois dagues. Chacune pose une Marque.',l5:'Cinq dagues au lieu de trois.'},
    {id:'poison',n:'Lame vénéneuse',s:'Venin',role:'Dégâts sur la durée',el:'eau',pa:3,min:8,max:10,cds:[6,5.5,5,4.5,4],rng:62,t:'dmg',fx:'poison',v:[120,140,160,180,220],unlock:3,
     d:'Empoisonne : le gardien subit encore une partie des dégâts pendant 6 s (3 doses au plus).',l5:'Le poison ralentit les préparations du gardien de 15%.'},
-   {id:'danse',n:'Danse des ombres',s:'Danse',role:'Renfort',el:null,pa:2,cds:[16,15,14,13,12],t:'buff',v:[20,25,30,35,45],dur:5,unlock:5,
+   {id:'danse',n:'Danse des ombres',s:'Danse',role:'Renfort',el:null,pa:2,cds:[16,15,14,13,12],t:'buff',v:[20,25,30,35,45],dur:5,unlock:4,
     d:'Augmente tes dégâts et ton critique (+20%) pendant 5 s.',l5:'Tes roulades ne coûtent plus d\u2019endurance pendant la danse.'},
-   {id:'exec',n:'Exécution',s:'Exécution',role:'Gros dégâts',el:'eau',pa:5,min:24,max:30,cds:[9,8.5,8,7.5,7],rng:62,t:'dmg',fx:'exec',wind:[.45,.42,.38,.34,.3],unlock:7,
+   {id:'exec',n:'Exécution',s:'Exécution',role:'Gros dégâts',el:'eau',pa:5,min:24,max:30,cds:[9,8.5,8,7.5,7],rng:62,t:'dmg',fx:'exec',wind:[.45,.42,.38,.34,.3],unlock:6,
     d:'Consomme toutes les Marques : +40% par Marque, et +50% si le gardien a moins de 30% de PV.',l5:'À 5 Marques, critique garanti.'}]},
  gard:{name:'Rempart',tag:'Corps à corps · Intelligence',hp:145,base:{vit:0,for:0,int:20,agi:0,cha:0},cost:180,
   desc:'Bouclier levé : encaisse, renvoie, écrase.',
   wpn:{n:'Égide de Bérane',god:'Bérane',el:'feu',min:9,max:12,rng:62,cd:.36,st:9,heavy:{m:2.2,wind:.55,st:22,cd:1.5},glow:'ember',melee:1,mace:1,shield:1,
-   fx:'Ta garde réduit 90% des dégâts pour moitié moins d’endurance et ta parade parfaite est plus large. Chaque coup bloqué ou paré charge un Ressentiment (5 au plus) : ton coup lourd les libère, +35% par charge.',lore:'La masse et le bouclier de Bérane, déesse du foyer. Le bouclier porte encore la chaleur de son âtre.'},
+   fx:'Ta garde réduit 90% des dégâts pour moitié moins d’endurance et ta parade parfaite est plus large. Chaque coup bloqué charge un Ressentiment (5 au plus) ; une parade parfaite les libère en riposte de zone autour de toi (+60% de dégâts d’arme par charge).',lore:'La masse et le bouclier de Bérane, déesse du foyer. Le bouclier porte encore la chaleur de son âtre.'},
   spells:[
    {id:'charge',n:'Charge au bouclier',s:'Charge',role:'Rapprochement',el:'feu',pa:3,min:10,max:13,cds:[7,6.5,6,5.5,5],rng:300,t:'leap',fx:'interrupt',unlock:1,
     d:'Fonce jusqu’au gardien et interrompt son attaque en préparation (sauf coups puissants).',l5:'Interrompt aussi les coups puissants.'},
@@ -693,9 +704,9 @@ const CLASSES={
     d:'Réduit les dégâts que tu subis pendant 5 s.',l5:'Ni Gel ni ralentissement pendant l’effet.'},
    {id:'onde',n:'Onde du foyer',s:'Onde',role:'Zone',el:'feu',pa:3,min:14,max:18,r:150,cds:[6,5.5,5,4.5,4],t:'nova',unlock:3,
     d:'Une onde de flammes autour de toi frappe le gardien et toutes les invocations proches.',l5:'Repousse les invocations touchées.'},
-   {id:'lumiere',n:'Lumière de l’âtre',s:'Âtre',role:'Soin',el:'feu',pa:3,min:18,max:24,cds:[12,11,10,9,8],t:'heal',res:2,unlock:5,
+   {id:'lumiere',n:'Lumière de l’âtre',s:'Âtre',role:'Soin',el:'feu',pa:3,min:18,max:24,cds:[12,11,10,9,8],t:'heal',res:2,unlock:4,
     d:'Te soigne et charge 2 Ressentiments.',l5:'Soigne aussi 3% de tes PV par seconde pendant 5 s.'},
-   {id:'jugement',n:'Jugement',s:'Jugement',role:'Gros dégâts',el:'feu',pa:5,min:36,max:44,cds:[11,10.5,10,9.5,9],rng:70,t:'dmg',fx:'judge',wind:[.8,.75,.7,.65,.55],unlock:7,
+   {id:'jugement',n:'Rétribution',s:'Rétribution',role:'Gros dégâts',el:'feu',pa:5,min:36,max:44,cds:[11,10.5,10,9.5,9],rng:70,t:'dmg',fx:'judge',wind:[.8,.75,.7,.65,.55],unlock:6,
     d:'Un coup de masse colossal. Consomme les Ressentiments : +40% par charge.',l5:'À 5 charges, le gardien est figé 1 s.'}]},
  chrono:{name:'Horloger',tag:'Distance · Chance',hp:116,base:{vit:0,for:0,int:0,agi:0,cha:20},cost:260,
   desc:'Ralentit, fige et rembobine le temps.',
@@ -708,9 +719,9 @@ const CLASSES={
     d:'Le gardien prépare ses coups plus lentement pendant 5 s.',l5:'Il se déplace aussi deux fois moins vite.'},
    {id:'retour',n:'Retour',s:'Retour',role:'Survie',el:null,pa:2,cds:[14,13,12,11,10],t:'rewind',unlock:3,
     d:'Tu reviens où tu étais il y a 2 s, avec les PV que tu avais alors s’ils étaient plus hauts.',l5:'Rend aussi toute ton endurance.'},
-   {id:'boucle',n:'Boucle',s:'Boucle',role:'Renfort',el:null,pa:3,cds:[22,21,20,19,18],t:'loop',unlock:5,
+   {id:'boucle',n:'Boucle',s:'Boucle',role:'Renfort',el:null,pa:3,cds:[22,21,20,19,18],t:'loop',unlock:4,
     d:'Remet à zéro la recharge de tous tes autres sorts.',l5:'Rend aussi 30 d’endurance.'},
-   {id:'arret',n:'Arrêt du temps',s:'Arrêt',role:'Contrôle',el:null,pa:5,cds:[24,23,22,21,20],t:'stop',v:[1.5,1.7,1.9,2.1,2.5],unlock:7,
+   {id:'arret',n:'Arrêt du temps',s:'Arrêt',role:'Contrôle',el:null,pa:5,cds:[24,23,22,21,20],t:'stop',v:[1.5,1.7,1.9,2.1,2.5],unlock:6,
     d:'Fige le gardien quelques secondes (sans effet pendant ses phases intouchables).',l5:'Le gardien figé prend +30% de dégâts au lieu de +15%.'}]},
  beast:{name:'Meneur de meute',tag:'Distance · Force',hp:115,base:{vit:0,for:20,int:0,agi:0,cha:0},cost:200,
   desc:'Un loup à tes côtés, des pièges, une meute.',
@@ -723,9 +734,9 @@ const CLASSES={
     d:'Ton loup bondit et mord ta cible : gros dégâts et saignement pendant 6 s.',l5:'La morsure interrompt les attaques normales du gardien.'},
    {id:'piege',n:'Piège à mâchoires',s:'Piège',role:'Contrôle',el:'terre',pa:3,min:14,max:18,cds:[10,9.5,9,8.5,8],t:'trap',unlock:3,
     d:'Pose un piège à tes pieds. Le gardien qui marche dessus est immobilisé 1,5 s, prend des dégâts et reste ouvert.',l5:'Deux pièges peuvent être posés.'},
-   {id:'meute',n:'Meute fantôme',s:'Meute',role:'Renfort',el:null,pa:4,cds:[20,19,18,17,16],t:'pack',dur:8,unlock:5,
+   {id:'meute',n:'Meute fantôme',s:'Meute',role:'Renfort',el:null,pa:4,cds:[20,19,18,17,16],t:'pack',dur:8,unlock:4,
     d:'Deux loups spectraux rejoignent le combat pendant 8 s.',l5:'Trois loups au lieu de deux.'},
-   {id:'cri',n:'Cri de la meute',s:'Cri',role:'Renfort',el:null,pa:2,cds:[16,15,14,13,12],t:'buff',v:[20,25,30,35,45],dur:6,unlock:7,
+   {id:'cri',n:'Cri de la meute',s:'Cri',role:'Renfort',el:null,pa:2,cds:[16,15,14,13,12],t:'buff',v:[20,25,30,35,45],dur:6,unlock:6,
     d:'Plus de dégâts pour toi et tes loups, et tes loups attaquent deux fois plus vite.',l5:'Soigne entièrement ton loup.'}]},
  bers:{name:'Berserker',tag:'Corps à corps · Force',hp:135,base:{vit:0,for:20,int:0,agi:0,cha:0},cost:240,
   desc:'Deux haches, aucune retenue : plus il saigne, plus il frappe.',
@@ -737,15 +748,15 @@ const CLASSES={
    {id:'sauvage',n:'Coup sauvage',s:'Sauvage',role:'Gros dégâts',el:'terre',pa:0,hpPct:6,min:30,max:38,cds:[6,5.5,5,4.5,4],rng:62,t:'dmg',pure:1,unlock:1,
     d:'Un coup de hache brutal qui ignore les résistances du gardien. Coûte 6% de tes PV max au lieu du mana.',l5:'Ne coûte plus de PV pendant la Rage du berserker.'},
    {id:'furor',n:'Rage du berserker',s:'Rage',role:'Renfort',el:null,pa:2,cds:[16,15,14,13,12],t:'buff',v:[10,12,15,18,22],dur:6,unlock:3,
-    d:'Pendant 6 s : plus de dégâts, tu frappes 50% plus vite et tes coups d’arme te soignent de 10% de leurs dégâts en plus.',l5:'Coup sauvage ne coûte plus de PV pendant la rage.'},
-   {id:'hurle',n:'Hurlement',s:'Hurlement',role:'Zone',el:'terre',pa:3,min:12,max:15,r:150,cds:[9,8.5,8,7.5,7],t:'nova',fx:'weaken',v:[20,24,28,32,40],dur:4,unlock:5,
+    d:'Pendant 6 s : plus de dégâts, tu frappes 50% plus vite et tes coups d’arme te soignent de 10% de leurs dégâts en plus.',l5:'Chaque invocation tuée pendant la rage la prolonge de 1 s (4 s de plus au maximum).'},
+   {id:'hurle',n:'Hurlement',s:'Hurlement',role:'Zone',el:'terre',pa:3,min:12,max:15,r:150,cds:[9,8.5,8,7.5,7],t:'nova',fx:'weaken',v:[20,24,28,32,40],dur:4,unlock:4,
     d:'Un cri qui frappe tout autour de toi et affaiblit le gardien pendant 4 s. Te libère du gel et des ralentissements.',l5:'Repousse aussi les invocations.'},
-   {id:'crep',n:'Crépuscule des haches',s:'Crépuscule',role:'Ultime',el:null,pa:4,cds:[30,28,26,24,22],t:'buff',v:[20,25,30,35,40],dur:7,unstop:1,unlock:7,
+   {id:'crep',n:'Crépuscule des haches',s:'Crépuscule',role:'Ultime',el:null,pa:4,cds:[30,28,26,24,22],t:'buff',v:[20,25,30,35,40],dur:7,unstop:1,unlock:6,
     d:'Pendant 7 s : plus de dégâts, et plus rien ne t’arrête (ni gel, ni ralentissement, ni garde brisée, ni projection). Se lance même figé et te libère.',l5:'Tes roulades ne coûtent plus d’endurance pendant l’effet.'}]},
  pal:{name:'Paladin',tag:'Corps à corps · Intelligence',hp:116,base:{vit:0,for:0,int:20,agi:0,cha:0},cost:250,
-  desc:'Marteau et lumière : accumule la Ferveur, frappe le Verdict, protège et soigne.',
+  desc:'Marteau et lumière : accumule la Ferveur au marteau, la dépense en sorts, protège et soigne.',
   wpn:{n:'Marteau de Solenne',god:'Solenne',el:'feu',min:9,max:12,rng:64,cd:.34,st:9,heavy:{m:2.2,wind:.5,st:22,cd:1.5},glow:'ember',glowHex:'#ffe08a',melee:1,mace:1,holy:1,
-   fx:'Chaque coup léger qui touche le gardien charge une Ferveur (5 au plus). Ton coup lourd devient un Verdict : +30% de dégâts par Ferveur, et te soigne de 1,5% de tes PV max par Ferveur.',lore:'Le marteau de Solenne, déesse de l’aube. Sa tête est forgée dans la première lumière du jour ; elle ne refroidit jamais.'},
+   fx:'Chaque coup léger qui touche le gardien charge une Ferveur (5 au plus). Ton prochain sort la dépense : +15% de dégâts par Ferveur, et il te soigne de 1% de tes PV max par Ferveur (Lumière sacrée l’utilise pour soigner plus).',lore:'Le marteau de Solenne, déesse de l’aube. Sa tête est forgée dans la première lumière du jour ; elle ne refroidit jamais.'},
   spells:[
    {id:'jugaube',n:'Jugement de l’aube',s:'Jugement',role:'Distance',el:'feu',pa:3,min:15,max:19,cds:[6,5.5,5,4.5,4],rng:400,proj:1,t:'dmg',fx:'holy2',unlock:1,
     d:'Lance un marteau de lumière sur le gardien. Charge 2 Ferveur.',l5:'Charge 3 Ferveur.'},
@@ -753,9 +764,9 @@ const CLASSES={
     d:'Sanctifie le sol autour de toi pendant 5 s : tout ennemi dans la zone brûle toutes les 0,5 s.',l5:'Tant que tu restes dans la zone, tu récupères 0,6% de tes PV par tick.'},
    {id:'lumsac',n:'Lumière sacrée',s:'Lumière',role:'Soin',el:'feu',pa:3,min:14,max:19,cds:[14,13,12,11,10],t:'heal',fx:'holyheal',unlock:3,
     d:'Te soigne. Consomme ta Ferveur : +15% de soin par charge.',l5:'Soigne aussi 3% de tes PV par seconde pendant 5 s.'},
-   {id:'bdiv',n:'Bouclier divin',s:'Bouclier',role:'Survie',el:null,pa:3,cds:[34,32,30,28,26],t:'buff',def:1,v:[100,100,100,100,100],dur:2,unlock:5,
+   {id:'bdiv',n:'Bouclier divin',s:'Bouclier',role:'Survie',el:null,pa:3,cds:[34,32,30,28,26],t:'buff',def:1,v:[100,100,100,100,100],dur:2,unlock:4,
     d:'Une bulle de lumière te rend insensible à tous les dégâts pendant 2 s et te libère du gel et des ralentissements.',l5:'Charge aussi 3 Ferveur.'},
-   {id:'ailes',n:'Ailes de l’aube',s:'Ailes',role:'Ultime',el:null,pa:4,cds:[30,28,26,24,22],t:'buff',v:[20,25,30,35,40],dur:8,unlock:7,
+   {id:'ailes',n:'Ailes de l’aube',s:'Ailes',role:'Ultime',el:null,pa:4,cds:[30,28,26,24,22],t:'buff',v:[20,25,30,35,40],dur:8,unlock:6,
     d:'Pendant 8 s : plus de dégâts, et chaque coup léger charge 2 Ferveur au lieu d’une.',l5:'Tes coups d’arme te soignent aussi de 8% de leurs dégâts.'}]},
  cra:{name:'Guette-Astre',tag:'Distance · Agilité',hp:113,base:{vit:0,for:0,int:0,agi:20,cha:0},cost:80,
   desc:'À distance : repousse, ralentit, monte en puissance.',
@@ -768,9 +779,9 @@ const CLASSES={
     d:'Repousse le boss loin de toi.',l5:'Interrompt aussi l\u2019attaque en préparation (sauf coups puissants).'},
    {id:'ralent',n:'Flèche entravante',s:'Entrave',role:'Contrôle',el:'terre',pa:3,min:8,max:10,cds:[10,9.5,9,8.5,8],rng:460,proj:1,t:'dmg',fx:'slowB',v:[25,30,35,40,50],dur:5,unlock:3,
     d:'Le boss prépare ses attaques plus lentement pendant 5 s.',l5:'Ralentit aussi ses déplacements de moitié.'},
-   {id:'tir',n:'Œil d\u2019astre',s:'Œil',role:'Renfort',el:null,pa:2,cds:[16,15,14,13,12],t:'buff',v:[20,25,30,35,42],dur:8,unlock:5,
+   {id:'tir',n:'Œil d\u2019astre',s:'Œil',role:'Renfort',el:null,pa:2,cds:[16,15,14,13,12],t:'buff',v:[20,25,30,35,42],dur:8,unlock:4,
     d:'Augmente tous tes dégâts pendant 8 s.',l5:'+15% de critique pendant l\u2019effet.'},
-   {id:'explo',n:'Comète',s:'Comète',role:'Gros dégâts',el:'terre',pa:5,min:30,max:38,cds:[9,8.5,8,7.5,7],rng:460,proj:1,t:'dmg',fx:'bomb',unlock:7,
+   {id:'explo',n:'Comète',s:'Comète',role:'Gros dégâts',el:'terre',pa:5,min:30,max:38,cds:[9,8.5,8,7.5,7],rng:460,proj:1,t:'dmg',fx:'bomb',unlock:6,
     d:'La flèche se fiche dans le boss et explose 1 s plus tard.',l5:'L\u2019explosion ouvre la garde du boss pendant 2 s.'}]},
  eni:{name:'Sèvemage',tag:'Mi-distance · Intelligence',hp:110,base:{vit:0,for:0,int:20,agi:0,cha:0},cost:150,
   desc:'Survie : soins, interruptions, vol de vie.',
@@ -783,9 +794,9 @@ const CLASSES={
     d:'Te soigne instantanément, selon ton Intelligence.',l5:'Soigne aussi 3% de tes PV max par seconde pendant 5 s.'},
    {id:'silence',n:'Mot muet',s:'Muet',role:'Contrôle',el:'feu',pa:3,min:6,max:8,cds:[14,13,12,11,10],rng:340,t:'dmg',fx:'interrupt',unlock:3,
     d:'Interrompt l\u2019attaque que le boss prépare (sauf coups puissants).',l5:'Interrompt aussi les coups puissants.'},
-   {id:'stim',n:'Montée de sève',s:'Montée',role:'Renfort',el:null,pa:2,cds:[16,15,14,13,12],t:'stim',dur:[4,4.5,5,5.5,6],unlock:5,
+   {id:'stim',n:'Montée de sève',s:'Montée',role:'Renfort',el:null,pa:2,cds:[16,15,14,13,12],t:'stim',dur:[4,4.5,5,5.5,6],unlock:4,
     d:'Endurance pleine et récupération doublée.',l5:'Tes sorts coûtent moitié moins d\u2019endurance pendant l\u2019effet.'},
-   {id:'vampir',n:'Racine avide',s:'Racine',role:'Vol de vie',el:'terre',pa:4,min:20,max:25,cds:[6,5.5,5,4.5,4],rng:340,proj:1,t:'dmg',fx:'leech',v:[15,18,21,24,30],unlock:7,
+   {id:'vampir',n:'Racine avide',s:'Racine',role:'Vol de vie',el:'terre',pa:4,min:20,max:25,cds:[6,5.5,5,4.5,4],rng:340,proj:1,t:'dmg',fx:'leech',v:[15,18,21,24,30],unlock:6,
     d:'Gros projectile qui te rend une partie des dégâts infligés.',l5:'Vol de vie porté à 65%.'}]}
 };
 
@@ -828,20 +839,20 @@ const PHASES={
 };
 /* Attaques : k = forme de la zone au sol. heavy = coup puissant, suivi d'une ouverture. */
 const BOSSES=[
-{id:'bouftou',name:'Grondecorne',de:'de Grondecorne',zone:'Fauchelande',hp:170,r:40,spd:85,keep:70,res:{terre:10,feu:0,air:0,eau:-10},loot:['vit','for'],
+{id:'bouftou',name:'Grondecorne',de:'de Grondecorne',zone:'Fauchelande',hp:170,r:40,spd:85,keep:70,res:{terre:15,feu:0,air:-15,eau:0},loot:['vit','for'],
  lore:'Il gratte le sol puis charge en ligne droite. Roule sur le côté au dernier moment, puis frappe pendant son ouverture.',
  seq:['corne','pietine','corne','rass','charge'],
  atks:{corne:{n:'Coup de corne',k:'cone',r:150,half:.6,wind:.75,dmg:12},pietine:{n:'Piétinement',k:'circle',r:115,wind:.9,dmg:14},
   rass:{n:'Rassemblement',k:'special',fx:f=>bossShield(f,.03,4)},
   charge:{n:'Charge royale',k:'charge',len:440,w:74,wind:1.1,dmg:30,heavy:1}}},
-{id:'tofu',name:'Vifplume',de:'de Vifplume',zone:'Sylve Ferreuse',hp:190,r:30,spd:150,keep:110,res:{terre:-10,feu:0,air:20,eau:0},loot:['agi','crit'],
+{id:'tofu',name:'Vifplume',de:'de Vifplume',zone:'Sylve Ferreuse',hp:190,r:30,spd:150,keep:110,res:{terre:-15,feu:0,air:20,eau:0},loot:['agi','crit'],
  lore:'Rapide, en rafales. Ses plumes lui font esquiver tes sorts quelques secondes : garde ton endurance pour après.',
  seq:['picore','plume','piail','picore','tempete'],
  atks:{picore:{n:'Picorage',k:'cone',r:125,half:.5,wind:.45,dmg:6,repeat:3,gap:.3},plume:{n:'Plumes au vent',k:'special',fx:f=>{f.ms.evade=2.5}},
   piail:{n:'Piaillement strident',k:'circle',r:165,wind:.8,dmg:10,slow:2},
   tempete:{n:'Tempête de plumes',k:'proj',count:5,spread:.9,speed:310,dmg:7,wind:.9,repeat:3,gap:.35,heavy:1}},
  chips:f=>f.ms.evade>0?[{t:'Esquive 40%',w:1}]:[]},
-{id:'scara',name:'La Tisseuse d’Ocre',de:'de la Tisseuse',zone:'Plaine d’Ocre',hp:245,r:44,spd:85,keep:80,res:{terre:10,feu:-10,air:15,eau:10},loot:['res','vit'],
+{id:'scara',name:'La Tisseuse d’Ocre',de:'de la Tisseuse',zone:'Plaine d’Ocre',hp:245,r:44,spd:85,keep:80,res:{terre:0,feu:-15,air:15,eau:0},loot:['res','vit'],
  lore:'Une araignée géante a tendu sa toile sur la Plaine d’Ocre. Ses jets de soie laissent au sol des toiles qui te ralentissent, son venin part en éventail, et quand elle se ramasse, elle bondit : sors du cercle. Le feu la brûle mieux.',
  tick:(f,dt)=>{f.ms.webT=(f.ms.webT??4)-dt;if(f.ms.webT<=0&&!f.storm){f.ms.webT=f.ms.webFast?5:8;for(let i=0;i<(f.ms.webFast?3:2);i++){const a=Math.random()*6.28,r=60+Math.random()*(ARR-110);addHz(f,CX+Math.cos(a)*r,CY+Math.sin(a)*r,58,'toile')}say(f,'Des fils de soie tombent du ciel')}},
  seq:['mord','toile','mord','crachat','bond'],
@@ -849,7 +860,7 @@ const BOSSES=[
   toile:{n:'Jet de toile',k:'drops',count:3,r:62,wind:.9,dmg:10,pool:'toile',slow:1.2},
   crachat:{n:'Crachat de venin',k:'proj',count:5,spread:.9,speed:300,wind:.7,dmg:12,slow:1},
   bond:{n:'Bond chasseur',k:'leap',r:115,wind:1.2,dmg:40,heavy:1}}},
-{id:'wa',name:'La Mandragore Mère',de:'de la Mandragore',zone:'Îles Vertes',hp:330,r:36,spd:115,keep:110,res:{terre:0,feu:10,air:10,eau:0},loot:['cha','soin'],
+{id:'wa',name:'La Mandragore Mère',de:'de la Mandragore',zone:'Îles Vertes',hp:330,r:36,spd:115,keep:110,res:{terre:0,feu:15,air:-15,eau:0},loot:['cha','soin'],
  lore:'Elle plante un bulbe dans le sable : tu as 6 secondes pour lui infliger assez de dégâts, sinon elle le mange et se soigne.',
  tick:(f,dt)=>{const c=f.ms.caw;if(!c)return;c.t-=dt;if(c.t<=0){if(c.dealt<c.need){const h=healBoss(f,Math.round(f.bmax*.06));say(f,`Elle mange le bulbe : +${h} PV`)}else say(f,'Bulbe écrasé');f.ms.caw=null}},
  onDealt:(f,d)=>{if(f.ms.caw)f.ms.caw.dealt+=d},
@@ -858,13 +869,13 @@ const BOSSES=[
  atks:{cawotte:{n:'Plante un bulbe',k:'special',fx:f=>{f.ms.caw={t:6,need:Math.round(f.bmax*.045),dealt:0}}},
   coup:{n:'Coup d’oreilles',k:'line',len:210,w:60,wind:.6,dmg:22},bond:{n:'Bond',k:'leap',r:90,wind:.8,dmg:22,pool:'thorn'},
   wak:{n:'Rayon de sève',k:'line',len:620,w:95,wind:1.4,dmg:50,heavy:1}}},
-{id:'craq',name:'Basalte',de:'de Basalte',zone:'La Faille',hp:420,r:50,spd:60,keep:80,res:{terre:40,feu:0,air:-15,eau:10},loot:['vit','res'],
- lore:'La Terre ne lui fait presque rien, l’Air le fissure. Son Séisme frappe en anneau : colle-toi à lui ou fuis tout au bord.',
+{id:'craq',name:'Basalte',de:'de Basalte',zone:'La Faille',hp:420,r:50,spd:60,keep:80,res:{terre:30,feu:0,air:0,eau:-15},loot:['vit','res'],
+ lore:'La Terre ne lui fait presque rien, l’Eau l’érode. Son Séisme frappe en anneau : colle-toi à lui ou fuis tout au bord.',
  seq:['poing','ebou','poing','seisme'],
  atks:{poing:{n:'Poing de roche',k:'cone',r:150,half:.55,wind:.8,dmg:28},
   ebou:{n:'Éboulement',k:'drops',count:4,onP:2,spread:110,r:62,wind:1,dmg:18,slow:2,pool:'magma'},
   seisme:{n:'Séisme',k:'ring',r1:95,r2:255,wind:1.5,dmg:62,heavy:1}}},
-{id:'krala',name:'Mâchevase',de:'de Mâchevase',zone:'Les Vasières',hp:460,r:46,spd:65,keep:140,res:{terre:0,feu:-10,air:10,eau:35},loot:['agi','dmg'],
+{id:'krala',name:'Mâchevase',de:'de Mâchevase',zone:'Les Vasières',hp:460,r:46,spd:65,keep:140,res:{terre:-15,feu:0,air:0,eau:30},loot:['agi','dmg'],
  lore:'Il plonge et devient intouchable pendant que ses tentacules jaillissent sous tes pieds. Ne reste pas immobile.',
  tick:(f,dt)=>{if(f.b.inv>0){f.ms.tentT=(f.ms.tentT||0)-dt;if(f.ms.tentT<=0){f.ms.tentT=.85;addZone(f,f.p.x,f.p.y,55,.75,9,'ink')}}},
  chips:f=>f.b.inv>0?[{t:`Immergé : invulnérable · ${Math.ceil(f.b.inv)} s`,w:1}]:[],
@@ -873,17 +884,17 @@ const BOSSES=[
   plonge:{n:'Plongée',k:'special',fx:f=>{f.b.inv=2.8;f.ms.tentT=.4},cool:3.1},
   encre:{n:'Jet d’encre',k:'proj',count:3,spread:.5,speed:330,dmg:16,wind:.7,slow:3},
   etreinte:{n:'Étreinte abyssale',k:'circle',r:215,wind:1.6,dmg:66,heavy:1}}},
-{id:'kimbo',name:'L’Arbitre aux deux visages',de:'de l’Arbitre',zone:'Canopée des Glyphes',hp:470,r:46,spd:95,keep:170,big:1.2,res:{terre:10,feu:10,air:10,eau:10},loot:['int','pct'],
- lore:'Ses glyphes alternent Pair et Impair toutes les 5 secondes. Seuls les coups de bonne parité le blessent : coup léger et sorts à 3 ou 5 en Impair, coup lourd et sorts à 2 ou 4 en Pair.',
+{id:'kimbo',name:'L’Arbitre aux deux visages',de:'de l’Arbitre',zone:'Canopée des Glyphes',hp:470,r:46,spd:95,keep:170,big:1.2,res:{terre:0,feu:20,air:0,eau:-15},loot:['int','pct'],
+ lore:'Chacune de tes attaques a un poids : coup léger 1, coup lourd 2, chaque sort son coût en points (2 à 5). Le glyphe de l’Arbitre alterne Pair et Impair toutes les 5 s : seules les attaques dont le poids est de la même parité le blessent. Un indicateur au centre de l’écran te dit lesquelles.',
  tick:(f,dt)=>{if(!f.ms.par){f.ms.par='impair';f.ms.parT=5}f.ms.parT-=dt;if(f.ms.parT<=0){f.ms.parT=f.ms.parFast?3:5;f.ms.par=f.ms.par==='pair'?'impair':'pair';say(f,f.ms.par==='pair'?'Glyphe Pair':'Glyphe Impair')}},
  dmgMod:(f,sp)=>(sp.pa%2===0)===(f.ms.par==='pair'),
- chips:f=>[{t:`${f.ms.par==='pair'?'Pair : coup lourd, sorts à 2 et 4':'Impair : coup léger, sorts à 3 et 5'} · ${Math.ceil(f.ms.parT)} s`,w:1}],
+ chips:f=>[],
  seq:['glyphe','double','glyphe','fatal'],
  atks:{glyphe:{n:'Glyphe de l’Arbitre',k:'drops',count:1,onP:1,r:95,wind:.8,dmg:34},
   double:{n:'Double glyphe',k:'proj',radial:1,count:10,speed:230,dmg:20,wind:.7,repeat:2,gap:.5},
   fatal:{n:'Glyphe fatal',k:'safe',safe:85,wind:1.9,dmg:75,heavy:1}}},
-{id:'obsi',name:'Hiverne',de:'d’Hiverne',zone:'Le Glacis',hp:520,r:56,spd:75,keep:130,big:1.25,res:{terre:10,feu:-20,air:10,eau:40},loot:['res','int'],
- lore:'Chaque coup de glace ajoute du Gel. À 3 Gel, tu es figé. Une fiole fait fondre la glace.',
+{id:'obsi',name:'Hiverne',de:'d’Hiverne',zone:'Le Glacis',hp:520,r:56,spd:75,keep:130,big:1.25,res:{terre:0,feu:-20,air:0,eau:30},loot:['res','int'],
+ lore:'Chaque coup de glace ajoute du Gel. À 3 Gel, tu es figé 1,4 s. Une fiole, une parade parfaite ou une esquive en roulade font fondre la glace ; sinon elle fond seule, un Gel toutes les 2,5 s.',
  seq:['souffle','pic','souffle','blizzard'],
  atks:{souffle:{n:'Souffle glacé',k:'cone',r:230,half:.4,wind:.8,dmg:30,gel:1},
   pic:{n:'Pic d’obsidienne',k:'line',len:320,w:52,wind:.6,dmg:42,repeat:2,gap:.45},
@@ -891,7 +902,7 @@ const BOSSES=[
  tick:(f,dt)=>{f.ms.warmT=(f.ms.warmT??4)-dt;if(f.ms.warmT<=0){f.ms.warmT=13;const t=randArena(70);addHz(f,t.x,t.y,62,'warm');say(f,'Des braises s’allument : elles te protègent du Gel')}}},
 {id:'hare',name:'Le Régent des Heures',de:'du Régent',zone:'Le Beffroi',hp:720,r:52,spd:105,keep:170,big:1.35,res:{terre:15,feu:15,air:15,eau:15},loot:['pct','crit'],
  lore:'Toutes les 24 s, l’horloge sonne : inflige assez de dégâts pendant les 6 s d’avertissement, ou il efface ce que tu lui as fait. Sous 50% de PV, le sablier se brise.',
- tick:(f,dt)=>{const m=f.ms;if(m.clock===undefined)m.clock=24;m.clock-=dt;
+ tick:(f,dt)=>{const m=f.ms;if(m.clock===undefined)m.clock=24;if(f.storm){m.win=null;m.clock=Math.max(m.clock,8);return}m.clock-=dt;
   if(m.clock<=6&&!m.win){m.win={dealt:0,need:Math.round(f.bmax*.07)};say(f,'L’horloge va sonner')}
   if(m.clock<=0){if(m.win.dealt>=m.win.need)say(f,'Engrenage brisé');else{const s=f.hist.filter(h=>f.t-h.t<12).reduce((a,h)=>a+h.d,0);const h=healBoss(f,Math.round(s*.5));say(f,`Retour en arrière : +${h} PV`)}m.win=null;m.clock=24}},
  onDealt:(f,d)=>{if(f.ms.win)f.ms.win.dealt+=d},
@@ -904,7 +915,7 @@ const BOSSES=[
   cadran:{n:'Cadran',k:'ring',r1:120,r2:285,wind:1.2,dmg:40},
   minuit:{n:'Minuit',k:'safe',safe:80,wind:2,dmg:95,heavy:1}}},
 {id:'secret',name:'Le Sablier Vivant',de:'du Sablier Vivant',zone:'Le Hors-Temps',hp:1050,r:52,spd:115,keep:150,big:1.4,res:{terre:20,feu:20,air:20,eau:20},loot:['pct','crit'],secret:1,
- lore:'Le sablier lui-même, enfin éveillé. Il n’attaque pas : il rejoue chaque gardien que tu as vaincu, plus vite.',
+ lore:'Le sablier lui-même, enfin éveillé. Il n’attaque pas : il rejoue les attaques des gardiens, d’abord à leur rythme, puis bien plus vite dès qu’il passe sous 75% de ses PV.',
  seq:['faux','spirale','charge','aiguilles','sable','bond','retour','jugement'],
  atks:{faux:{n:'Faux du temps',k:'cone',r:220,half:.8,multi:[-.75,.75],wind:.7,dmg:42,repeat:2,gap:.35},
   spirale:{n:'Spirale de sable',k:'proj',radial:1,count:18,speed:250,dmg:20,wind:.7,repeat:5,gap:.25,spin:.17},
@@ -918,16 +929,17 @@ const BOSSES=[
 
 const UPG=[
  {k:'vit',n:'Corps endurci',d:'+10 PV max de départ',max:10,cost:l=>60+l*45+l*l*4},
- {k:'pow',n:'Ferveur',d:'+5% dommages',max:10,cost:l=>80+l*60+l*l*6},
+ {k:'pow',n:'Puissance sacrée',d:'+5% dommages',max:10,cost:l=>80+l*60+l*l*6},
  {k:'pts',n:'Héritage',d:'+5 points de caractéristiques au départ',max:5,cost:l=>120+l*130},
  {k:'flask',n:'Fiole supplémentaire',d:'+1 charge de fiole',max:3,cost:l=>300+l*300},
  {k:'flaskPow',n:'Élixir concentré',d:'Fioles +10% de soin',max:5,cost:l=>140+l*110},
  {k:'pa',n:'Souffle d\u2019Aurel',d:'+25 endurance max',max:2,cost:l=>600+l*600},
+ {k:'relic',n:'Reliques du Temple',d:'Palier final, un effet par niveau : I une Altération de départ · II une arme alternative de ta classe dès le départ · III une 2e Altération · IV arme au rang II · V une 3e Altération',max:5,cost:l=>[3000,5000,8500,14500,25000][l]||25000,relic:1},
  {k:'rez',n:'Sablier de secours',d:'Une fois par ascension, quand tu tombes en combat, tu te relèves (30% des PV, puis 50% au niveau 2)',max:2,cost:l=>l?3500:1800}
 ];
 const NODES={
- repos:{n:'Feu de camp',d:'Soigne 50% des PV, remplit les fioles et met tes grains à l’abri.'},
- forge:{n:'Bibliothèque de sorts',d:'+2 points de sort à dépenser comme tu veux.'},
+ repos:{n:'Feu de camp',d:'Au choix : te reposer (50% des PV et fioles remplies) ou mettre tes grains à l’abri.'},
+ forge:{n:'Bibliothèque de sorts',d:'+2 points de sort à dépenser comme tu veux. La première fois, tes 4e et 5e sorts se débloquent un niveau plus tôt.'},
  parch:{n:'Parchemins',d:'Gros bonus permanent à une caractéristique de ton choix.'},
  divin:{n:'Autel divin',d:'Ton dieu bénit ton arme : +1 rang (max 5), +25% de dégâts d\u2019arme par rang.'},
  autel:{n:'Autel sombre',d:'−10% PV max pour le reste de l’ascension, +15% dommages.'}
@@ -991,7 +1003,10 @@ const EVENTS={
   {t:'Traverser le miroir',d:'Rembourse tous tes points de caractéristiques pour les répartir à nouveau.',fx:()=>{const b=Object.assign({},CLS().base);for(const k in RC().stats||{})b[k]=(b[k]||0)+RC().stats[k];if(!Object.keys(run.stats).some(k=>(run.stats[k]||0)>(b[k]||0)))return {keep:1,msg:'Ton reflet n’a rien à changer : tu n’as encore dépensé aucun point. Répartis-les plus bas, puis reviens au miroir.'};let n=0;for(const k in run.stats){const x=(run.stats[k]||0)-(b[k]||0);if(x>0){n+=x;run.stats[k]=b[k]||0}}run.pts+=n;run.hp=Math.min(run.hp,maxHp());return `${n} points à répartir de nouveau.`}},
   {t:'Partir',fx:()=>'Tu détournes les yeux.'}]}
 };
-function rollEvent(){if(run.floor>=2&&run.floor<=8&&Math.random()<.3&&Object.keys(WEAPONS).some(k=>WEAPONS[k].cls===run.cls&&!(run.arsenal||[]).includes(k)))return 'echo';if(run.floor<2||run.floor>8||Math.random()>.6)return null;const seen=run.evSeen||[];const ks=Object.keys(EVENTS).filter(k=>!seen.includes(k));return ks.length?pick(ks):null}
+function rollEvent(){const echoOk=Object.keys(WEAPONS).some(k=>WEAPONS[k].cls===run.cls&&!(run.arsenal||[]).includes(k));
+  /* garantie : si tu n'as encore aucune arme alternative, un Écho se présente au plus tard à l'étage IV */
+  if(!run.endless&&!run.echoMet&&!(run.arsenal||[]).length&&echoOk&&run.floor>=2&&run.floor<=4&&(run.floor===4||Math.random()<.35)){run.echoMet=1;return 'echo'}
+  if(run.floor>=2&&run.floor<=8&&Math.random()<.3&&echoOk){run.echoMet=1;return 'echo'}if(run.floor<2||run.floor>8||Math.random()>.6)return null;const seen=run.evSeen||[];const ks=Object.keys(EVENTS).filter(k=>!seen.includes(k));return ks.length?pick(ks):null}
 function rEvent(){const E=EVENTS[run.ev];return `<div class="mbg"><div class="mbox event"><span class="label">Entre deux étages</span><h2 class="mtitle">${E.n}</h2><p class="dim" style="max-width:60ch;margin:0 auto 12px">${E.txt}</p>
   <div class="mcards">${E.ch.map((c,i)=>{const ok=c.ok?c.ok():true;return `<button class="mcard" style="--i:${i};--c:${i===E.ch.length-1?'var(--line)':'var(--ember)'}" data-a="evc" data-v="${i}" ${ok===true?'':'disabled'}><h3>${c.t}</h3>${c.d?`<small>${c.d}</small>`:''}${c.gain?`<small style="color:var(--ember)">${c.gain()}</small>`:''}${ok!==true?`<small class="down">${ok}</small>`:''}</button>`}).join('')}</div></div></div>`}
 
@@ -1003,7 +1018,7 @@ const INF={
  foudre:{n:'Foudre',el:'air',col:'#f5e05a',cost:120,boss:'kimbo',d:'25% de chances qu\u2019un coup rebondisse sur 2 autres ennemis (60% des dégâts). +10% de critique.'},
  givre:{n:'Givre',el:'eau',col:'#7fd0f0',cost:120,boss:'obsi',d:'Chaque coup ajoute du givre (2 pour un coup lourd). À 6 charges, le gardien est figé 1 s et prend +15%. Le givre ralentit ses préparations.'}
 };
-let meta={race:'plainois',souls:0,infU:{},up:{vit:0,pow:0,pts:0,flask:0,flaskPow:0,pa:0,rez:0},unlocked:{},stain:null,cycle:0,wins:0,best:0,runs:0,sel:null};
+let meta={race:'plainois',souls:0,infU:{},up:{vit:0,pow:0,pts:0,flask:0,flaskPow:0,pa:0,rez:0,relic:0},unlocked:{},stain:null,cycle:0,wins:0,best:0,runs:0,sel:null};
 const firstPick=()=>!Object.values(meta.unlocked||{}).some(Boolean);
 const clsCost=k=>firstPick()?0:CLASSES[k].cost;
 let run=null,fight=null;
@@ -1045,7 +1060,7 @@ const ACH={
  arena10:{n:'Champion de l’arène',d:'Gagner 10 duels dans l’arène.',r:300,t:'Champion',cos:'braise'},
  end15:{n:'Vertige',d:'Atteindre l’étage XV de la Tour sans fin.',r:300,t:'Funambule',cos:'astre'},
  end25:{n:'Au-delà des nuages',d:'Atteindre l’étage XXV de la Tour sans fin.',r:800,t:'Céleste'},
- secret:{n:'Hors du temps',d:'Vaincre le boss caché.',r:600,t:'Hors du temps',cos:'sable'},
+ secret:{n:'Hors du temps',d:'Vaincre le boss caché.',r:800,t:'Hors du temps',cos:'sable'},
  secretnh:{n:'Parfait',d:'Vaincre le boss caché sans prendre un coup.',r:1500,t:'le Parfait',cos:'couronne'}
 };
 /* apparences : auras portées en combat, débloquées par les exploits */
@@ -1053,11 +1068,12 @@ const COS={
  braise:{n:'Braises',c:'#ff8a3a',fx:'ember'},givre:{n:'Givre',c:'#bfe8ff',fx:'snow'},sable:{n:'Sable du temps',c:'#e8c070',fx:'sand'},
  ombre:{n:'Ombre',c:'#9a86c8',fx:'shadow'},sang:{n:'Sang',c:'#c4483d',fx:'blood'},echo:{n:'Écho',c:'#a9b8ff',fx:'mist'},
  acier:{n:'Acier',c:'#d8dee8',fx:'tspark'},feuilles:{n:'Feuilles',c:'#8fd07a',fx:'leaf'},foudre:{n:'Foudre',c:'#fff1a8',fx:'tspark'},
- astre:{n:'Astres',c:'#c9a8ff',fx:'prism'},aube:{n:'Aube',c:'#ffe6a8',fx:'holy'},couronne:{n:'Couronne d’or',c:'#ffd36a',fx:'holy',ring:1}
+ astre:{n:'Astres',c:'#c9a8ff',fx:'prism'},eternite:{n:'Éternité',c:'#f4f1ff',fx:'holy',ring:1},aube:{n:'Aube',c:'#ffe6a8',fx:'holy'},couronne:{n:'Couronne d’or',c:'#ffd36a',fx:'holy',ring:1}
 };
-const TITLES=()=>Object.values(ACH).map(A=>A.t).filter(Boolean);
-const myTitle=()=>{const A=ACH[meta.title];return A&&A.t&&(meta.ach||{})[meta.title]?A.t:''};
-const cosOk=k=>k&&COS[k]&&Object.keys(ACH).some(a=>ACH[a].cos===k&&(meta.ach||{})[a]);
+const PRESTT=(k,n)=>CLASSES[k].name+(n>=2?' immortel':' éternel');
+const TITLES=()=>Object.values(ACH).map(A=>A.t).filter(Boolean).concat(...Object.keys(CLASSES).map(k=>[PRESTT(k,1),PRESTT(k,2)]));
+const myTitle=()=>{const t=meta.title||'';if(t.startsWith('p:')){const [,k,n]=t.split(':');return CLASSES[k]&&((meta.prest||{})[k]||0)>=+n?PRESTT(k,+n):''}const A=ACH[t];return A&&A.t&&(meta.ach||{})[t]?A.t:''};
+const cosOk=k=>!!(k&&COS[k]&&(Object.keys(ACH).some(a=>ACH[a].cos===k&&(meta.ach||{})[a])||(k==='eternite'&&Object.values(meta.prest||{}).some(v=>v>0))));
 function cosAura(f,R){const k=meta.aura;if(!R||!R.pg||!R.scene)return;const on=cosOk(k)&&!f.over;
   if(!on){if(R.cosRing)R.cosRing.visible=false;return}const C=COS[k],T=THREE,p=R.pg.position;R.cosT=(R.cosT||0)+1;
   if(!R.cosRing){const m=new T.Mesh(new T.PlaneGeometry(3.2,3.2),new T.MeshBasicMaterial({map:fxTex('ring'),transparent:true,depthWrite:false,blending:T.AdditiveBlending,toneMapped:false}));m.rotation.x=-Math.PI/2;m.renderOrder=1;R.scene.add(m);R.cosRing=m}
@@ -1098,15 +1114,15 @@ function dailyScore(won){return (run.floor-(won?0:1))*1000+(run.nohits||0)*300+h
 /* ===================== PEUPLES ===================== */
 const RACES={
  plainois:{n:'Humain',tag:'Polyvalent',skin:'#d9a982',d:'Les gens des plaines de Fauchelande. Ni grands ni petits, prêts à tout.',
-   pros:['+5 points de caractéristiques au départ','+1 fiole maximum'],cons:[],pts:5,fb:1},
+   pros:['+5 points de caractéristiques au départ','+1 fiole maximum','Une relance du butin par ascension'],cons:['Aucun talent de combat particulier'],pts:5,fb:1,reroll:1},
  gobelin:{n:'Gobelin',tag:'Petit et rapide',skin:'#a8b44a',gob:1,scale:[.74,.74,.74],d:'Petits, vifs et voleurs. Ils passent entre les coups et les poches.',
-   pros:['Déplacement +22%','+12% de critique : il vise les points faibles','Plus petit : plus dur à toucher','Roulade plus longue et −5 endurance','+30% de grains gagnés'],cons:['−25% PV max'],spd:1.22,hit:.78,roll:1.15,rollSt:-5,grains:1.3,hp:.75,crit:12},
+   pros:['Déplacement +22%','Plus petit : plus dur à toucher','+15% de grains gagnés'],cons:['−25% PV max'],spd:1.22,hit:.78,grains:1.15,hp:.75},
  orc:{n:'Orc',tag:'Gros et lent',skin:'#62704f',orc:1,scale:[1.2,1.2,1.32],d:'Massifs, patients, terribles quand ils frappent. Rien ne les fait plier.',
-   pros:['+40% PV max','+18% dégâts d’arme','+8% résistance','Ralentissements deux fois plus courts'],cons:['Déplacement −15%','Plus gros : plus facile à toucher','Roulade plus courte et +5 endurance'],spd:.85,hit:1.25,roll:.85,rollSt:5,hp:1.4,wdmg:1.18,res:8,slowR:.5},
+   pros:['+30% PV max','+12% dégâts d’arme','Ralentissements deux fois plus courts'],cons:['Déplacement −15%','Plus gros : plus facile à toucher'],spd:.85,hit:1.25,hp:1.3,wdmg:1.12,slowR:.5},
  elfe:{n:'Elfe',tag:'Précis',skin:'#f0dcc6',elf:1,scale:[.9,1.1,.88],d:'Grands et fins, ils voient venir les coups avant tout le monde.',
    pros:['Parade parfaite plus large (0,32 s)','+10% critique','Roulade invulnérable plus longtemps (+0,08 s)'],cons:['−12% PV max'],parry:.32,crit:10,ifr:.08,hp:.88},
  braise:{n:'Braisé',tag:'Offensif',skin:'#a85e46',ember:1,d:'Nés d’un foyer éteint depuis des siècles. Cornus, brûlants, fragiles.',
-   pros:['+15% dommages','Tes coups critiques brûlent le gardien'],cons:['−15% PV max'],pct:15,critBurn:1,hp:.85}
+   pros:['+15% dommages','Tes coups critiques brûlent le gardien','+10% de dégâts de posture'],cons:['−15% PV max'],pct:15,critBurn:1,hp:.85,post:1.1}
 };
 const RC=()=>RACES[(run&&run.race)||meta.race||'plainois']||RACES.plainois;
 
@@ -1282,20 +1298,22 @@ function setB(S,t){const o={};if(!S||!S.b[t])return o;let U=null,main=null;try{i
 function setBonus(rn){const o={},c=setCounts(rn);for(const id in c){const S=SETS[id];if(!S)continue;[2,3,4].forEach(t=>{if(c[id]>=t){const B2=setB(S,t);for(const k in B2)o[k]=(o[k]||0)+B2[k]}})}return o}
 function itemSum(k){let s=0;for(const sl in run.items)s+=run.items[sl].stats[k]||0;return s+(setBonus()[k]||0)}
 function statT(k){return (run.stats[k]||0)+itemSum(k)+(['for','int','agi','cha'].includes(k)?itemSum('all'):0)}
-function maxHp(){return Math.round((CLS().hp+meta.up.vit*10+(run.lvl-1)*6+statT('vit'))*run.hpPct/100*(RC().hp||1)*(hasA('verre')?.65:1)*(1+talE('hp')/100)*(WM('verre')?.65:1))}
-const stMax=()=>100+meta.up.pa*25+itemSum('end')+(RC().end||0)+talE('st');
+/* améliorations du Temple : neutralisées pendant l'ascension du jour (scores comparables) */
+const UP=k=>(run&&run.daily&&!run.weekly)?0:((meta.up||{})[k]||0);
+function maxHp(){return Math.round((CLS().hp+UP('vit')*10+(run.lvl-1)*6+statT('vit'))*run.hpPct/100*(RC().hp||1)*(hasA('verre')?.65:1)*(1+talE('hp')/100)*(WM('verre')?.65:1))}
+const stMax=()=>100+UP('pa')*25+itemSum('end')+(RC().end||0)+talE('st');
 const stRegen=()=>Math.min(85,Math.round((42+statT('agi')*.1)*(RC().regen||1)));
 const resT=()=>Math.min(40,itemSum('res')+(RC().res||0));
 const critC=()=>Math.min(70,Math.round((run&&hasS('rasoir')&&run.hp<maxHp()*.35?25:0)+5+(RC().crit||0)+statT('agi')/8+itemSum('crit')+(WPN().crit||0)+(run&&run.inf==='foudre'?10:0)+talE('crit')));
 const infPow=()=>1+.15*(wRank()-1);
-const pctDmg=()=>(WM('verre')?40:0)+(WM('hate')?20:0)+meta.up.pow*5+run.bonus+(ML(4)?5:0)+(ML(7)?5:0)+itemSum('pct')+(RC().pct||0);
-const flaskMax=()=>WM('vamp')?0:WM('fiole')?1:Math.max(1,3+meta.up.flask+(run&&run.fb||0)-(PK('secheresse')?1:0)-(SL(6)?1:0)+(run&&hasS('alchi')?1:0));
-const flaskHeal=()=>WM('fiole')?maxHp():Math.round((RC().flask||1)*(maxHp()*.35*(1+meta.up.flaskPow*.1)+(run?itemSum('soin')*2:0))*(hasL('cawotte')?2:1)*(hasA('bourse')?.7:1)*(SL(2)?.85:1));
+const pctDmg=()=>(WM('verre')?40:0)+(WM('hate')?20:0)+UP('pow')*5+run.bonus+(ML(4)?5:0)+(ML(7)?5:0)+itemSum('pct')+(RC().pct||0);
+const flaskMax=()=>WM('vamp')?0:WM('fiole')?1:Math.max(1,3+UP('flask')+(run&&run.fb||0)-(PK('secheresse')?1:0)-(SL(6)?1:0)+(run&&hasS('alchi')?1:0));
+const flaskHeal=()=>WM('fiole')?maxHp():Math.round((RC().flask||1)*(maxHp()*.35*(1+UP('flaskPow')*.1)+(run?itemSum('soin')*2:0))*(hasL('cawotte')?2:1)*(hasA('bourse')?.7:1)*(hasA('rouage')?.8:1)*(SL(2)?.85:1));
 const lvOf=sp=>run.spellLv[sp.id]||1;
-const spellCd=sp=>at(sp.cds,lvOf(sp))*(fight&&fight.ms.p2?.5:1)*(1+talE('cd',sp.id)/100)*(WM('arcane')?.65:1);
-const unlocked=sp=>sp.unlock<=run.lvl;
+const spellCd=sp=>(hasA('rouage')?.8:1)*at(sp.cds,lvOf(sp))*(fight&&fight.ms.p2?.5:1)*(1+talE('cd',sp.id)/100)*(WM('arcane')?.65:1);
+const unlocked=sp=>sp.unlock-(run.libAdv&&sp.unlock>=4?1:0)<=run.lvl;
 const MPREG=5,MPHIT={wl:3,wh:8};
-const mpMax=()=>100+meta.up.pa*15+(RC().mp||0)+talE('mp');
+const mpMax=()=>100+UP('pa')*15+(RC().mp||0)+talE('mp');
 const stCost=sp=>Math.round(sp.pa*7*(fight&&fight.ms.stim>0&&fight.ms.stimL5?.5:1)*(hasL('glyphe')?.5:1)*(1+talE('mana',sp.id)/100)*(WM('arcane')?1.5:1));
 const buffPct=()=>fight?fight.buffs.reduce((a,b)=>a+(b.def?0:b.v),0):0;
 function resOf(el){const B=fight.B;return (B.res[el]||0)+(B.resMod?B.resMod(fight,el):0)}
@@ -1312,13 +1330,15 @@ function newRun(daily){
   TCLK=performance.now();
   ui.dailyLast=null;
   const WKS=daily==='week'?weeklySetup():null,D=daily&&!WKS?dailySetup():null,c=D?D.cls:WKS?(CLASSES[meta.wcls]?meta.wcls:meta.sel||'iop'):meta.sel;
-  run={cls:c,lvl:1,pts:meta.up.pts*5,stats:Object.assign({},CLASSES[c].base),items:{},spellLv:{},carried:0,floor:1,flasks:3+meta.up.flask,wpn:1,spPts:1,node:null,hpPct:100,bonus:0};
+  run={cls:c,lvl:1,pts:(D?0:UP('pts'))*5,stats:Object.assign({},CLASSES[c].base),items:{},spellLv:{},carried:0,floor:1,flasks:3+(D?0:UP('flask')),wpn:1,spPts:1,node:null,hpPct:100,bonus:0};
   run.order=[0,1,2,3,4,5,6,7,8];run.paths={};run.dmgSrc={};run.asc=D?0:Math.min(meta.ascSel||0,meta.ascMax||0);run.race=D?D.race:(meta.race||'plainois');run.pacts=D?D.pacts:(meta.pacts||[]).filter(k=>PACTS[k]);if(D)run.daily=todaySeed();run.tal=D?[]:talSel(c).slice();if(WKS){run.daily=weekSeed();run.weekly=1;run.wmods=WKS.mods;run.pacts=WKS.pacts;run.asc=0;run.tal=[]}if(PK('secheresse'))run.flasks=Math.max(1,run.flasks-1);{const R=RC();for(const k in R.stats||{})run.stats[k]=(run.stats[k]||0)+R.stats[k];run.pts+=R.pts||0;if(R.fb){run.fb=(run.fb||0)+R.fb;run.flasks+=R.fb}}
   if(meta.sablier){const it=legItem('sablier');run.items[it.slot]=it}
   if(SL(6))run.flasks=Math.max(1,run.flasks-1);
   if(WM('vamp'))run.flasks=0;if(WM('fiole'))run.flasks=1;
   if(ML(1))run.pts+=3;if(ML(2))run.spPts+=1;if(ML(3))run.wpn=2;if(ML(6)){run.fb=(run.fb||0)+1;run.flasks++}
   if(ML(5)){const it=randAlt();if(it)run.items[slotKey(it)]=it}
+  {const R=UP('relic');for(let i=0;i<[0,1,1,2,2,3][R];i++){const it=randAlt();if(it)run.items[slotKey(it)]=it}
+   if(R>=2){const ks=Object.keys(WEAPONS).filter(k=>WEAPONS[k].cls===run.cls);if(ks.length){run.arsenal=[pick(ks)]}}if(R>=4)run.wpn=Math.max(run.wpn,2)}
   run.hp=maxHp();checkSyn();kkHero(run.cls);ui.sub=null;ui.confirm=null;arriveFloor();ui.screen='map';save();render();
 }
 function arriveFloor(){
@@ -1379,16 +1399,19 @@ function tutTick(f,dt){const T=f.tut,p=f.p;if(T.lx!==undefined)T.mv+=Math.hypot(
   if(run.hp<maxHp()*.25&&T.step!==6){run.hp=Math.round(maxHp()*.6)}
   const S=TUTS[T.step];if(S&&S.ok(f)){T.step++;T.flash=1.6;f.msg={txt:'Bien joué !',t:1.3,big:1};ev(f,'chtier',{n:3});const N=TUTS[T.step];if(N&&N.enter)N.enter(f)}
   if(T.flash>0)T.flash-=dt}
+function parHud(f){const el=id('parity');if(!el)return;const P=f.ms.par||'impair',t=Math.max(0,Math.ceil(f.ms.parT||0)),ok=x=>(x%2===0)===(P==='pair');
+  const L=[ok(1)?'coup léger':null,ok(2)?'coup lourd':null,...spells().filter(sp=>unlocked(sp)&&ok(sp.pa)).map(sp=>sp.s||sp.n)].filter(Boolean);const k=P+t+L.join();if(el.dataset.k===k)return;el.dataset.k=k;el.className='parity '+P;
+  el.innerHTML=`<b>${P==='pair'?'PAIR':'IMPAIR'}</b><span class="num">${t} s</span><small>Touchent : ${L.join(', ')||'rien'}</small>`}
 function tutHud(f){const el=id('tutp');if(!el||!f.tut)return;const T=f.tut,S=TUTS[T.step];if(!S)return;const k=T.step+'|'+(S.c?T[S.c]:'')+'|'+(T.flash>0?1:0);if(el.dataset.k===k)return;el.dataset.k=k;
   el.innerHTML=`<div class="tutdots">${TUTS.map((x,i)=>`<i class="${i<T.step?'ok':i===T.step?'on':''}"></i>`).join('')}</div><span class="label">Étape ${T.step+1} / ${TUTS.length}${T.flash>0?' · <b style="color:var(--ok)">réussie !</b>':''}</span><b class="tutt">${S.t}${S.n?` <small>${Math.min(S.n,T[S.c]||0)} / ${S.n}</small>`:''}</b><p>${S.d()}</p>`}
 function tutLeave(won){fight=null;if(PV.saved){run=PV.saved.run;meta.up=PV.saved.up;PV.saved=null}else run=null;teardown3D();document.body.style.overflow='';
   if(won){const first=!meta.tutDone;meta.tutDone=1;achieve('tuto');if(first)meta.souls+=60;ui.toast=(first?'Tutoriel terminé ! +60 grains au temple.':'Tutoriel terminé !')+(ui.toast?' · '+ui.toast:'')}
   ui.screen='home';ui.hub='menu';save();render()}
-function startTraining(){if(!run)return;run.train={hp:run.hp,flasks:run.flasks};ui.trainHit=ui.trainHit||false;startFight()}
+function startTraining(v){if(!run)return;run.train={hp:run.hp,flasks:run.flasks,boss:v==='secret'&&meta.secretSeen?'secret':null};ui.trainHit=ui.trainHit||false;startFight()}
 function endTraining(){if(!run||!run.train)return;run.hp=run.train.hp;run.flasks=run.train.flasks;run.train=null;fight=null;ui.screen='map';save();render()}
 function startFight(){tickClock();if(run){run.alloc={};run.spAlloc={}}
-  const PB=run.pvpB||run.tutB,B=PB||(run.train?DUMMY:run.mini?echoBoss():BOSSAT(run.floor)),EN=run.endless&&run.floor>=10,sc=(1+meta.cycle*.35)*(EN?1+.2*(run.floor-9):1)*(run.rush?Math.pow(2.1,run.rush.loop||0)*(1+.04*((run.rush.w||0)%9)):1),C0=EN?BOSSES[8]:BOSSES[Math.min(run.floor,10)-1],main=!PB&&!run.train&&!run.mini;
-  const mut=main&&!B.secret&&run.mut===run.floor;
+  const PB=run.pvpB||run.tutB,B=PB||(run.train?(run.train.boss==='secret'?Object.assign({},BOSSES.find(x=>x.id==='secret'),{practice:1,name:'Le Sablier Vivant · entraînement'}):DUMMY):run.mini?echoBoss():BOSSAT(run.floor)),EN=run.endless&&run.floor>=10,sc=(1+meta.cycle*.35)*(EN?1+.2*(run.floor-9):1)*(run.rush?Math.pow(2.1,run.rush.loop||0)*(1+.04*((run.rush.w||0)%9)):1),C0=EN?BOSSES[8]:BOSSES[Math.min(run.floor,10)-1],main=!PB&&!run.train&&!run.mini;
+  const mut=main&&!B.secret&&run.mut===run.floor;if(main&&B.secret)meta.secretSeen=1;
   save();
   PR=Math.round(13*(RC().hit||1));
   const hp=PB?PB.hp:Math.round((main?C0.hp:B.hp)*3*sc*(run.wager?1.25:1)*(main?(SL(1)?1.1:1)*(SL(8)?1.15:1)*(mut?1.35:1)*(WM('geant')?1.4:1):1));
@@ -1468,7 +1491,7 @@ function stormTick(f,dt){const S=f.storm,b=f.b,p=f.p;S.t-=dt;b.atk=null;b.cool=M
   if(S.t<=0){f.storm=null;b.vuln=3;b.rec=2;b.cool=2.6;f.msg={txt:'Le gardien s’épuise : frappe !',t:2.2,big:1};ev(f,'stormEnd')}}
 const addRage=f=>1+.1*f.adds.filter(a=>a.alive).length;
 const dmgMult=f=>(SL(3)?1.1:1)*(SL(8)?1.15:1)*(PK('fureur')?1.2:1)*f.sc*(f.ms.p2?1.35:1)*.75*(f.ms.pdmg||1)*addRage(f);
-const windMul=f=>(SL(5)?.92:1)*(WM('hate')?.85:1)*(PK('hate')?.85:1)*(f.ms.poisL5&&f.pois&&f.pois.length?1.15:1)*(hasL('glaces')?1.25:1)*(f.ms.pwind||1)*.95*(f.frost>0?1+.06*f.frost:1)*(f.ms.p2?.8:1)*(f.ms.slowB>0?1+(f.ms.slowAmt||0):1)/(1+meta.cycle*.08);
+const windMul=f=>(f.B&&f.B.secret&&!(f.ms.ph>0)?1.3:1)*(SL(5)?.92:1)*(WM('hate')?.85:1)*(PK('hate')?.85:1)*(f.ms.poisL5&&f.pois&&f.pois.length?1.15:1)*(hasL('glaces')?1.25:1)*(f.ms.pwind||1)*.95*(f.frost>0?1+.06*f.frost:1)*(f.ms.p2?.8:1)*(f.ms.slowB>0?1+(f.ms.slowAmt||0):1)/(1+meta.cycle*.08);
 
 function curT(f){let T=f.tgt;const al=f.adds.filter(a=>a.alive),near=L=>L.reduce((m,a)=>dist(a,f.p)<dist(m,f.p)?a:m);
   if(!T||(T!==f.b&&!T.alive)){T=(T&&T!==f.b&&al.length)?near(al):f.b;f.tgt=T}
@@ -1488,7 +1511,7 @@ function summon(f,k,n){const A=ADD[k],b=f.b;if(PK('horde'))n*=2;
     else{const a=i/n*Math.PI*2+Math.random()*.4;x=CX+Math.cos(a)*205;y=CY+Math.sin(a)*205}
     const hp=Math.max(45,Math.round(f.bmax*A.hp*1.6));const o={k,A,x,y,r:A.r,hp,max:hp,alive:true,cool:1+Math.random()*1.2,atk:null,hurt:0,link:!!f.ms.curLink,id:(f.addId=(f.addId||0)+1)};
     clampArena(o,o.r);f.adds.push(o);ev(f,'summon',{x:o.x,y:o.y,col:A.col})}}
-function killAdd(f,a){if(!a.alive)return;const wasLink=a.link;a.alive=false;a.atk=null;ev(f,'adeath',{x:a.x,y:a.y,col:a.A.col});
+function killAdd(f,a){if(!a.alive)return;{const fb=f.buffs&&f.buffs.find(x=>x.id==='furor'&&x.l5);if(fb&&(fb.ext||0)<4){fb.t+=1;fb.ext=(fb.ext||0)+1;txt(f,f.p.x,f.p.y-34,'Rage +1 s','ember')}}const wasLink=a.link;a.alive=false;a.atk=null;ev(f,'adeath',{x:a.x,y:a.y,col:a.A.col});
   if(f.tgt===a)f.tgt=null;
   if(wasLink&&!f.over&&!f.adds.some(x=>x.alive&&x.link)){say(f,'Le boss n\u2019est plus protégé');ev(f,'unlink')}}
 function checkPhase(f){if(f.coG)return;const ph=PHASES[f.B.id];if(!ph)return;const i=f.ms.ph||0;if(i>=ph.length)return;if(f.bhp/f.bmax<=ph[i].at){f.ms.ph=i+1;startPhase(f,ph[i])}}
@@ -1578,8 +1601,8 @@ function resolveAtk(f,a){
   if(f.co&&f.co.role==='A')coAtkOther(f,a,raw);
 }
 function hurtP(f,raw,d){
-  const p=f.p;if(f.over)return false;if(p.ghost){coHit(f,raw,d);return false}if(p.down)return false;if(f.co)raw=coDR(f,raw);
-  if(p.iframe>0){txt(f,p.x,p.y,'Esquivé','frost');if(p.roll>0&&hasA('esquive')&&!(f.ms.pendT>f.t)&&!f.storm&&!f.b.jump){const b=f.b;f.ms.pendT=f.t+4;f.frz=Math.max(f.frz||0,.7);b.atk=null;b.dash=null;b.rec=Math.max(b.rec,.7);b.cool=Math.max(b.cool,1.1);ev(f,'freeze');txt(f,p.x,p.y-20,'Pendule','frost');if(hasS('horsT'))spells().forEach(x=>f.cds[x.id]=0)}if(p.roll>0&&hasL('gelano')&&!(f.ms.lierreCd>0)){p.st=Math.min(stMax(),p.st+25);f.ms.lierre=1;f.ms.lierreCd=.4;txt(f,p.x,p.y-20,'Lierre','ok')}return false}
+  const p=f.p;if(f.over)return false;if(p.ghost){coHit(f,raw,d);return false}if(p.down)return false;if(f.co)raw=coDR(f,raw);if(f.ms.ward>f.t)raw*=.6;
+  if(p.iframe>0){txt(f,p.x,p.y,'Esquivé','frost');if(p.roll>0&&f.gel)f.gel=0;if(p.roll>0&&hasA('esquive')&&!(f.ms.pendT>f.t)&&!f.storm&&!f.b.jump){const b=f.b;f.ms.pendT=f.t+4;f.frz=Math.max(f.frz||0,.7);b.atk=null;b.dash=null;b.rec=Math.max(b.rec,.7);b.cool=Math.max(b.cool,1.1);ev(f,'freeze');txt(f,p.x,p.y-20,'Pendule','frost');if(hasS('horsT'))spells().forEach(x=>f.cds[x.id]=0)}if(p.roll>0&&hasL('gelano')&&!(f.ms.lierreCd>0)){p.st=Math.min(stMax(),p.st+25);f.ms.lierre=1;f.ms.lierreCd=.4;txt(f,p.x,p.y-20,'Lierre','ok')}return false}
   if(f.buffs.some(x=>x.id==='bdiv')){txt(f,p.x,p.y,'Bouclier divin','ember');return false}
   const ub=d&&(d.unblock||d.k==='ring'||d.k==='safe');
   if(!ub&&p.parry>0){perfectParry(f);return false}
@@ -1593,7 +1616,7 @@ function hurtP(f,raw,d){
   if(f.tut&&run.hp<=0)run.hp=Math.round(maxHp()*.6);
   if(f.B.train&&run.hp<=0){run.hp=maxHp();txt(f,p.x,p.y,'PV remis à fond','ok')}
   if(run.hp<=0&&hasL('emeraude')&&!f.ms.revived&&!PK('fragile')){f.ms.revived=1;run.hp=Math.round(maxHp()*.4);p.iframe=2;f.msg={txt:'Le Cocon d’émeraude te relève',t:2.4,big:1};ev(f,'revive')}
-  if(run.hp<=0&&meta.up.rez>0&&!run.rezUsed&&!PK('fragile')){run.rezUsed=1;run.hp=Math.round(maxHp()*(meta.up.rez>1?.5:.3));p.iframe=2.5;f.msg={txt:'Le Sablier de secours se retourne',t:2.6,big:1};ev(f,'revive');f.hitstop=Math.max(f.hitstop||0,.2)}
+  if(run.hp<=0&&UP('rez')>0&&!run.rezUsed&&!PK('fragile')){run.rezUsed=1;run.hp=Math.round(maxHp()*(UP('rez')>1?.5:.3));p.iframe=2.5;f.msg={txt:'Le Sablier de secours se retourne',t:2.6,big:1};ev(f,'revive');f.hitstop=Math.max(f.hitstop||0,.2)}
   if(run.hp<=0){if(coDown(f))return true;if(f.co)coSend('cdn',{});endFight(false)}
   return true;
 }
@@ -1617,10 +1640,10 @@ function doGuard(on){const f=fight;if(!f||f.over||f.paused)return;const p=f.p;
   if(p.st<8){txt(f,p.x,p.y,'Endurance','ok');return}
   p.st-=8;p.stDelay=.4;p.parry=Math.max(RC().parry||.2,WPN().shield?.27:0);p.parryCd=.55;p.guard=true;p.cast=0;heavyRefund(f);if(f.swing&&!f.swing.done)f.swing=null;f.pending=[];f.buf=null}
 /* Posture : chaque coup l'entame, les parades parfaites et les coups lourds surtout. Pleine, le gardien s'effondre. */
-function addPosture(f,v){if(f.coG){coAcc(0,v);return}if(f.post+v/(f.B.big||1)>=100&&!(f.brokenT>0))setTimeout(()=>achieve('brk'),0);const b=f.b;if(f.storm||b.jump||f.over||f.brokenT>0)return;f.post=Math.min(100,(f.post||0)+v/(f.B.big||1));f.postT=2.5;
+function addPosture(f,v){v*=RC().post||1;if(f.coG){coAcc(0,v);return}if(f.post+v/(f.B.big||1)>=100&&!(f.brokenT>0))setTimeout(()=>achieve('brk'),0);const b=f.b;if(f.storm||b.jump||f.over||f.brokenT>0)return;f.post=Math.min(100,(f.post||0)+v/(f.B.big||1));f.postT=2.5;
   if(f.post>=100){f.post=0;f.brokenT=2.6;b.atk=null;b.dash=null;b.rec=Math.max(b.rec,2.6);b.vuln=Math.max(b.vuln,2.6);b.cool=Math.max(b.cool,3);f.hitstop=Math.max(f.hitstop||0,.18);f.shake=Math.max(f.shake,.5);
     f.msg={txt:'Posture brisée',t:2,big:1};ev(f,'break')}}
-function perfectParry(f){addPosture(f,30);if(f.coG)coFx('par',0);if(f.tut)f.tut.parry++;const p=f.p,b=f.b;if(WM('parade')&&!f.storm){const A=altSp(2);applyDmg(f,Object.assign(A.sp,{n:'Contre-temps'}),A.base,b)}if(WPN().shield)f.resent=Math.min(5,(f.resent||0)+1);f.hitstop=Math.max(f.hitstop||0,.12);f.shake=Math.max(f.shake,.25);ev(f,'parry');f.ms.parries=(f.ms.parries||0)+1;
+function perfectParry(f){addPosture(f,30);if(hasA('brassard'))f.ms.ward=f.t+3;if(f.gel)f.gel=0;if(f.coG)coFx('par',0);if(f.tut)f.tut.parry++;const p=f.p,b=f.b;if(WM('parade')&&!f.storm){const A=altSp(2);applyDmg(f,Object.assign(A.sp,{n:'Contre-temps'}),A.base,b)}if(WPN().shield){const m=Math.min(5,(f.resent||0)+1);f.resent=0;if(!f.storm){const A=altSp(1+.6*m),sp2=Object.assign(A.sp,{n:'Riposte du Ressentiment',el:WPN().el});ev(f,'nova',{x:p.x,y:p.y,r:150});enemies(f).forEach(o=>{if(dist(o,p)<150+o.r)applyDmg(f,sp2,A.base,o)});txt(f,p.x,p.y-44,'Riposte ×'+m,'ember')}}f.hitstop=Math.max(f.hitstop||0,.12);f.shake=Math.max(f.shake,.25);ev(f,'parry');f.ms.parries=(f.ms.parries||0)+1;
   txt(f,p.x,p.y-24,'Parade parfaite','ember');if(hasL('glaces')&&!f.storm&&!(f.frz>0)){f.frz=.9;b.rec=Math.max(b.rec,.9);ev(f,'freeze')}p.st=Math.min(stMax(),p.st+20);f.ms.riposte=2.5;p.parry=0;
   if(hasA('contre')&&f.lastSpell!=null)castSpell(f.lastSpell,true);if(hasS('bastion')){const h=healP(Math.round(maxHp()*.1));if(h)txt(f,p.x,p.y-40,'+'+h,'ok')}
   if(dist(p,b)<b.r+260&&!b.jump&&!f.storm){const rep=f.t-(f.ms.lastParry??-99)<6,k=rep?.5:1;f.ms.lastParry=f.t;b.atk=null;b.dash=null;b.rec=Math.max(b.rec,.55*k);b.vuln=Math.max(b.vuln,.8*k);b.cool=Math.max(b.cool,.75*k);ev(f,'stagger')}}
@@ -1632,8 +1655,8 @@ function doRoll(){
   let v=moveVec();if(!v.x&&!v.y){const a=angTo(f.b,p);v={x:Math.cos(a),y:Math.sin(a)}}
   p.charge=null;const l=Math.hypot(v.x,v.y);p.rdx=v.x/l;p.rdy=v.y/l;p.roll=.3;p.rhit=[];p.trT=0;if(hasA('ombre'))f.ms.ombre=f.t+1.8;p.guard=false;p.parry=0;
   const chain=f.t-(p.lastRoll??-9)<1.1;p.rchain=chain?(p.rchain||0)+1:0;p.lastRoll=f.t;
-  p.iframe=Math.max(.06,(.34+(RC().ifr||0))*(f.storm?.6:1)*Math.pow(.5,p.rchain));p.cast=0;heavyRefund(f);f.pending=[];f.swing=null;ev(f,'roll');
-  p.st-=WM('agile')?0:(f.buffs.some(x=>(x.id==='danse'||x.id==='crep')&&x.l5)?0:Math.max(4,(hasL('abysses')?11:18)+(RC().rollSt||0)))+(p.rchain||0)*8+(f.storm?6:0);p.stDelay=.45;
+  p.iframe=Math.max(.06,(.34+(RC().ifr||0))*(f.storm?.6:1)*Math.pow(.5,p.rchain));p.cast=0;heavyRefund(f);f.pending=[];f.swing=null;ev(f,'roll');if(hasS('course'))spells().forEach(x=>{if(f.cds[x.id])f.cds[x.id]=Math.max(0,f.cds[x.id]-.5)});
+  p.st-=WM('agile')?0:(f.buffs.some(x=>(x.id==='danse'||x.id==='crep')&&x.l5)?0:Math.max(4,(hasL('abysses')?11:18)+(RC().rollSt||0)-(hasA('vent')?5:0)))+(p.rchain||0)*8+(f.storm?6:0);p.stDelay=.45;
 }
 function doFlask(){
   const f=fight;if(!f||f.over||f.paused)return;const p=f.p;
@@ -1648,6 +1671,7 @@ function castSpell(i,free){
   const cost=free?0:stCost(sp),hpc=sp.hpPct&&!free?((lv>=5&&f.buffs.some(x=>x.id==='furor'))?0:Math.ceil(maxHp()*sp.hpPct/100)):hasA('sang')?Math.ceil(cost/3):0;if(hpc){if(run.hp<=hpc){txt(f,p.x,p.y,'PV','blood');return}}else if((p.mp??0)<cost){txt(f,p.x,p.y,'Mana','frost');return}
   if((sp.t==='dmg'||sp.t==='leap')&&sp.rng&&edge(p,b)>sp.rng){txt(f,p.x,p.y,'Trop loin','dim');return}
   if(!free&&hasA('surcharge')&&(p.mp??0)>=mpMax()-.5&&['dmg','leap','nova','trap','order','zone'].includes(sp.t)){f.ms.surch=sp.id;f.ms.surchT=f.t+4;txt(f,p.x,p.y-30,'Surcharge','frost')}
+  if(WPN().holy&&f.holy&&sp.t!=='buff'&&sp.fx!=='holyheal'&&!free){const m=f.holy;f.holy=0;f.ms.holyM={m,id:sp.id,t:f.t};const h=healP(Math.round(maxHp()*.01*m));if(h)txt(f,p.x,p.y-20,'+'+h,'ok')}
   if(hpc){run.hp-=hpc;txt(f,p.x,p.y-12,'−'+hpc,'blood')}else p.mp-=cost;if(free)txt(f,p.x,p.y-30,'Contretemps','frost');else{f.cds[sp.id]=spellCd(sp);f.lastSpell=i}p.cast=.2;p.face=angTo(p,b);ev(f,'cast',{sid:sp.id,el:sp.el});talCast(f,sp);if(f.tut)f.tut.cast++;if(f.pvp)pvpAct('s',{sid:sp.id,el:sp.el,proj:sp.proj&&sp.t==='dmg'?1:0});if(hasL('glyphe')){f.ms.gly=Math.min(5,(f.ms.gly||0)+1);f.ms.glyT=6}
   if(sp.t==='blink'){const face=b.face??angTo(b,p),m=b.r+PR+8,from={x:p.x,y:p.y};p.x=b.x-Math.cos(face)*m;p.y=b.y-Math.sin(face)*m;clampArena(p,PR);p.face=angTo(p,b);p.iframe=Math.max(p.iframe,.25);f.ms.shadow=1;f.ms.lost=.5;if(lv>=5)p.st=Math.min(stMax(),p.st+25);ev(f,'blink',{a:from,b:{x:p.x,y:p.y}});return}
   if(sp.t==='leap'){const a=angTo(b,p),m=b.r+PR+4;p.leap={fx:p.x,fy:p.y,tx:b.x+Math.cos(a)*m,ty:b.y+Math.sin(a)*m,t:0,life:.3,sp,base:rnd(sp.min,sp.max),tgt:b};p.iframe=.36;p.cast=.32;return}
@@ -1659,7 +1683,7 @@ function castSpell(i,free){
     else if(w){p.cast=w;f.pending.push({t:w,sp,base,tgt:b})}
     else{if(sp.rng<120)f.fx.push({k:'slash',x:p.x,y:p.y,a:p.face,t:0,life:.18,r:sp.rng+PR+10,el:sp.el});applyDmg(f,sp,base,b)}
   }else if(sp.t==='heal'){if(sp.res)f.resent=Math.min(5,(f.resent||0)+sp.res);let hb=healCalc(sp,rnd(sp.min,sp.max));if(sp.fx==='holyheal'&&f.holy){const m=f.holy;hb=Math.round(hb*(1+.15*m));f.holy=0;txt(f,p.x,p.y-30,'Ferveur ×'+m,'ember')}const h=healP(hb);txt(f,p.x,p.y,'+'+h,'ok');if(lv>=5)f.ms.hot=5}
-  else if(sp.t==='zone'){f.consac={x:p.x,y:p.y,r:sp.r,t:sp.dur,sp,base:rnd(sp.min,sp.max),tick:0,l5:lv>=5};ev(f,'consac',{x:p.x,y:p.y,r:sp.r,life:sp.dur})}
+  else if(sp.t==='zone'){let zb=rnd(sp.min,sp.max);if(f.ms.holyM&&f.ms.holyM.id===sp.id){zb*=1+.15*f.ms.holyM.m;txt(f,p.x,p.y-40,'Ferveur ×'+f.ms.holyM.m,'ember');f.ms.holyM=null}f.consac={x:p.x,y:p.y,r:sp.r,t:sp.dur,sp,base:zb,tick:0,l5:lv>=5};ev(f,'consac',{x:p.x,y:p.y,r:sp.r,life:sp.dur})}
   else if(sp.t==='buff'){if(sp.id==='bdiv'){p.frozen=0;p.slow=0;f.gel=0;p.kb=null;if(lv>=5)f.holy=Math.min(5,(f.holy||0)+3)}if(sp.unstop){p.frozen=0;p.slow=0;f.gel=0;f.shake=Math.max(f.shake,.3);ev(f,'nova',{x:p.x,y:p.y,r:90})}const v=at(sp.v,lv);f.buffs.push({n:sp.n,id:sp.id,v,t:sp.dur,l5:lv>=5,def:sp.def});txt(f,p.x,p.y,sp.def?`−${v}% dégâts subis`:`+${v}%`,'ember');if(sp.id==='cri'&&lv>=5&&f.pet){f.pet.hp=f.pet.max}}
   else if(sp.t==='nova'){if(sp.id==='hurle'){p.slow=0;f.gel=0}const base=rnd(sp.min,sp.max);ev(f,'nova',{x:p.x,y:p.y,r:sp.r});enemies(f).forEach(o=>{if(dist(o,p)<sp.r+o.r){applyDmg(f,sp,base,o);if(o!==b&&lv>=5){const a=angTo(p,o);o.x+=Math.cos(a)*90;o.y+=Math.sin(a)*90;clampArena(o,o.r)}}})}
   else if(sp.t==='hex'){f.ms.slowB=sp.dur;f.ms.slowAmt=at(sp.v,lv)/100;f.ms.slowL5=lv>=5;txt(f,b.x,b.y,'Lenteur','frost');ev(f,'hex',{x:b.x,y:b.y})}
@@ -1686,7 +1710,9 @@ const SWINGS={
 };
 const wRank=()=>run.wpn||1;
 const wMult=()=>(1+.25*(wRank()-1))*(RC().wdmg||1);
-function clsEls(){const C=CLS(),E=[C.wpn.el];C.spells.forEach(sp=>{if(sp.el&&!E.includes(sp.el))E.push(sp.el)});return E.slice(0,2)}
+function clsEls(){const C=CLS(),E=[C.wpn.el];C.spells.forEach(sp=>{if(sp.el&&!E.includes(sp.el))E.push(sp.el)});const B=E.slice(0,2);
+  /* l'arme portée (arme alternative ou infusion) ajoute son élément : le butin suit aussi cette arme */
+  const w=run&&run.wsel&&WEAPONS[run.wsel],ie=run&&run.inf&&INF[run.inf]&&INF[run.inf].el;[w&&w.cls===run.cls?w.el:null,ie].forEach(e=>{if(e&&!B.includes(e))B.push(e)});return B}
 function mainStat(){if(!run)return 'for';const S=clsEls().map(e=>EL[e].s),v=k=>run.stats[k]||0;return S.reduce((a,k)=>v(k)>v(a)?k:a,S[0])}
 function wpnSp(heavy){const w=WPN(),I=run.inf&&INF[run.inf];return {id:heavy?'wh':'wl',n:heavy?w.n+' (lourd)':w.n,el:I?I.el:w.el,stat:mainStat(),inf:run.inf||null,col:I?I.col:null,pa:heavy?2:1,rng:w.rng,proj:w.proj,t:'dmg',fx:w.leech?'wleech':null}}
 /* coup lourd chargé : maintenir pour monter en paliers (0,4 s, 0,9 s, 1,5 s), relâcher pour frapper */
@@ -1765,10 +1791,11 @@ function applyDmg(f,sp,base,T){sp._b=base;
   if(inHz(f,'sanct'))d=Math.round(d*1.3);
   if(f.ms.lierre){f.ms.lierre=0;d=Math.round(d*1.6)}
   let fx5=false;
-  if(WPN().shield&&f.resent&&(sp.id==='wh'||sp.fx==='judge')){const m=f.resent;d=Math.round(d*(1+(sp.fx==='judge'?.4:.35)*m));f.resent=0;txt(f,b.x,b.y-40,'Ressentiment ×'+m,'ember');ev(f,'marks',{n:m});if(sp.fx==='judge'&&m>=5&&lv>=5&&!f.storm){f.frz=Math.max(f.frz||0,1);b.atk=null;b.rec=Math.max(b.rec,1);ev(f,'freeze')}}
+  if(WPN().shield&&f.resent&&sp.fx==='judge'){const m=f.resent;d=Math.round(d*(1+(sp.fx==='judge'?.4:.35)*m));f.resent=0;txt(f,b.x,b.y-40,'Ressentiment ×'+m,'ember');ev(f,'marks',{n:m});if(sp.fx==='judge'&&m>=5&&lv>=5&&!f.storm){f.frz=Math.max(f.frz||0,1);b.atk=null;b.rec=Math.max(b.rec,1);ev(f,'freeze')}}
   if(WPN().holy&&!sp.chain&&!sp.echoA){if(sp.id==='wl'){f.holy=Math.min(5,(f.holy||0)+(f.buffs.some(x=>x.id==='ailes')?2:1))}
     else if(sp.fx==='holy2'){f.holy=Math.min(5,(f.holy||0)+(lv>=5?3:2))}
-    else if(sp.id==='wh'&&f.holy&&!sp.wave&&!sp.splashed){const m=f.holy;d=Math.round(d*(1+.3*m));f.holy=0;const h=healP(Math.round(maxHp()*.015*m));txt(f,b.x,b.y-40,'Verdict ×'+m,'ember');if(h)txt(f,f.p.x,f.p.y-20,'+'+h,'ok');ev(f,'marks',{n:m})}}
+}
+  if(f.ms.holyM&&f.ms.holyM.id===sp.id&&!sp.chain&&f.t-f.ms.holyM.t<4){d=Math.round(d*(1+.15*f.ms.holyM.m));txt(f,b.x,b.y-40,'Ferveur ×'+f.ms.holyM.m,'ember');ev(f,'marks',{n:f.ms.holyM.m});f.ms.holyM=null}
   if(!sp.chain&&kOn('exec',sp.id)&&f.bhp<f.bmax*.3)d=Math.round(d*1.4);
   if(sp.id==='wh'&&f.ms.nh>f.t){f.ms.nh=0;d=Math.round(d*1.5);txt(f,b.x,b.y-48,'Embuscade','ember')}
   if(sp.fx==='slowbonus'&&(f.ms.slowB>0||f.frz>0))d=Math.round(d*(lv>=5?1.8:1.4));
@@ -1784,7 +1811,7 @@ function applyDmg(f,sp,base,T){sp._b=base;
   const rip=(sp.id==='wl'||sp.id==='wh')&&f.ms.riposte>0;if(rip){f.ms.riposte=0;d=Math.round(d*1.5);txt(f,b.x,b.y-30,'Riposte','ember')}
   const forced=altCrit(f,sp)||rip||fx5||sp.id==='epee'&&lv>=5&&b.vuln>0;
   const cc=critC()+(f.buffs.some(x=>x.id==='tir'&&x.l5)?15:0)+(f.buffs.some(x=>x.id==='danse')?20:0);
-  if(forced||Math.random()*100<cc){d=Math.round(d*1.4);crit=true;if(RC().critBurn){const L=f.burn||(f.burn=[]);if(L.length>=3)L.shift();L.push({t:3,dps:d*.06})}if(hasL('turquoise'))spells().forEach(x=>{if(f.cds[x.id])f.cds[x.id]=Math.max(0,f.cds[x.id]-.5)})}
+  if(forced||Math.random()*100<cc){d=Math.round(d*1.4);crit=true;if(hasA('croc')){const h=healP(Math.round(maxHp()*.02*(hasS('veille')&&f.ms.ward>f.t?2:1)));if(h)txt(f,f.p.x,f.p.y-16,'+'+h,'ok')}if(RC().critBurn){const L=f.burn||(f.burn=[]);if(L.length>=3)L.shift();L.push({t:3,dps:d*.06})}if(hasL('turquoise'))spells().forEach(x=>{if(f.cds[x.id])f.cds[x.id]=Math.max(0,f.cds[x.id]-.5)})}
   if(link)d=Math.max(1,Math.round(d*(1-link)));
   if(f.frz>0)d=Math.round(d*(f.ms.stopL5?1.3:1.15));
   if(f.brokenT>0)d=Math.round(d*1.3);
@@ -1866,7 +1893,7 @@ function update(f,dt){
   if(b.inv>0)b.inv-=dt;
   for(const k in f.cds)f.cds[k]=Math.max(0,f.cds[k]-dt);
   f.buffs.forEach(x=>x.t-=dt);f.buffs=f.buffs.filter(x=>x.t>0);
-  if(f.gel>0){f.gelT+=dt;if(f.gelT>6){f.gel--;f.gelT=0}}
+  if(f.gel>0){f.gelT+=dt;if(f.gelT>2.5){f.gel--;f.gelT=0}}
   f.hist=f.hist.filter(h=>f.t-h.t<15);
   if(p.drink>0){p.drink-=dt;if(p.drink<=0){ev(f,'heal');if(f.tut)f.tut.flask++;if(hasL('cawotte'))p.iframe=Math.max(p.iframe,1.5);const h=healP(flaskHeal());txt(f,p.x,p.y,'+'+h,'ok');if(hasA('fiole')){ev(f,'nova',{x:p.x,y:p.y,r:130});f.shake=Math.max(f.shake,.3);enemies(f).forEach(o=>{if(dist(o,p)<130+o.r){const A=altSp(3);applyDmg(f,Object.assign(A.sp,{n:'Onde de fiole'}),A.base,o);if(o!==f.b){const a=angTo(p,o);o.x+=Math.cos(a)*90;o.y+=Math.sin(a)*90;clampArena(o,o.r)}}});if(hasS('alchi')){run.carried+=10;txt(f,p.x,p.y-30,'+10 grains','ember')}}}}
   p.mp=Math.min(mpMax(),(p.mp??mpMax())+MPREG*(f.ms.stim>0?1.5:1)*dt);
@@ -1876,7 +1903,7 @@ function update(f,dt){
   if(p.leap){const L=p.leap;L.t+=dt;const k=Math.min(1,L.t/L.life);p.x=L.fx+(L.tx-L.fx)*k;p.y=L.fy+(L.ty-L.fy)*k;
     if(k>=1){p.leap=null;f.fx.push({k:'slash',x:p.x,y:p.y,a:angTo(p,b),t:0,life:.3,r:70,el:L.sp.el,big:1});f.shake=Math.max(f.shake,.22);ev(f,'land');applyDmg(f,L.sp,L.base,L.tgt);if(lvOf(L.sp)>=5&&L.tgt===b)b.vuln=Math.max(b.vuln,2)}}
   else if(p.roll>0){p.roll-=dt;const rs=(hasL('abysses')?730:540)*(RC().roll||1);p.x+=p.rdx*rs*dt;p.y+=p.rdy*rs*dt}
-  else if(p.frozen<=0&&!p.down){const v=moveVec();const spd=175*(RC().spd||1)*(p.charge?.5:1)*(p.slow>0?.55:1)*(p.drink>0?.35:1)*(p.cast>0?.4:1)*(p.guard?.45:1);p.x+=v.x*spd*dt;p.y+=v.y*spd*dt;if(R3&&R3.cam&&R3.cam.lock)p.face=angTo(p,curT(f));else if(v.x||v.y)p.face=Math.atan2(v.y,v.x)}
+  else if(p.frozen<=0&&!p.down){const v=moveVec();const spd=175*(RC().spd||1)*(hasA('vent')?1.15:1)*(p.charge?.5:1)*(p.slow>0?.55:1)*(p.drink>0?.35:1)*(p.cast>0?.4:1)*(p.guard?.45:1);p.x+=v.x*spd*dt;p.y+=v.y*spd*dt;if(R3&&R3.cam&&R3.cam.lock)p.face=angTo(p,curT(f));else if(v.x||v.y)p.face=Math.atan2(v.y,v.x)}
   clampArena(p,PR);
   if(f.ptr)altTick(f,dt);
   if(f.consac){const z=f.consac;z.t-=dt;z.tick-=dt;if(z.tick<=0){z.tick=.5;enemies(f).forEach(o=>{if(dist(z,o)<z.r+o.r)applyDmg(f,Object.assign({},z.sp,{chain:1,tick:1}),z.base,o)});if(z.l5&&dist(z,f.p)<z.r){const h=healP(Math.max(1,Math.round(maxHp()*.006)));if(h)txt(f,f.p.x,f.p.y,'+'+h,'ok')}}if(z.t<=0||f.over)f.consac=null}
@@ -1958,7 +1985,7 @@ function endFight(won){
   ev(f,won?'bdeath':'pdeath');f.msg=null;
   if(won)f.adds.forEach(a=>killAdd(f,a));
   if(won){f.slow=2.6;f.cine={t:0};f.hitstop=0;id('stage')&&id('stage').classList.add('flash');setTimeout(()=>{const s2=id('stage');s2&&s2.classList.remove('flash')},200)}
-  setTimeout(()=>{if(fight===f){if(run&&run.rush)rushAfter(f,won);else won?win():die()}},won?(run&&run.rush?2600:4200):2800);
+  setTimeout(()=>{if(fight===f){if(run&&run.train){endTraining();return}if(run&&run.rush)rushAfter(f,won);else won?win():die()}},won?(run&&run.rush?2600:4200):2800);
 }
 
 
@@ -4082,7 +4109,7 @@ function buildFightDom(){
     <div class="row" style="gap:6px;justify-content:center"><button class="btn sm" data-f="trainhit" id="trh">${ui.trainHit?'Il frappe : oui':'Il frappe : non'}</button><button class="btn sm" data-f="trainreset">Remettre à zéro</button><button class="btn sm primary" data-f="quit">Quitter</button></div></div>`:''}
   <div class="endcard" id="endcard"></div>
   ${TOUCH?'':'<div class="hint" id="hint">Clique dans l’arène pour diriger la caméra à la souris</div>'}
-  ${f.tut?'<div class="tutp" id="tutp"></div>':''}${f.co?'<div class="coopb" id="coop"></div>':''}<div class="pause" id="pause"><span class="label">${f.tut?'Combat tutoriel':f.pvp?'Arène de chaos · manche '+PV.round:'Étage '+ROMAN[run.floor]+' · '+B.zone}</span><h2 id="ptitle">${B.name}</h2>
+  ${f.tut?'<div class="tutp" id="tutp"></div>':''}${f.B.id==='kimbo'?'<div class="parity" id="parity"></div>':''}${f.co?'<div class="coopb" id="coop"></div>':''}<div class="pause" id="pause"><span class="label">${f.tut?'Combat tutoriel':f.pvp?'Arène de chaos · manche '+PV.round:'Étage '+ROMAN[run.floor]+' · '+B.zone}</span><h2 id="ptitle">${B.name}</h2>
     <p class="dim" style="max-width:52ch">${B.lore}</p>${ctrlHtml()}
     <div class="row" style="justify-content:center"><button class="btn primary big" style="width:auto;padding-inline:32px" data-f="resume" id="pgo">Combattre</button><button class="btn danger" data-f="giveup">Abandonner le combat</button></div></div>
   <div class="pause" id="nogl" hidden><h2>3D indisponible</h2><p class="dim">Ce navigateur n’a pas pu démarrer le rendu 3D (WebGL). Essaie un navigateur de bureau récent.</p><button class="btn primary" data-f="quit">Retour à la carte</button></div>
@@ -4127,7 +4154,7 @@ function badges(box,list,cache,onNew){const seen=new Set();list.forEach((c,i)=>{
   for(const [k,el] of cache)if(!seen.has(k)){if(el.remove)el.remove();cache.delete(k)}}
 function chipHtml(list){return list.map(c=>`<span class="chip ${c.w?'warn':c.g?'good':''}">${esc(c.t)}</span>`).join('')}
 function hud(){
-  const f=fight;if(!f||!H.bhp)return;if(f.tut)tutHud(f);if(f.co)coHud(f);const p=f.p;
+  const f=fight;if(!f||!H.bhp)return;if(f.tut)tutHud(f);if(f.co)coHud(f);if(f.B.id==='kimbo')parHud(f);const p=f.p;
   const hp=f.bhp/f.bmax*100;
   H.bhp.style.width=hp+'%';{const pe=id('bpost');if(pe){pe.style.width=(f.brokenT>0?100:(f.post||0))+'%';pe.classList.toggle('full',f.brokenT>0||(f.post||0)>75)}}H.bsh.style.left=hp+'%';H.bsh.style.width=Math.min(100-hp,f.bshield/f.bmax*100)+'%';
   H.bhpT.textContent=`${f.bhp} / ${f.bmax}`;
@@ -4159,7 +4186,7 @@ function hud(){
   f.buffs.forEach(x=>pc.push({id:'b'+x.id,t:x.def?`${x.n} −${x.v}% subis`:`${x.n} +${x.v}%`,g:1,ic:'✦',p:x.t/(x.dur||(spells().find(s2=>s2.id===x.id)||{}).dur||6)}));
   if(f.ms.stim>0)pc.push({t:'Stimulé',g:1});
   if(f.gel)pc.push({t:`Gel ${f.gel}/3`,w:1});
-  if(meta.up.rez>0)pc.push(run.rezUsed?{t:'Sablier de secours utilisé'}:{t:'Sablier de secours prêt',g:1});
+  if(UP('rez')>0)pc.push(run.rezUsed?{t:'Sablier de secours utilisé'}:{t:'Sablier de secours prêt',g:1});
   if(f.marks)pc.push({t:`Marques ${f.marks}/5`,g:1});if(f.resent)pc.push({t:`Ressentiment ${f.resent}/5`,g:1});if(WPN().holy&&f.holy)pc.push({t:`Ferveur ${f.holy}/5`,g:1});if(f.pet&&WPN().pet)pc.push(f.pet.hp>0?{t:`Loup ${Math.max(0,Math.round(f.pet.hp))}/${f.pet.max}`,g:1}:{t:'Loup tombé',w:1});if(f.traps&&f.traps.length)pc.push({t:`Piège ×${f.traps.length}`,g:1});if(f.ms.shadow)pc.push({t:'Dans l’ombre : prochain coup dans le dos',g:1});
   if(p.slow>0)pc.push({t:'Ralenti',w:1});
   if(p.frozen>0)pc.push({t:'Figé',w:1});
@@ -4303,7 +4330,7 @@ function win(){if(run&&run.tut){tutLeave(true);return}
   if(run.mini){achieve('echo');const k=grantWeapon(),g=Math.round((15+run.floor*8)*(RC().grains||1));run.carried+=g;run.mini=null;fight=null;run.hp=Math.min(maxHp(),run.hp+Math.round(maxHp()*.15));
     if(k)ui.got={kind:'weapon',k};ui.toast=`Écho vaincu : +${g} grains.`;ui.screen='map';save();render();return}
   const perk=(run.paths||{})[run.floor],mutd=!!(fight&&fight.mut);
-  let g=Math.round((20+run.floor*12)*(1+meta.cycle*.5)*(RC().grains||1)*(1+.15*heatOf(run.pacts))*(1+.12*(run.asc||0))*(hasA('bourse')?1.6:1)*(perk==='or'?1.5:1)*(mutd?2:1));
+  let g=Math.round((20+run.floor*12)*(1+meta.cycle*.5)*(RC().grains||1)*(1+.15*heatOf(run.pacts)+.12*(run.asc||0))*(hasA('bourse')?1.6:1)*(perk==='or'?1.5:1)*(mutd?2:1));
   ui.speedRes=null;if(run.speed===run.floor&&fight){const t=Math.round(fight.t);if(t<=90){g*=3;ui.speedRes=`Défi de vitesse réussi en ${t} s : grains ×3.`}else{g=Math.round(g/2);ui.speedRes=`Défi de vitesse raté (${t} s) : grains divisés par deux.`}run.speed=0}
   {const Bc=BOSSAT(run.floor),cb=cx().boss[Bc.id]||(cx().boss[Bc.id]={});cb.w=1;if(fight&&!fight.hits)cb.nh=1;if(mutd)cb.mut=1}
   ui.mutWon=mutd;
@@ -4324,7 +4351,7 @@ function win(){if(run&&run.tut){tutLeave(true);return}
     meta.heatBest=Math.max(meta.heatBest||0,heatOf(run.pacts));
     run.carried=0;run.secret=1;run.floor=10;run.hp=Math.max(run.hp,Math.round(maxHp()*.6));run.flasks=Math.max(run.flasks,flaskMax());run.node=null;run.ev=null;ui.screen='challenger';save();render();return;
   }
-  run.lvl++;run.pts+=5;run.spPts=(run.spPts??1)+1;ui.newSp=spells().filter(s=>s.unlock===run.lvl).map(s=>s.n);run.hp=Math.min(maxHp(),run.hp+6+Math.round(maxHp()*.25));
+  run.lvl++;run.pts+=5;run.spPts=(run.spPts??1)+1;ui.newSp=spells().filter(s=>s.unlock-(run.libAdv&&s.unlock>=4?1:0)===run.lvl).map(s=>s.n);run.hp=Math.min(maxHp(),run.hp+6+Math.round(maxHp()*.12));
   ui.newW=null;seeded(()=>{if(Math.random()<(nohit?.35:.12))ui.newW=grantWeapon()});
   ui.gain=gg;ui.wagerWon=!!wg;ui.loot=[];if(ui.nohit&&ui.nohit!=='owned')ui.loot.push(legItem(ui.nohit));const nL=(wg||perk==='butin')?4:3;seeded(()=>{while(ui.loot.length<nL)ui.loot.push(genItem(ui.loot.map(x=>x.leg).filter(Boolean),ui.loot.map(x=>x.slot)));if(perk==='butin'||mutd||Math.random()<.3){const a=randAlt(null,ui.loot.map(x=>x.alt).filter(Boolean));if(a){let j=-1;for(let q=ui.loot.length-1;q>=0;q--)if(!ui.loot[q].leg){j=q;break}if(j>=0)ui.loot[j]=a}}});ui.lootImg=ui.loot.map(it=>renderPortrait(Object.assign({},run,{items:Object.assign({},run.items,{[slotKey(it)]:it})}),280,340));ui.screen='reward';render();
 }
@@ -4401,7 +4428,7 @@ function ladPaint(){const box=id('ladlist');if(!box)return;const md=id('ladmode'
 function rLadder(){return `<section class="panel"><div class="between"><span class="label">Classement des Veilleurs</span><span class="dim" id="ladmode"></span></div>
   <div class="ladme"><label class="dim" for="ladname">Ton pseudo</label><input id="ladname" maxlength="16" placeholder="Ex. Veilleuse" value="${esc(ui.ladDraft??meta.pseudo??'')}" autocomplete="off" spellcheck="false"><button class="btn sm" data-a="ladname">Enregistrer</button></div>
   <div class="ladtabs">${[['gen','Général'],['day','Du jour'],['week','Semaine'],['me','Mes ascensions']].map(([k,n])=>`<button class="${LAD.tab===k?'on':''}" data-a="ladtab" data-v="${k}">${n}</button>`).join('')}</div>
-  <div id="ladlist" class="ladlist"></div>
+  ${LAD.tab==='day'?'<p class="dim" style="font-size:12.5px;margin:4px 0 8px">Ascension du jour : même départ pour tous, sans améliorations du Temple ni talents.</p>':''}<div id="ladlist" class="ladlist"></div>
   <p class="dim" style="font-size:12.5px;margin:8px 0 0">Score : 1000 par étage franchi, 2000 pour la victoire, 2500 de plus contre le Sablier Vivant, 300 par gardien sans dégâts, 150 par point de chaleur, 500 par sceau et par cycle, et un bonus de vitesse en cas de victoire. Ton meilleur score compte ; les ascensions du jour ont leur propre tableau.</p></section>`}
 
 
@@ -4411,7 +4438,7 @@ function rLadder(){return `<section class="panel"><div class="between"><span cla
    L'attaquant détecte ses coups, la victime les applique (esquive, parade et garde décidées chez elle). */
 const PVPS=470;
 const PV={st:'idle',ws:null,code:'',role:'',opp:null,round:0,score:[0,0],saved:null,os:null,last:0,sendT:0,msg:'',err:''};
-const PVUP={vit:0,pow:0,pts:0,flask:0,flaskPow:0,pa:0,rez:0};
+const PVUP={vit:0,pow:0,pts:0,flask:0,flaskPow:0,pa:0,rez:0,relic:0};
 const pvpOk=()=>!!(LADDER_API.url&&LADDER_API.key&&typeof WebSocket!=='undefined');
 const pvpMe=()=>PV.role==='A'?0:1;
 function pvpSend(ev,pl){const w=PV.ws;if(!w||w.readyState!==1)return;try{w.send(JSON.stringify({topic:PV.topic,event:'broadcast',payload:{type:'broadcast',event:ev,payload:pl||{}},ref:String(PV.ref++)}))}catch(e){}}
@@ -4501,6 +4528,13 @@ function creaturePvp(R){const o=PV.oppRun||{cls:'iop',race:'plainois',items:{}};
     c.ch.pg.updateMatrixWorld(true);if(K&&!st.dead)kkHands(c.ch,null)}}}
 CREATURES.pvp=creaturePvp;
 /* ===================== COOP : ascension à deux (en ligne) =====================
+   Ce qui tourne CHEZ L'HÔTE SEUL : l'IA du gardien (choix et timing des attaques, phases, intouchables),
+   ses mécaniques propres (B.tick : parité de l'Arbitre, horloge du Régent, toiles de la Tisseuse, bulbes
+   de la Mandragore, plumes de Vifplume, plongée de Mâchevase), ses invocations, projectiles, zones et
+   flaques, ses PV et sa posture, et la détection des coups qui touchent chacun des deux joueurs.
+   Copié chez le partenaire 15 fois/s : position, attaque en préparation, PV, posture, gel, cible, invocations,
+   nouveaux projectiles/zones/flaques, et l'état des mécaniques utile à ses coups (parité, esquive de Vifplume,
+   horloge du Régent). Les invocations visent le même joueur que le gardien (aggro).
    L'hôte (A) fait tourner le gardien, ses invocations et ses projectiles ; chaque joueur gère son héros.
    L'hôte détecte les coups qui touchent le partenaire et les lui envoie ; le partenaire les subit (esquive et parade décidées chez lui).
    Les dégâts du partenaire sont cumulés et envoyés avec sa position, 12 fois par seconde. */
@@ -4551,7 +4585,7 @@ function coOn(e,m){const f=fight&&fight.co?fight:null;CO.last=performance.now();
   if(e==='s'){const A=f.ally;if(!A)return;A.tx=m.x;A.ty=m.y;A.face=m.fa;A.hp=m.hp;A.mx=m.mx;A.roll=m.r?.2:0;A.iframe=m.r?.2:0;A.guard=!!m.g;A.drink=m.d?.5:0;A.leap=m.l?1:null;A.atkT=m.a?.3:A.atkT;A.castT=m.c?.4:A.castT;A.down=!!m.dn;A.duo=m.du||null;
     if(m.acc&&m.acc.hl>0&&!f.p.down&&!f.over){const h=Math.min(maxHp()-run.hp,m.acc.hl);if(h>0){run.hp+=h;txt(f,f.p.x,f.p.y-18,'+'+h,'ok')}}
     if(A.x===undefined){A.x=m.x;A.y=m.y}
-    if(CO.role==='A'&&m.acc&&!f.over){const q=m.acc;if(q.d>0){f.bhp=Math.max(0,f.bhp-q.d);f.b.hurt=.12;f.co.dA+=q.d;checkPhase(f)}if(q.po>0)addPosture(f,q.po);
+    if(CO.role==='A'&&m.acc&&!f.over){const q=m.acc;if(q.d>0){f.bhp=Math.max(0,f.bhp-q.d);f.b.hurt=.12;f.co.dA+=q.d;f.hist.push({t:f.t,d:q.d});f.B.onDealt&&f.B.onDealt(f,q.d);checkPhase(f)}if(q.po>0)addPosture(f,q.po);
       if(q.ad)for(const k in q.ad){const a=f.adds.find(x=>x.id===+k);if(a&&a.alive){a.hp-=q.ad[k];a.hurt=.12;if(a.hp<=0)killAdd(f,a)}}
       const b=f.b;if(q.fz>(f.frz||0)){f.frz=q.fz;b.atk=null;b.dash=null;b.jump=null;b.rec=Math.max(b.rec,q.fz);b.cool=Math.max(b.cool,q.fz+.4);ev(f,'freeze')}
       if(q.vu)b.vuln=Math.max(b.vuln,q.vu);if(q.sl)f.ms.slowB=Math.max(f.ms.slowB||0,q.sl);
@@ -4608,7 +4642,7 @@ function coTick(f,dt){if(!f.co)return;const A=f.ally;coRevive(f,dt);
     const q=CO.acc;CO.acc=null;coSend('s',{x:Math.round(p.x),y:Math.round(p.y),fa:+(p.face||0).toFixed(2),hp:run.hp,mx:maxHp(),r:p.roll>0?1:0,g:p.guard?1:0,d:p.drink>0?1:0,l:p.leap?1:0,a:f.swing&&f.swing.t<.15?1:0,c:p.cast>0?1:0,dn:p.down?1:0,du:run.duo||undefined,acc:q||undefined})}
   if(f.co.role==='A'){CO.syncT-=dt;if(CO.syncT<=0){CO.syncT=1/15;coSend('cb',coSnap(f))}}}
 const coD=d=>{const o={};for(const k in d){const v=d[k];if(typeof v!=='function')o[k]=v}return o};
-function coSnap(f){const b=f.b,a=b.atk,J=b.jump,c=f.co;const S={x:Math.round(b.x),y:Math.round(b.y),fa:+(b.face||0).toFixed(2),hp:Math.round(f.bhp),mx:f.bmax,po:Math.round(f.post||0),br:+(f.brokenT||0).toFixed(2),vu:b.vuln>0?1:0,fz:f.frz>0?+f.frz.toFixed(2):0,tg:c.tgt==='ally'?'B':'A'};
+function coSnap(f){const b=f.b,a=b.atk,J=b.jump,c=f.co;const S={x:Math.round(b.x),y:Math.round(b.y),fa:+(b.face||0).toFixed(2),hp:Math.round(f.bhp),mx:f.bmax,po:Math.round(f.post||0),br:+(f.brokenT||0).toFixed(2),vu:b.vuln>0?1:0,fz:f.frz>0?+f.frz.toFixed(2):0,tg:c.tgt==='ally'?'B':'A',ms:{par:f.ms.par,parT:f.ms.parT,evade:f.ms.evade,clock:f.ms.clock,win:f.ms.win,p2:f.ms.p2,webT:f.ms.webT}};
   if(a&&a.d){if(!a._cid)a._cid=(c.cid=(c.cid||0)+1);S.at={i:a._cid,k:a.key,t:+a.t.toFixed(2),w:+a.wind.toFixed(2),an:+(a.ang||0).toFixed(3),tg:a.tgt?{x:Math.round(a.tgt.x),y:Math.round(a.tgt.y)}:null,ts:a.tgts?a.tgts.map(t=>({x:Math.round(t.x),y:Math.round(t.y)})):null,rk:a.rk||0};if(c.sentD!==a._cid){c.sentD=a._cid;S.at.d=coD(a.d)}}
   if(J)S.ju={fx:J.fx,fy:J.fy,tx:J.tx,ty:J.ty,t:+J.t.toFixed(2),du:J.dur,r:J.d&&J.d.r};
   if(b.dash)S.da={vx:Math.round(b.dash.vx),vy:Math.round(b.dash.vy)};
@@ -4619,7 +4653,7 @@ function coSnap(f){const b=f.b,a=b.atk,J=b.jump,c=f.co;const S={x:Math.round(b.x
   if(c.evq&&c.evq.length){S.ev=c.evq;c.evq=[]}
   return S}
 /* partenaire : applique l'état envoyé par l'hôte */
-function coGuestApply(f,m){const b=f.b;f.bhp=m.hp;f.bmax=m.mx;f.post=m.po;f.brokenT=m.br;b.vuln=Math.max(b.vuln>0?b.vuln:0,m.vu?.2:0);if(m.fz>(f.frz||0))f.frz=m.fz;b.tx=m.x;b.ty=m.y;b.tfa=m.fa;
+function coGuestApply(f,m){const b=f.b;if(m.ms)for(const k in m.ms)f.ms[k]=m.ms[k];f.bhp=m.hp;f.bmax=m.mx;f.post=m.po;f.brokenT=m.br;b.vuln=Math.max(b.vuln>0?b.vuln:0,m.vu?.2:0);if(m.fz>(f.frz||0))f.frz=m.fz;b.tx=m.x;b.ty=m.y;b.tfa=m.fa;
   if(m.at){const A=f.atkX&&f.atkX[m.at.k]||f.B.atks[m.at.k];if(!b.atk||b.atk._cid!==m.at.i){const d=m.at.d||A||{k:'circle',r:60};b.atk={_cid:m.at.i,key:m.at.k,d,t:m.at.t,wind:m.at.w,ang:m.at.an,tgt:m.at.tg,tgts:m.at.ts||[],rk:m.at.rk,gen:m.at.i*100+m.at.rk}}
     else{const a=b.atk;if(m.at.d)a.d=m.at.d;if(m.at.rk!==a.rk){a.rk=m.at.rk;a.gen=m.at.i*100+m.at.rk;a.tgts=m.at.ts||a.tgts;a.tgt=m.at.tg||a.tgt}a.t=Math.max(a.t,m.at.t);a.wind=m.at.w;a.ang=m.at.an}}
   else b.atk=null;
@@ -4639,8 +4673,8 @@ function coGuestProj(f,dt){f.proj=f.proj.filter(q=>{q.life-=dt;q.x+=q.vx*dt;q.y+
 /* dégâts du partenaire : cumulés puis envoyés */
 function coAcc(d,po,T){const q=CO.acc||(CO.acc={d:0,po:0});if(T&&T.id){(q.ad||(q.ad={}))[T.id]=(q.ad[T.id]||0)+Math.round(d)}else{q.d+=Math.round(d||0);q.po+=po||0}}
 function coFx(k,v){const q=CO.acc||(CO.acc={d:0,po:0});(q.fx||(q.fx=[])).push([k,v])}
-/* les invocations s'en prennent au joueur le plus proche */
-function coAddT(f,a,p0){const A=f.ally;if(!f.co||f.co.role!=='A'||!A||A.down)return p0;if(p0.down)return A;return dist(a,A)<dist(a,p0)?A:p0}
+/* les invocations suivent l'aggro du gardien (le joueur qu'il vise) */
+function coAddT(f,a,p0){const A=f.ally;if(!f.co||f.co.role!=='A'||!A||A.down)return p0;if(p0.down)return A;return f.co.tgt==='ally'?A:p0}
 /* relever son partenaire : rester 3 s à côté de lui */
 function coRevive(f,dt){const A=f.ally,p=f.p,c=f.co;if(!c||!A||f.over)return;
   if(allyHas(f,'vigueur')&&!A.down&&!p.down&&dist(p,A)<230&&run.hp<maxHp()){c.vg=(c.vg||0)+maxHp()*.015*dt;if(c.vg>=1){const n=Math.floor(c.vg);c.vg-=n;run.hp=Math.min(maxHp(),run.hp+n)}}
@@ -4781,24 +4815,30 @@ function act(a,v){
     case 'pvpjoin': {const el=id('pvpcode'),c=((el&&el.value)||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);if(c.length===4)pvpConnect(c,'B');else{ui.toast='Le code fait 4 caractères.';render()}} break;
     case 'pvpgo': pvpHostStart(true); break;
     case 'pvpquit': pvpQuit(); break;
-    case 'pvpcopy': try{navigator.clipboard.writeText(PV.code);ui.toast='Code copié : '+PV.code}catch(e){}render(); break;
+    case 'pvpcopy': try{(navigator.clipboard.writeText(PV.code).catch(()=>{}));ui.toast='Code copié : '+PV.code}catch(e){}render(); break;
     case 'tal': {const k=meta.sel;if(!k||run)break;const T=meta.tal||(meta.tal={}),sel=talSel(k);const [b,t]=v.split('-').map(Number);
       if(sel.includes(v))T[k]=sel.filter(x=>{const [b2,t2]=x.split('-').map(Number);return !(b2===b&&t2>=t)});else if(talCan(k,v).ok)T[k]=[...sel,v];else{ui.toast=talCan(k,v).why;}save();render()} break;
     case 'talreset': if(meta.sel&&!run){(meta.tal||(meta.tal={}))[meta.sel]=[];save();render()} break;
     case 'ladname': {const el=id('ladname'),n=ladName(el&&el.value);meta.pseudo=n;ui.ladDraft=null;save();if(el)el.value=n;ui.toast=n?`Pseudo enregistré : ${n}.`:'Pseudo effacé.';
       if(n&&LAD.mode==='claude'&&LAD.uid&&LAD.canW!==false&&LAD.rows.some(r=>r.uid===LAD.uid))LAD.db.doc('ladder/'+LAD.uid).update({pseudo:n}).catch(()=>{});render()} break;
     case 'ladtab': LAD.tab=v;if(LAD.mode==='api')ladFetch();render(); break;
-    case 'train': if(run&&!run.secret)startTraining(); break;
+    case 'train': if(run&&!run.secret)startTraining(v); break;
     case 'secretgo': if(run&&run.secret){if(coRun()){coReady(true);break}startFight()} break;
     case 'coopnew': {const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<4;i++)c+=A[Math.floor(Math.random()*A.length)];coConnect(c,'A')} break;
     case 'coopjoin': {const el=id('coopcode'),c=((el&&el.value)||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);if(c.length===4)coConnect(c,'B');else{ui.toast='Le code fait 4 caractères.';render()}} break;
     case 'coopquit': coQuit(); break;
     case 'amode': ui.amode=v;render(); break;
+    case 'savex': {save();try{const raw=localStorage.getItem(KEY)||'';ui.saveCode='SB1:'+btoa(unescape(encodeURIComponent(raw)));ui.saveMsg='Code prêt : copie tout le texte ci-dessous.';ui.saveBad=0;try{const pr=navigator.clipboard&&navigator.clipboard.writeText(ui.saveCode);if(pr&&pr.then)pr.then(()=>{ui.saveMsg='Code copié dans le presse-papiers (et affiché ci-dessous).';if(ui.hub==='options')render()},()=>{})}catch(e){}}catch(e){ui.saveMsg='Export impossible dans ce navigateur.';ui.saveBad=1}render()} break;
+    case 'savei': {const el=id('savecode'),c=((el&&el.value)||'').trim();ui.saveCode=c;let ok=false;
+      try{if(!c.startsWith('SB1:'))throw 0;const raw=decodeURIComponent(escape(atob(c.slice(4))));const o=JSON.parse(raw);if(!o||!o.meta||typeof o.meta.souls!=='number')throw 0;
+        if(ui.confirm!=='saveimp'){ui.confirm='saveimp';ui.saveMsg='Code valide. Ta progression actuelle sera remplacée : clique encore sur « Importer » pour confirmer.';ui.saveBad=0;render();break}
+        localStorage.setItem(KEY,raw);ok=true}catch(e){ui.saveMsg='Ce code n’est pas une sauvegarde valide du Sablier Brisé. Rien n’a été changé.';ui.saveBad=1;ui.confirm=null}
+      if(ok)location.reload();else render()} break;
     case 'coopgo': rushStart(false); break;
     case 'rushsolo': rushStart(true); break;
     case 'rpick': rushPick(+v); break;
     case 'coopun': if(CO.ready){CO.ready=null;coSend('cun',{});render()} break;
-    case 'coopcopy': try{navigator.clipboard.writeText(CO.code);ui.toast='Code copié : '+CO.code}catch(e){}render(); break;
+    case 'coopcopy': try{(navigator.clipboard.writeText(CO.code).catch(()=>{}));ui.toast='Code copié : '+CO.code}catch(e){}render(); break;
     case 'endless': startEndless(); break;
     case 'secretno': if(run&&run.secret){ui.end=ui.end||{souls:0,cycle:meta.cycle,cls:RC().n+' '+CLS().name,sheet:makeSheet(true)};ui.end.secret={won:-1};run=null;ui.screen='win';save();render()} break;
     case 'pact':{const L=meta.pacts||(meta.pacts=[]);const i=L.indexOf(v);if(i>=0)L.splice(i,1);else L.push(v);save();render()} break;
@@ -4810,7 +4850,8 @@ function act(a,v){
       let m=`${PERKS[o.perk].n} : tu affrontes ${BOSSES[o.i].name}.`;if(o.perk==='soin'){run.hp=maxHp();run.flasks=Math.max(run.flasks,flaskMax())}if(o.perk==='savoir')run.spPts=(run.spPts??1)+2;if(o.perk==='mut')run.mut=fl;ui.toast=m;save();render()} break;
     case 'fullscreen':{try{const d=document.documentElement;(d.requestFullscreen||d.webkitRequestFullscreen).call(d);setTimeout(()=>{try{screen.orientation.lock('landscape').catch(()=>{})}catch(_){}},300)}catch(_){}} break;
     case 'gfx': meta.gfx=v==='basse'?'basse':'haute';save();render(); break;
-    case 'title': meta.title=v&&ACH[v]&&(meta.ach||{})[v]?v:'';save();render(); break;
+    case 'title': meta.title=v&&((ACH[v]&&(meta.ach||{})[v])||String(v).startsWith('p:'))?v:'';save();render(); break;
+    case 'prestige': {const k=v;if(!CLASSES[k]||mastLv(k)<MAST.length)break;const P=meta.prest||(meta.prest={});if((P[k]||0)>=2)break;if(ui.confirm!=='prest:'+k){ui.confirm='prest:'+k;render();break}ui.confirm=null;P[k]=(P[k]||0)+1;(meta.mast||(meta.mast={}))[k]=0;meta.title='p:'+k+':'+P[k];meta.aura='eternite';ui.toast=`Prestige ${ROMAN[P[k]]} : titre « ${PRESTT(k,P[k])} », aura Éternité et +1 point de talent permanent pour ${CLASSES[k].name}.`;save();render()} break;
     case 'aura': meta.aura=cosOk(v)?v:'';save();render(); break;
     case 'asc': meta.ascSel=Math.max(0,Math.min(meta.ascMax||0,+v));save();render(); break;
     case 'fight': if(needPath()){render();break}if(unspent()&&ui.confirm!=='unspent'){ui.confirm='unspent';render();break}ui.confirm=null;if(coRun()&&!run.train&&!run.mini){coReady(false);break}startFight(); break;
@@ -4824,12 +4865,14 @@ function act(a,v){
     case 'spdown':{const sp=spells().find(x=>x.id===v),S=run.spAlloc||(run.spAlloc={});if(!sp||!S[v])break;const lv=lvOf(sp);if(lv<=1)break;run.spellLv[v]=lv-1;run.spPts=(run.spPts??1)+spCost(lv-1);S[v]--;save();render()} break;
     case 'take': {const [iv,fk]=String(v).split('|');const it=ui.loot[+iv];const k=slotKey(it,fk);const old=run.items[k];const dv=(it.stats.vit||0)-(old?old.stats.vit||0:0);run.items[k]=it;checkSyn();run.hp=Math.max(1,Math.min(maxHp(),run.hp+Math.max(0,dv)));nextFloor()} break;
     case 'skip': nextFloor(); break;
+    case 'reroll': if(run&&RC().reroll&&!run.rerolled&&ui.loot&&ui.loot.length){run.rerolled=1;const n=ui.loot.length,lg=ui.loot.filter(x=>x.leg);ui.loot=lg.slice();while(ui.loot.length<n)ui.loot.push(genItem(ui.loot.map(x=>x.leg).filter(Boolean),ui.loot.map(x=>x.slot)));ui.toast='Butin relancé.';save();render()} break;
     case 'gotok': {const G=ui.got;ui.got=null;if(v==='equip'&&G&&G.kind==='weapon'){run.wsel=G.k;PORT.key='';save()}render()} break;
     case 'node': doNode(v); break;
     case 'wsel': run.wsel=v==='base'?null:v;PORT.key='';save();render(); break;
     case 'evc':{const E=EVENTS[run.ev];if(!E)break;const c=E.ch[+v];if(!c||(c.ok&&c.ok()!==true))break;const r=c.fx();if(r&&r.keep){ui.toast=r.msg;render();break}if(r&&r.fight){run.ev=null;save();startFight();break}(run.evSeen||(run.evSeen=[])).push(run.ev);run.ev=null;checkSyn();if(r&&r.got){ui.got=r.got;ui.toast=r.msg}else ui.toast=r&&r.msg?r.msg:r;save();render();scrollTo(0,0)} break;
     case 'spup':{const sp=spells().find(x=>x.id===v);if(!sp)break;const lv=lvOf(sp),c=spCost(lv);if(unlocked(sp)&&lv<5&&(run.spPts??1)>=c){run.spPts=(run.spPts??1)-c;run.spellLv[v]=lv+1;const S=run.spAlloc||(run.spAlloc={});S[v]=(S[v]||0)+1;save();render()}} break;
     case 'forge_old': run.spellLv[v]=Math.min(3,(run.spellLv[v]||1)+1);run.node=null;ui.sub=null;ui.toast=`${spells().find(s=>s.id===v).n} passe au niveau ${run.spellLv[v]}.`;save();render(); break;
+    case 'camp': {if(ui.sub!=='camp'||!run)break;if(v==='rest'){const h=healP(Math.round(maxHp()*(SL(4)?.3:.5)));run.flasks=flaskMax();ui.toast=`Tu te reposes : +${h} PV, fioles remplies. Tes ${run.carried} grains restent sur toi.`}else{const b=run.carried;meta.souls+=b;run.carried=0;ui.toast=`${b} grains mis à l’abri au temple. Pas de repos cette fois.`}run.node=null;ui.sub=null;save();render()} break;
     case 'parch': {const n=10+run.floor*2;const add=v==='vit'?n*3:n;run.stats[v]=(run.stats[v]||0)+add;if(v==='vit')run.hp+=add;run.node=null;ui.sub=null;ui.toast=`+${add} ${STATN[v]}.`;save();render()} break;
     case 'confirm': ui.confirm=v;render(); break;
     case 'cancel': ui.confirm=null;render(); break;
@@ -4842,9 +4885,8 @@ function act(a,v){
 }
 function nextFloor(){run.floor++;seeded(()=>{run.node=makeNodes();run.ev=rollEvent();if((run.floor<=9&&Math.random()<(SL(7)?.2:.06))||(run.endless&&Math.random()<.3))run.mut=run.floor});checkAch();checkSyn();ui.loot=null;ui.sub=null;run.hp=Math.min(run.hp,maxHp());arriveFloor();ui.screen='map';save();render()}
 function doNode(k){
-  if(k==='repos'){const h=healP(Math.round(maxHp()*(SL(4)?.3:.5)));run.flasks=flaskMax();const b=run.carried;meta.souls+=b;run.carried=0;run.node=null;
-    ui.toast=`Tu te reposes : +${h} PV, fioles remplies${b?`, ${b} grains mis à l’abri`:''}.`;save();render()}
-  else if(k==='forge'){run.spPts=(run.spPts??1)+2;run.node=null;ui.toast='+2 points de sort.';save();render()}
+  if(k==='repos'){ui.sub='camp';render()}
+  else if(k==='forge'){run.spPts=(run.spPts??1)+2;const first=!run.libAdv;run.libAdv=1;run.node=null;ui.toast='+2 points de sort.'+(first?' Tes prochains sorts se débloquent un niveau plus tôt.':'');save();render()}
   else if(k==='divin'){run.wpn=Math.min(5,wRank()+1);run.node=null;ui.toast=`${WPN().god} bénit ${WPN().n} : rang ${run.wpn}.`;save();render()}
   else if(k==='autel'){run.hpPct-=10;run.bonus+=15;run.hp=Math.min(run.hp,maxHp());run.node=null;ui.toast='L’autel prend ta vie et te rend plus fort : −10% PV max, +15% dommages.';save();render()}
   else{ui.sub=k;render()}
@@ -4934,11 +4976,13 @@ const PACTP=()=>`${run?'':`<section class="panel"><div class="between"><span cla
     <div class="pacts">${Object.entries(PACTS).map(([k,P])=>`<button class="pact ${(meta.pacts||[]).includes(k)?'on':''}" data-a="pact" data-v="${k}"><span class="between"><b>${P.n}</b><span class="chip">+${P.heat}</span></span><small>${P.d}</small></button>`).join('')}</div></section>`}
   ${run?'':`<section class="panel"><div class="between"><span class="label">Sceaux d’ascension</span><span class="dim">${meta.ascMax?`Débloqués : ${meta.ascMax} / 8`:'Bats le Régent pour débloquer le Sceau I'}</span></div>
     <p class="dim" style="font-size:13px;margin:4px 0 8px">Chaque sceau ajoute une contrainte aux précédents et +12% de grains. Battre le Régent avec ton sceau le plus haut débloque le suivant.</p>
-    <div class="seals">${SEALS.map((S,i)=>`<button class="seal ${(meta.ascSel||0)===i?'on':''}" data-a="asc" data-v="${i}" ${i>(meta.ascMax||0)?'disabled':''} title="${esc(S.d)}"><b>${i?S.n:'Aucun'}</b><small>${i>(meta.ascMax||0)?'Verrouillé':S.d}</small></button>`).join('')}</div></section>`}`;
+    <div class="seals">${SEALS.map((S,i)=>`<button class="seal ${(meta.ascSel||0)===i?'on':''}" data-a="asc" data-v="${i}" ${i>(meta.ascMax||0)?'disabled':''} title="${esc(S.d)}"><b>${i?S.n:'Aucun'}</b><small>${i>(meta.ascMax||0)?'Verrouillé':S.d}</small></button>`).join('')}</div></section>`}${run?'':gainLine()}`;
+function gainLine(){const r=(RACES[meta.race]||RACES.plainois).grains||1,h=heatOf(meta.pacts||[]),a=Math.min(meta.ascSel||0,meta.ascMax||0),c=meta.cycle||0,add=.15*h+.12*a,tot=r*(1+add)*(1+c*.5);
+  return `<section class="panel gmult"><div class="between"><span class="label">Grains par gardien</span><b class="num" style="color:var(--ember);font-size:20px">×${tot.toFixed(2)}</b></div><p class="dim" style="font-size:13px;margin:4px 0 0">Sceau +${Math.round(a*12)}% et chaleur +${h*15}% s’additionnent (+${Math.round(add*100)}%)${r!==1?`, peuple ×${r}`:''}${c?`, cycle ×${(1+c*.5).toFixed(1)}`:''}. Corrompu et pari du Veilleur doublent en plus.</p></section>`}
 function rDefis(){if(run)return '<section class="panel"><p class="dim">Termine ou abandonne ton ascension en cours pour tenter un défi.</p></section>';return `${(()=>{const D=dailySetup(),best=(meta.daily||{})[todaySeed()];return `<section class="panel daily"><div class="between"><span class="label">Ascension du jour</span><span class="dim">${new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}</span></div>
     <p>Même départ pour tout le monde aujourd’hui : <b>${RACES[D.race].n} ${CLASSES[D.cls].name}</b>, pactes <b>${D.pacts.map(k=>PACTS[k].n).join(' et ')}</b>. Butin et événements fixés par la date.</p>
     <div class="between"><span class="dim">${best?`Ton meilleur score aujourd’hui : <b style="color:var(--ember)">${best}</b>`:'Pas encore tenté aujourd’hui.'}</span><button class="btn" data-a="daily">Tenter l’ascension du jour</button></div>
-    <p class="dim" style="font-size:12.5px;margin:6px 0 0">Score : 1000 par étage franchi, 300 par gardien battu sans dégâts, 150 par point de chaleur, 2000 pour la victoire. La classe est jouable même si elle n’est pas débloquée.</p></section>`})()}
+    <p class="dim" style="font-size:12.5px;margin:6px 0 0">Score : 1000 par étage franchi, 300 par gardien battu sans dégâts, 150 par point de chaleur, 2000 pour la victoire. La classe est jouable même si elle n’est pas débloquée. <b style="color:var(--bone)">Améliorations du Temple et talents désactivés</b> : tout le monde part à égalité.</p></section>`})()}
   ${(()=>{const W=weeklySetup(),best=(meta.weekly||{})[weekSeed()],wc=CLASSES[meta.wcls]?meta.wcls:(meta.sel||'iop');return `<section class="panel weekly"><div class="between"><span class="label">Défi de la semaine</span><span class="dim">Semaine ${weekNo().w} · fin dans ${weekLeft()}</span></div>
     <div class="wmods">${W.mods.map(k=>`<div class="wmod"><b>${WMODS[k].n}</b><small>${WMODS[k].d}</small></div>`).join('')}<div class="wmod pact"><b>Pacte : ${PACTS[W.pacts[0]].n}</b><small>${PACTS[W.pacts[0]].d}</small></div></div>
     <span class="label" style="display:block;margin:10px 0 6px">Ta classe pour le défi</span>
@@ -4958,9 +5002,13 @@ function rTemple(){const st=meta.stain;return `<section class="panel"><div class
 function rLook(){const got=Object.keys(ACH).filter(k=>(meta.ach||{})[k]),tt=got.filter(k=>ACH[k].t),aur=Object.keys(COS).filter(cosOk);
   return `<section class="panel look" id="sec-look"><div class="between"><span class="label">Apparence</span><span class="dim">${tt.length} titre${tt.length>1?'s':''} · ${aur.length} aura${aur.length>1?'s':''}</span></div>
   <p class="dim" style="font-size:13px;margin:4px 0 8px">Ton titre s’affiche sous ton pseudo dans le classement. L’aura t’entoure pendant les combats. Les exploits ci-dessous en débloquent d’autres.</p>
-  <div class="lookrow"><span class="lk">Titre</span><div class="chips"><button class="chipb ${!myTitle()?'on':''}" data-a="title" data-v="">Aucun</button>${tt.map(k=>`<button class="chipb ${meta.title===k?'on':''}" data-a="title" data-v="${k}">${ACH[k].t}</button>`).join('')}</div></div>
+  <div class="lookrow"><span class="lk">Titre</span><div class="chips"><button class="chipb ${!myTitle()?'on':''}" data-a="title" data-v="">Aucun</button>${tt.map(k=>`<button class="chipb ${meta.title===k?'on':''}" data-a="title" data-v="${k}">${ACH[k].t}</button>`).join('')}${Object.entries(meta.prest||{}).flatMap(([k,n])=>Array.from({length:n},(_,i)=>`p:${k}:${i+1}`)).map(t=>{const [,k,n]=t.split(':');return `<button class="chipb ${meta.title===t?'on':''}" data-a="title" data-v="${t}">${PRESTT(k,+n)}</button>`}).join('')}</div></div>
   <div class="lookrow"><span class="lk">Aura</span><div class="chips"><button class="chipb ${!cosOk(meta.aura)?'on':''}" data-a="aura" data-v="">Aucune</button>${aur.map(k=>`<button class="chipb ${meta.aura===k?'on':''}" data-a="aura" data-v="${k}"><span class="pip" style="--c:${COS[k].c}"></span>${COS[k].n}</button>`).join('')}${aur.length?'':'<span class="dim" style="font-size:12.5px;align-self:center">Aucune aura encore : vaincs le Régent pour la première.</span>'}</div></div></section>`}
 function rOptions(){return `<section class="panel"><span class="label">Son et touches</span>${ctrlHtml()}</section>
+  <section class="panel savep"><span class="label">Sauvegarde</span><p class="dim" style="font-size:13px;margin:4px 0 8px">Ta progression est gardée dans ce navigateur. Copie ce code pour la transférer sur un autre appareil ou la garder en sécurité, puis colle-le ailleurs et importe-le.</p>
+  <div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn sm" data-a="savex">Exporter</button><button class="btn sm" data-a="savei">Importer le code collé</button></div>
+  <textarea id="savecode" rows="3" spellcheck="false" placeholder="Le code de sauvegarde apparaît ici ; colle un code ici pour l’importer." style="width:100%;margin-top:8px;font:12px ui-monospace,monospace;background:var(--well);color:var(--bone);border:1px solid var(--line);border-radius:8px;padding:8px;box-sizing:border-box">${esc(ui.saveCode||'')}</textarea>
+  ${ui.saveMsg?`<p class="${ui.saveBad?'down':'dim'}" style="font-size:13px;margin:6px 0 0">${esc(ui.saveMsg)}</p>`:''}</section>
   <p class="dim" style="font-size:11.5px;text-align:center;margin:4px 0">Bruitages d’impact : Kenney (kenney.nl, CC0) · Modèles 3D : héros KayKit Adventurers (Kay Lousberg, CC0) · Grondecorne : Mixamo (Adobe) · Basalte : Armored Stone Golem (Alexander Lenski, Fab) · Hiverne : « Wyvern animated » par Charlie catling (Fab, CC-BY) · Vifplume « Animated Cockatrice » par Marko J (Fab) · La Tisseuse : « Spiders » par Mixall (Fab, CC-BY) · Régent « Vampire » par Khornes (Fab) · sbires « Stylized Low Poly Skeleton » par SazenGames (Fab)</p>
 <footer><span>${meta.runs} ascension${meta.runs>1?'s':''} · ${meta.wins} victoire${meta.wins>1?'s':''}</span>
   ${ui.confirm==='reset'?`<span class="row"><span>Tout effacer ?</span><button data-a="reset">Oui, effacer</button><button data-a="cancel">Annuler</button></span>`:`<button data-a="confirm" data-v="reset">Effacer la sauvegarde</button>`}</footer>`}
@@ -4982,17 +5030,19 @@ function rArenaHub(){if(typeof rArena!=='function')return '';const m=ui.amode||(
 function rArenaHub_old(){return typeof rArena==='function'?rCoop()+rArena():'<section class="panel"><p>L’arène de chaos arrive bientôt : des duels 1 contre 1 en ligne avec des héros tirés au sort.</p></section>'}
 function rTalents(){const k=meta.sel;if(!k||!meta.unlocked[k]||!TAL[k])return '';const C=CLASSES[k],sel=talSel(k),pts=talPts(k),lv=mastLv(k),nx=MAST[lv];
   return `<section class="panel tal" id="sec-tal"><div class="between"><span class="label">Talents · ${C.name}</span><span class="num ${pts-sel.length>0?'tpl':'dim'}">${sel.length} / ${pts} point${pts>1?'s':''}</span></div>
-  <p class="dim tali">Un point par niveau de maîtrise de la classe (${TALMAX} au plus). Un seul talent ultime (rang III) à la fois. Change-les librement avant chaque ascension ; ils ne s’appliquent pas aux ascensions du jour et de la semaine.${pts<TALMAX&&nx?` <span style="color:var(--bone)">Prochain point : ${mastXp(k)} / ${nx.xp} XP de maîtrise.</span>`:''}</p>
+  <p class="dim tali">Un point par niveau de maîtrise de la classe, des niveaux I à VI (${TALMAX} au plus ; les niveaux VII et VIII donnent d’autres récompenses). Un seul talent ultime (rang III) à la fois. Change-les librement avant chaque ascension ; ils ne s’appliquent pas aux ascensions du jour et de la semaine.${pts<TALMAX&&nx?` <span style="color:var(--bone)">Prochain point : ${mastXp(k)} / ${nx.xp} XP de maîtrise.</span>`:''}</p>
+  ${(()=>{const pr=(meta.prest||{})[k]||0;if(lv<MAST.length&&!pr)return '';return `<div class="prest"><b>Prestige ${pr?ROMAN[pr]:''}</b> ${pr?`<span class="dim">· +${pr} point${pr>1?'s':''} de talent permanent${pr>1?'s':''}</span>`:''}${lv>=MAST.length&&pr<2?(ui.confirm==='prest:'+k?`<p class="dim">Ta maîtrise de ${C.name} repart à zéro (ses bonus aussi, jusqu’à ce que tu la regagnes). Tu gagnes le titre « ${PRESTT(k,pr+1)} », l’aura Éternité et +1 point de talent permanent.</p><div class="row" style="gap:6px"><button class="btn primary sm" data-a="prestige" data-v="${k}">Confirmer le prestige</button><button class="btn sm" data-a="cancel">Annuler</button></div>`:`<p class="dim">Maîtrise complète : passe un prestige (${pr}/2) pour un titre, une aura et un point de talent permanent.</p><button class="btn sm" data-a="prestige" data-v="${k}">Passer le prestige ${ROMAN[pr+1]}</button>`):''}</div>`})()}
   <div class="tgrid">${TAL[k].map((B,b)=>`<div class="tbr"><div class="tbh"><b>${B.n}</b><small class="dim">${B.d}</small></div>
     ${B.t.map((N,t)=>{const id=talId(b,t),on=sel.includes(id),c=talCan(k,id),ks=t===2;return `${t?`<i class="tlink ${on?'on':''}"></i>`:''}<button class="tnode ${ks?'ks':''} ${on?'on':c.ok?'can':'off'}" data-a="tal" data-v="${id}" ${!on&&!c.ok?'aria-disabled="true"':''} title="${esc(on?'Cliquer pour retirer':c.ok?'Cliquer pour choisir':c.why)}">
       <span class="trk">${ks?'◆ Ultime':'Rang '+ROMAN[t+1]}</span><b>${N.n}</b><small>${N.d}</small>${!on&&!c.ok?`<em>${c.why}</em>`:''}</button>`}).join('')}</div>`).join('')}</div>
   ${sel.length?`<div class="row" style="justify-content:flex-end;margin-top:8px"><button class="btn sm" data-a="talreset">Tout retirer</button></div>`:''}</section>`}
 function rStats(){
   const keys=['vit','for','int','agi','cha'];
-  const sub={vit:'Vie',for:'Terre',int:'Feu · soins',agi:'Air · crit · endurance',cha:'Eau'};
+  const sub={vit:'Vie',for:'Terre',int:'Feu · soins',agi:'Air · critique · endurance',cha:'Eau (pas le critique)'};
   const w=WPN(),wS=mainStat(),wAvg=add=>{const sp=wpnSp(false),k=sp.stat;run.stats[k]=(run.stats[k]||0)+add;const v=Math.round(dmgBase(sp,(w.min+w.max)/2*wMult(),1));run.stats[k]-=add;return v};
   const uses=k=>{const u=[];
-    if(k==='vit')u.push(`<b>+1 PV max</b> par point (${maxHp()} actuellement)`);
+    if(k==='vit')u.push(`<b>+3 PV max</b> par point (${maxHp()} actuellement)`);
+    if(k==='cha')u.push(`Malgré son nom, la Chance ne donne pas de critique : c’est la caractéristique de l’<b>Eau</b>. Le critique vient de l’Agilité.`);
     if(k===wS){u.push(`<b>Coups d’arme</b> (léger et lourd) : +1% de dégâts par point (bonus actuel <b>+${statT(k)+pctDmg()}%</b>, coup léger moyen ${wAvg(0)})`)}
     const sps=spells().filter(sp=>unlocked(sp)&&(sp.stat||EL[sp.el]&&EL[sp.el].s)===k&&sp.t!=='heal'&&sp.t!=='buff').map(sp=>sp.n);
     if(sps.length)u.push(`Sorts : <b>${sps.join(', ')}</b> (+1% par point)`);
@@ -5147,7 +5197,8 @@ function rMap(){
   else if(run.ev&&EVENTS[run.ev]){pop=rEvent()}
   else if(run.node&&!ui.sub){pop=modal('Avant l’étage '+ROMAN[run.floor],'Choisis une faveur',run.node.map((k,i)=>`<button class="mcard" data-a="node" data-v="${k}" style="--c:${NODEUI[k].c};--i:${i}"><div class="mico">${NODEUI[k].i}</div><h3>${NODES[k].n}</h3><small>${NODES[k].d}</small></button>`).join(''))}
   else if(needPath()&&!ui.sub){const O=pathOffer();pop=modal('Deux chemins','Étages '+ROMAN[run.floor]+' et '+ROMAN[run.floor+1]+' · choisis qui tu affrontes d’abord',O.opts.map((o,i)=>{const Bx=BOSSES[o.i],P=PERKS[o.perk];return `<button class="mcard path" data-a="path" data-v="${i}" style="--c:${P.c};--i:${i}"><div class="mico">${P.i}</div><span class="label">${esc(Bx.zone)}</span><h3>${esc(Bx.name)}</h3><b style="color:${P.c}">${P.n}</b><small>${P.d}</small><small class="dim">L’autre gardien t’attendra à l’étage suivant, sans bonus.</small></button>`}).join(''))}
-  else if(ui.sub==='parch'){const n=10+run.floor*2;pop=modal('Parchemins','Choisis une caractéristique',['vit','for','int','agi','cha'].map((k,i)=>`<button class="mcard sm" data-a="parch" data-v="${k}" style="--c:var(--${{vit:'ok',for:'terre',int:'feu',agi:'air',cha:'eau'}[k]});--i:${i}"><div class="mico">+${k==='vit'?n*3:n}</div><h3>${STATN[k]}</h3><small>${k===EL[CLS().wpn.el].s?'Caractéristique de ton arme':k==='vit'?'+1 PV par point':usefulStats().has(k)?'Utile à tes sorts':'Peu utile à ta classe'}</small></button>`).join(''))}
+  else if(ui.sub==='camp'){const hh=Math.min(maxHp()-run.hp,Math.round(maxHp()*(SL(4)?.3:.5)));pop=modal('Feu de camp','Un seul des deux',`<button class="mcard" data-a="camp" data-v="rest" style="--c:var(--ok);--i:0"><div class="mico">✚</div><h3>Te reposer</h3><small>+${hh} PV et fioles remplies (${run.flasks} → ${flaskMax()}). Tes grains restent sur toi : tu les perds si tu tombes.</small></button><button class="mcard" data-a="camp" data-v="bank" style="--c:var(--ember);--i:1"><div class="mico">⏳</div><h3>Mettre à l’abri</h3><small>${run.carried} grains envoyés au temple, en sécurité. Pas de soin ni de fiole.</small></button>`)}
+  else if(ui.sub==='parch'){const n=10+run.floor*2;pop=modal('Parchemins','Choisis une caractéristique',['vit','for','int','agi','cha'].map((k,i)=>`<button class="mcard sm" data-a="parch" data-v="${k}" style="--c:var(--${{vit:'ok',for:'terre',int:'feu',agi:'air',cha:'eau'}[k]});--i:${i}"><div class="mico">+${k==='vit'?n*3:n}</div><h3>${STATN[k]}</h3><small>${k===EL[CLS().wpn.el].s?'Caractéristique de ton arme':k==='vit'?'+3 PV par point':usefulStats().has(k)?'Utile à tes sorts':'Peu utile à ta classe'}</small></button>`).join(''))}
   const wsp=wpnSp(false),wr=B.res[wsp.el]||0,effC=wr<0?'good':wr>=20?'bad':wr>0?'meh':'',effT=wr<0?`efficace : +${-wr}% de dégâts`:wr>0?`résisté : −${wr}% de dégâts`:'dégâts normaux';
   const alt=wr>=15&&(['base',...(run.arsenal||[])].some(k=>{const V=k==='base'?CLS().wpn:Object.assign({},CLS().wpn,WEAPONS[k]);return (B.res[V.el]||0)<wr})||Object.keys(INF).some(k=>meta.infU[k]&&(B.res[INF[k].el]||0)<wr));
   const pk=(run.paths||{})[run.floor];
@@ -5162,7 +5213,7 @@ function rMap(){
       ${PHASES[B.id]?`<details class="bph" ${TOUCH||(typeof innerWidth!=='undefined'&&innerWidth<700)?'':'open'}><summary>Ce qui t’attend · ${PHASES[B.id].length} phase${PHASES[B.id].length>1?'s':''}</summary><div class="phl">${PHASES[B.id].map(P=>`<div><span class="label">À ${Math.round(P.at*100)}% de ses PV</span><b>${P.n}</b><span class="dim">${P.d}</span></div>`).join('')}${PHASES[B.id].some(P=>P.adds)?`<p class="dim" style="font-size:12.5px;margin:6px 0 0">Tant qu’elles vivent, chaque invocation donne <b>+10% de dégâts</b> au gardien et arrête tes projectiles.</p>`:''}</div></details>`:''}
       ${L?`<p class="nohit">🏆 <b>Sans prendre un coup</b> : ${esc(L.n)} et grains doublés.<span class="dim" style="display:block">${L.pow}</span></p>`:''}
       ${rUnspent()}
-      ${ui.confirm==='unspent'?`<div class="confirm"><p>Tu entres avec des points non dépensés. Ils ne servent à rien dans l’arène.</p><div class="row"><button class="btn" data-a="cancel">Les dépenser d’abord</button><button class="btn primary" data-a="fight">Entrer quand même</button></div></div>`:`<div class="bcta"><button class="btn primary big" data-a="fight">Entrer dans l’arène</button><button class="btn" data-a="train" title="Sur un mannequin, sans risque">S’entraîner</button></div>`}</section>`;
+      ${ui.confirm==='unspent'?`<div class="confirm"><p>Tu entres avec des points non dépensés. Ils ne servent à rien dans l’arène.</p><div class="row"><button class="btn" data-a="cancel">Les dépenser d’abord</button><button class="btn primary" data-a="fight">Entrer quand même</button></div></div>`:`<div class="bcta"><button class="btn primary big" data-a="fight">Entrer dans l’arène</button><button class="btn" data-a="train" title="Sur un mannequin, sans risque">S’entraîner</button>${meta.secretSeen?`<button class="btn" data-a="train" data-v="secret" title="Contre le Sablier Vivant, sans récompense ni risque : tes PV et fioles sont rendus après">S’entraîner contre le Sablier</button>`:''}</div>`}</section>`;
   const tab=['spells','stats','gear','tower'].includes(ui.ptab)?ui.ptab:(run.pts>0&&!spAffordable()?'stats':'spells'),spA=spAffordable();
   const TB=[['spells','Sorts',spA?run.spPts??1:0],['stats','Caractéristiques',run.pts||0],['gear','Équipement',0],['tower','Ascension',0]];
   const tower=`<section class="panel"><span class="label">L’ascension</span>${run.endless?`<div class="fl cur" style="margin:6px 0"><span class="rn">${ROMAN[run.floor]}</span><span>Tour sans fin · ${esc(BOSSAT(run.floor).name)} <small class="dim">(+${Math.round(20*(run.floor-9))}% PV et dégâts)</small></span></div>`:''}<div class="tower">${[9,8,7,6,5,4,3,2,1].map(n=>{const b=BOSSAT(n),pr=n%2?n:n-1,open=n<9&&n>=run.floor&&!(run.paths||{})[pr]&&run.order;const alt2=open?(n%2?BOSSES[n]:BOSSES[n-2]):null;const cls=n<run.floor?'done':n===run.floor?'cur':'';const stain=meta.stain&&meta.stain.floor===n;return `<div class="fl ${cls}"><span class="rn">${ROMAN[n]}</span><span>${open?`${b.name} <span class="dim">ou</span> ${alt2.name}`:b.name}${run.mut===n&&n>=run.floor?' <span class="chip mutc">Corrompu</span>':''}</span><span class="tag">${stain?`<span class="chip" style="color:var(--ember)">${meta.stain.souls} grains</span>`:n<run.floor?'vaincu':n===run.floor?'prochain':''}</span></div>`}).join('')}</div></section>
@@ -5221,12 +5272,15 @@ function rReward(){
     ${ui.mutWon?'<p style="color:#ff5c8a;font-family:var(--f-disp);font-size:20px">Gardien corrompu vaincu : grains ×2, Altération dans le butin.</p>':''}${ui.speedRes?`<p style="color:var(--ember)">${ui.speedRes}</p>`:''}
     <p>+${ui.gain} grains sur toi. Niveau ${run.lvl} : +5 points de caractéristiques, +1 point de sort.</p>${ui.newSp&&ui.newSp.length?`<p style="color:var(--ember)">Nouveau sort débloqué : ${ui.newSp.join(', ')}</p>`:''}</section>
   <section class="panel lootwide"><div class="between"><span class="label">Butin : choisis une pièce</span><span class="dim" style="font-size:13px">Comparé à ce que tu portes maintenant</span></div><div class="loot3">${(()=>{const bi=lootBest();return ui.loot.map((it,i)=>lootCard(it,i,bi)).join('')})()}</div>
-    <button class="btn" data-a="skip">Ne rien prendre</button></section>`;
+    <div class="row" style="gap:8px;justify-content:center">${RC().reroll&&!run.rerolled&&!run.daily?`<button class="btn" data-a="reroll" title="Humain : une fois par ascension">Relancer le butin (1 fois)</button>`:''}<button class="btn" data-a="skip">Ne rien prendre</button></div></section>`;
 }
+const ATKK={cone:'en cône devant lui',proj:'salves de projectiles',charge:'charge en ligne',line:'lignes au sol',drops:'impacts sur toi',leap:'bond, sors du cercle',ring:'anneau qui s’élargit',safe:'seule une petite zone est sûre',circle:'zone autour de lui'};
+function rSecretAtks(){const S=BOSSES.find(x=>x.id==='secret');return `<div class="satk"><span class="label">Les 8 attaques qu’il emprunte</span><div class="satkl">${S.seq.map(k=>{const a=S.atks[k];return `<div><b>${a.n}</b><small>${ATKK[a.k]||a.k}${a.repeat>1?` · ×${a.repeat}`:''}</small></div>`}).join('')}</div><small class="dim">Au-dessus de 75 % de ses PV, il frappe au rythme normal ; en dessous, il accélère. Une fois rencontré, il est disponible à l’entraînement.</small></div>`}
 function rChallenger(){return `<section class="end challenger"><span class="label nc">Un nouveau défi apparaît</span>
   <h1 class="nch">LE SABLIER VIVANT</h1><p>Le Régent tombe… et le sablier se brise pour de bon. Ce qui dormait dedans s’éveille.</p>
   <p class="dim">Ta victoire est déjà enregistrée et tes grains sont au temple. Ce combat est un bonus : <b style="color:var(--ember)">${Math.round(1500*(1+meta.cycle*.5)*(1+.15*heatOf(run.pacts)))} grains</b> si tu gagnes, le double sans prendre un coup. Tu perds seulement le bonus si tu tombes.</p>
   <p class="dim">PV remontés à 60% au moins, fioles remplies.</p>
+  ${rSecretAtks()}
   <div class="row" style="justify-content:center;gap:10px">${coBanner()}<button class="btn primary big" data-a="secretgo">${CO.ready&&CO.ready.sec?'Prêt · en attente…':'Affronter le Sablier Vivant'}</button><button class="btn big" data-a="endless">Gravir la Tour sans fin</button><button class="btn" data-a="secretno">Rentrer au temple</button></div>
   <p class="dim" style="margin-top:10px;font-size:13.5px"><b style="color:var(--bone)">Tour sans fin</b> : les gardiens reviennent dans le désordre, +20% de PV et de dégâts à chaque étage, souvent corrompus. Tu gardes ton personnage, tes grains gagnés là-haut sont à toi même si tu tombes, et chaque étage franchi vaut +1500 au classement.</p></section>`}
 function rMast(M){if(!M)return '';const C=CLASSES[M.cls],lv=M.lv1,nx=MAST[lv];return `<div class="mastend"><span class="label">Maîtrise · ${C.name}</span><p><b style="color:var(--ember)">+${M.xp} XP</b> · niveau ${ROMAN[lv]||0}${nx?` · ${M.tot}/${nx.xp} vers : ${nx.d}`:' · maîtrise complète'}</p>${M.news.length?`<p class="up">Niveau de maîtrise atteint ! Débloqué : ${M.news.join(' · ')}</p>`:''}${M.lv1>M.lv0&&M.lv0<TALMAX?`<p class="talnew">✦ +${Math.min(M.lv1,TALMAX)-M.lv0} point${Math.min(M.lv1,TALMAX)-M.lv0>1?'s':''} de talent pour ${esc(C.name)} : place-${Math.min(M.lv1,TALMAX)-M.lv0>1?'les':'le'} avant ta prochaine ascension.</p>`:''}</div>`}

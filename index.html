@@ -1163,7 +1163,7 @@ addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button[
 /* ===================== TOUCHES ===================== */
 const ACTS=[['up','Avancer'],['down','Reculer'],['left','Gauche'],['right','Droite'],['light','Coup léger'],['heavy','Coup lourd'],['roll','Roulade'],['guard','Parade (maintenir)'],
   ['flask','Fiole'],['s1','Sort 1'],['s2','Sort 2'],['s3','Sort 3'],['s4','Sort 4'],['s5','Sort 5'],['lock','Cible : verrouiller / suivante (maintenir : libérer)'],['next','Cible suivante (touche en plus)'],['pause','Pause']];
-const DEFKEYS={up:'KeyW',down:'KeyS',left:'KeyA',right:'KeyD',light:'Mouse0',heavy:'Mouse2',roll:'Space',guard:'ShiftLeft',flask:'KeyE',s1:'Digit1',s2:'Digit2',s3:'Digit3',s4:'Digit4',s5:'Digit5',lock:'Tab',next:'',pause:'KeyP'};
+const DEFKEYS={up:'KeyW',down:'KeyS',left:'KeyA',right:'KeyD',light:'Mouse0',heavy:'ShiftLeft',roll:'Space',guard:'Mouse2',flask:'KeyE',s1:'Digit1',s2:'Digit2',s3:'Digit3',s4:'Digit4',s5:'Digit5',lock:'Tab',next:'',pause:'KeyP'};
 const KB=()=>Object.assign({},DEFKEYS,meta.keys||{});
 let LAYOUT=null;try{navigator.keyboard&&navigator.keyboard.getLayoutMap&&navigator.keyboard.getLayoutMap().then(m=>{LAYOUT=m;if(ui.screen!=='fight')render();else refreshKeys()}).catch(()=>{})}catch(_){}
 const KNAMES={Space:'Espace',ShiftLeft:'Maj',ShiftRight:'Maj droite',ControlLeft:'Ctrl',ControlRight:'Ctrl droite',AltLeft:'Alt',AltRight:'Alt Gr',Tab:'Tab',CapsLock:'Verr. maj',Enter:'Entrée',Backspace:'Retour',
@@ -4122,7 +4122,7 @@ function tReset(){for(const [i,t] of TP){if(t.k==='btn'){t.b.classList.remove('p
 function actDown(code,e){return actA(actOf(code),e)}
 function actA(a,e){if(!a||!fight||fight.paused)return false;
   if(a==='light'){castWeapon(false);LHOLD={t0:performance.now(),ch:0}}else if(a==='heavy')beginCharge();else if(a==='roll')doRoll();else if(a==='guard')doGuard(true);
-  else if(a==='flask')doFlask();else if(a==='lock'){LOCKD=performance.now();if(!R3)return true;LOCKS=!!(e&&e.shiftKey&&KB().guard.indexOf('Shift')<0);LOCKW=R3.cam.lock;if(!R3.cam.lock){R3.cam.lock=true;R3.cam.off=0}}else if(a==='next')cycleT(fight,e&&e.shiftKey&&KB().guard.indexOf('Shift')<0?-1:1);
+  else if(a==='flask')doFlask();else if(a==='lock'){LOCKD=performance.now();if(!R3)return true;LOCKS=!!(e&&e.shiftKey&&KB().guard.indexOf('Shift')<0&&KB().heavy.indexOf('Shift')<0);LOCKW=R3.cam.lock;if(!R3.cam.lock){R3.cam.lock=true;R3.cam.off=0}}else if(a==='next')cycleT(fight,e&&e.shiftKey&&KB().guard.indexOf('Shift')<0&&KB().heavy.indexOf('Shift')<0?-1:1);
   else if(a[0]==='s'&&a.length===2)castSpell(+a[1]-1);else return false;return true}
 function actUp(code){actAUp(actOf(code))}
 let LHOLD=null;
@@ -4607,7 +4607,7 @@ function rStats(){
   const w=WPN(),wS=mainStat(),wAvg=add=>{const sp=wpnSp(false),k=sp.stat;run.stats[k]=(run.stats[k]||0)+add;const v=Math.round(dmgBase(sp,(w.min+w.max)/2*wMult(),1));run.stats[k]-=add;return v};
   const uses=k=>{const u=[];
     if(k==='vit')u.push(`<b>+1 PV max</b> par point (${maxHp()} actuellement)`);
-    if(k===wS){u.push(`<b>Clic gauche et clic droit</b> : +1% de dégâts par point (bonus actuel <b>+${statT(k)+pctDmg()}%</b>, coup léger moyen ${wAvg(0)})`)}
+    if(k===wS){u.push(`<b>Coups d’arme</b> (léger et lourd) : +1% de dégâts par point (bonus actuel <b>+${statT(k)+pctDmg()}%</b>, coup léger moyen ${wAvg(0)})`)}
     const sps=spells().filter(sp=>unlocked(sp)&&(sp.stat||EL[sp.el]&&EL[sp.el].s)===k&&sp.t!=='heal'&&sp.t!=='buff').map(sp=>sp.n);
     if(sps.length)u.push(`Sorts : <b>${sps.join(', ')}</b> (+1% par point)`);
     if(k==='int'&&spells().some(sp=>unlocked(sp)&&sp.t==='heal'))u.push('Soins de tes sorts : +1% par point');

@@ -709,7 +709,7 @@ const CLASSES={
    {id:'bond',n:'Saut de brèche',s:'Brèche',role:'Rapprochement',el:'terre',pa:3,min:12,max:16,cds:[6,5.5,5,4.5,4],rng:320,t:'leap',unlock:1,
     d:'Bondit jusqu\u2019au boss et frappe à l\u2019atterrissage. Invulnérable pendant le saut.',l5:'L\u2019atterrissage ouvre la garde du boss pendant 2 s.'},
    {id:'colere',n:'Courroux d\u2019Orvane',s:'Courroux',role:'Gros dégâts',el:'terre',pa:5,min:34,max:42,cds:[10,9.5,9,8.5,8],rng:58,t:'dmg',wind:[.7,.65,.6,.55,.45],unlock:1,
-    d:'Charge un coup énorme au contact. Tu es vulnérable pendant la charge.',l5:'Charge très courte : 0,45 s.'},
+    d:'Charge un coup énorme au contact. Tu peux bouger pendant la charge (plus lentement) ; rouler ou parer l’annule.',l5:'Charge très courte : 0,45 s.'},
    {id:'intim',n:'Cri d\u2019enclume',s:'Cri',role:'Défense',el:'terre',pa:2,min:6,max:8,cds:[8,7.5,7,6.5,6],rng:60,t:'dmg',fx:'weaken',v:[25,30,35,40,45],dur:4,unlock:3,
     d:'Un coup qui affaiblit le boss : ses attaques font moins mal pendant 4 s.',l5:'Interrompt aussi l\u2019attaque en préparation (sauf coups puissants).'},
    {id:'puiss',n:'Forge intérieure',s:'Forge',role:'Renfort',el:null,pa:2,cds:[16,15,14,13,12],t:'buff',v:[20,25,30,37,45],dur:6,unlock:4,
@@ -799,7 +799,7 @@ const CLASSES={
    {id:'jugaube',n:'Jugement de l’aube',s:'Jugement',role:'Distance',el:'feu',pa:3,min:15,max:19,cds:[6,5.5,5,4.5,4],rng:400,proj:1,t:'dmg',fx:'holy2',unlock:1,
     d:'Lance un marteau de lumière sur le gardien. Charge 2 Ferveur.',l5:'Charge 3 Ferveur.'},
    {id:'consac',n:'Consécration',s:'Consécration',role:'Zone',el:'feu',pa:3,min:3,max:4,r:125,dur:5,cds:[14,13,12,11,10],t:'zone',unlock:1,
-    d:'Sanctifie le sol autour de toi pendant 5 s : tout ennemi dans la zone brûle toutes les 0,5 s.',l5:'Tant que tu restes dans la zone, tu récupères 0,6% de tes PV par tick.'},
+    d:'Une aura sacrée t’entoure pendant 5 s et te suit : tout ennemi à portée brûle toutes les 0,5 s.',l5:'L’aura te rend aussi 0,6% de tes PV par tick.'},
    {id:'lumsac',n:'Lumière sacrée',s:'Lumière',role:'Soin',el:'feu',pa:3,min:14,max:19,cds:[14,13,12,11,10],t:'heal',fx:'holyheal',unlock:3,
     d:'Te soigne. Consomme ta Ferveur : +15% de soin par charge.',l5:'Soigne aussi 3% de tes PV par seconde pendant 5 s.'},
    {id:'bdiv',n:'Bouclier divin',s:'Bouclier',role:'Survie',el:null,pa:3,cds:[34,32,30,28,26],t:'buff',def:1,v:[100,100,100,100,100],dur:2,unlock:4,
@@ -874,7 +874,7 @@ const CLASSES={
    {id:'priere',n:'Prière',s:'Prière',role:'Soin',el:'eau',pa:3,min:16,max:21,cds:[8,7.5,7,6.5,6],t:'heal',fx:'holyheal',unlock:1,
     d:'Soigne ; la Ferveur accumulée l’amplifie.',l5:'Soins sur la durée pendant 5 s.'},
    {id:'sanct',n:'Sanctuaire',s:'Sanctuaire',role:'Zone',el:'eau',pa:3,min:3,max:4,r:125,dur:5,cds:[14,13,12,11,10],t:'zone',unlock:1,
-    d:'Sanctifie le sol : dégâts continus au gardien dans la zone.',l5:'Zone plus forte.'},
+    d:'Une aura sacrée te suit pendant 5 s : dégâts continus au gardien à portée.',l5:'Zone plus forte.'},
    {id:'chati',n:'Châtiment',s:'Châtiment',role:'Défense',el:'eau',pa:3,min:12,max:15,cds:[7,6.5,6,5.5,5],rng:360,proj:1,t:'dmg',fx:'weaken',v:[20,24,28,32,40],dur:4,unlock:3,
     d:'Un trait de lumière qui affaiblit le gardien.',l5:'Affaiblissement de 40 %.'},
    {id:'egide2',n:'Égide sacrée',s:'Égide',role:'Survie',el:null,pa:3,cds:[30,28,26,24,22],t:'buff',def:1,v:[100,100,100,100,100],dur:2,unlock:4,
@@ -1676,7 +1676,7 @@ function ev(f,k,o){(f.ev||(f.ev=[])).push(Object.assign({k},o||{}));if(f.co&&f.c
 function txt(f,x,y,s,c){const near=dist({x,y},f.b)<f.b.r;f.texts.push({x,y,s,c,t:0,h:near?f.b.r/10*2+1.8:2.9})}
 /* annonce de sort : nom en grand au-dessus du héros, couleur de l'élément, puis ce que ça fait */
 function callout(f,x,y,s,col,sub,h){f.texts=f.texts.filter(o=>o.c!=='cast'||o.t>.5);f.texts.push({x,y,s,c:'cast',col,sub,t:0,life:1.5,h:h||3.6})}
-function spellTag(sp,lv){if(sp.t==='hex'||sp.fx==='slowB')return 'Gardien ralenti '+(sp.dur||5)+' s';if(sp.t==='stop')return 'Gardien figé';if(sp.t==='order')return 'Le loup bondit';if(sp.t==='heal')return 'Soin';if(sp.t==='buff')return sp.def?'Protection':'Renfort';if(sp.t==='blink')return 'Téléportation';if(sp.t==='rewind')return 'Retour 2 s en arrière';if(sp.t==='loop')return 'Recharges remises à zéro';if(sp.fx==='weaken')return 'Gardien affaibli';if(sp.wind&&!sp.proj)return 'Charge… ne bouge pas';return ''}
+function spellTag(sp,lv){if(sp.t==='hex'||sp.fx==='slowB')return 'Gardien ralenti '+(sp.dur||5)+' s';if(sp.t==='stop')return 'Gardien figé';if(sp.t==='order')return 'Le loup bondit';if(sp.t==='heal')return 'Soin';if(sp.t==='buff')return sp.def?'Protection':'Renfort';if(sp.t==='blink')return 'Téléportation';if(sp.t==='rewind')return 'Retour 2 s en arrière';if(sp.t==='loop')return 'Recharges remises à zéro';if(sp.fx==='weaken')return 'Gardien affaibli';if(sp.wind&&!sp.proj)return 'Charge… reste au contact';return ''}
 function bossShield(f,pct,dur){f.bshield=Math.round(f.bmax*pct);f.bshieldT=dur}
 function healBoss(f,h){const b=f.bhp;f.bhp=Math.min(f.bmax,f.bhp+h);return f.bhp-b}
 function addZone(f,x,y,r,wind,dmg,pool,inv){f.zones.push({x,y,r,t:0,wind,dmg,pool,inv,lin:f.storm?.75:0})}
@@ -2150,15 +2150,15 @@ function update(f,dt){
   if(p.leap){const L=p.leap;L.t+=dt;const k=Math.min(1,L.t/L.life);p.x=L.fx+(L.tx-L.fx)*k;p.y=L.fy+(L.ty-L.fy)*k;
     if(k>=1){p.leap=null;f.fx.push({k:'slash',x:p.x,y:p.y,a:angTo(p,b),t:0,life:.3,r:70,el:L.sp.el,big:1});f.shake=Math.max(f.shake,.22);ev(f,'land');applyDmg(f,L.sp,L.base,L.tgt);if(lvOf(L.sp)>=5&&L.tgt===b)b.vuln=Math.max(b.vuln,2)}}
   else if(p.roll>0){p.roll-=dt;const rs=(hasL('abysses')?730:540)*(RC().roll||1);p.x+=p.rdx*rs*dt;p.y+=p.rdy*rs*dt}
-  else if(p.frozen<=0&&!p.down){const v=moveVec();const spd=175*(RC().spd||1)*(1+.1*runeN('leger'))*(hasA('vent')?1.15:1)*(p.charge?.5:1)*(p.slow>0?.55:1)*(p.drink>0?.35:1)*(p.cast>0?.4:1)*(p.guard?.45:1);p.x+=v.x*spd*dt;p.y+=v.y*spd*dt;if(R3&&R3.cam&&R3.cam.lock)p.face=angTo(p,curT(f));else if(v.x||v.y)p.face=Math.atan2(v.y,v.x)}
+  else if(p.frozen<=0&&!p.down){const v=moveVec();const spd=175*(RC().spd||1)*(1+.1*runeN('leger'))*(hasA('vent')?1.15:1)*(p.charge?.7:1)*(p.slow>0?.55:1)*(p.drink>0?.35:1)*(p.cast>0?.65:1)*(p.guard?.45:1);p.x+=v.x*spd*dt;p.y+=v.y*spd*dt;if(R3&&R3.cam&&R3.cam.lock)p.face=angTo(p,curT(f));else if(v.x||v.y)p.face=Math.atan2(v.y,v.x)}
   clampArena(p,PR);
   if(f.ptr)altTick(f,dt);
-  if(f.consac){const z=f.consac;z.t-=dt;z.tick-=dt;if(z.tick<=0){z.tick=.5;enemies(f).forEach(o=>{if(dist(z,o)<z.r+o.r)applyDmg(f,Object.assign({},z.sp,{chain:1,tick:1}),z.base,o)});if(z.l5&&dist(z,f.p)<z.r){const h=healP(Math.max(1,Math.round(maxHp()*.006)));if(h)txt(f,f.p.x,f.p.y,'+'+h,'ok')}}if(z.t<=0||f.over)f.consac=null}
+  if(f.consac){const z=f.consac;z.x=f.p.x;z.y=f.p.y;z.t-=dt;z.tick-=dt;if(z.tick<=0){z.tick=.5;enemies(f).forEach(o=>{if(dist(z,o)<z.r+o.r)applyDmg(f,Object.assign({},z.sp,{chain:1,tick:1}),z.base,o)});if(z.l5&&dist(z,f.p)<z.r){const h=healP(Math.max(1,Math.round(maxHp()*.006)));if(h)txt(f,f.p.x,f.p.y,'+'+h,'ok')}}if(z.t<=0||f.over)f.consac=null}
   if(f.axe){f.axe.t+=dt;if(f.axe.t>.3&&dist(p,f.axe)<PR+22){f.cds.hache=0;txt(f,p.x,p.y-20,'Hache reprise','ember');if(lvOf({id:'hache'})>=5)p.mp=Math.min(mpMax(),(p.mp||0)+25);ev(f,'click');f.axe=null}else if(f.axe.t>9)f.axe=null}
   f.pending=f.pending.filter(q=>{q.t-=dt;if(q.t>0)return true;
     const T=q.tgt&&(q.tgt===b||q.tgt.alive)?q.tgt:b;
     if(q.proj){f.pproj.push({x:p.x,y:p.y,sp:q.sp,base:q.base,life:2,tgt:T});return false}
-    if(edge(p,T)<=q.sp.rng+30){f.fx.push({k:'slash',x:p.x,y:p.y,a:angTo(p,T),t:0,life:.25,r:q.sp.rng+PR+20,el:q.sp.el,big:1});f.shake=Math.max(f.shake,.15);applyDmg(f,q.sp,q.base,T)}
+    if(edge(p,T)<=q.sp.rng+55){f.fx.push({k:'slash',x:p.x,y:p.y,a:angTo(p,T),t:0,life:.25,r:q.sp.rng+PR+20,el:q.sp.el,big:1});f.shake=Math.max(f.shake,.15);applyDmg(f,q.sp,q.base,T)}
     else txt(f,p.x,p.y,'Raté','dim');return false});
   f.pproj=f.pproj.filter(q=>{q.life-=dt;if(q.ghost){q.x+=Math.cos(q.a)*PVPS*dt;q.y+=Math.sin(q.a)*PVPS*dt;return q.life>0&&Math.hypot(q.x-CX,q.y-CY)<ARR+30}
     if(f.pvp){if(q.a===undefined){q.a=Math.atan2(b.y-q.y,b.x-q.x);q.life=Math.min(q.life,1.3)}q.x+=Math.cos(q.a)*PVPS*dt;q.y+=Math.sin(q.a)*PVPS*dt;if(dist(q,b)<b.r+11){applyDmg(f,q.sp,q.base,b);return false}return q.life>0&&Math.hypot(q.x-CX,q.y-CY)<ARR+30}const T=q.tgt||b;if(T!==b&&!T.alive)return false;const a=Math.atan2(T.y-q.y,T.x-q.x);q.x+=Math.cos(a)*600*dt;q.y+=Math.sin(a)*600*dt;
@@ -3861,7 +3861,7 @@ function handleEvents(f){
     else if(e.k==='blink'){const a=W3(e.a,1),b2=W3(e.b,1);burst(a,'#2b2638',24,5,.3,1.5);burst(a,'#6a5aa0',10,4,.2,2);shock(W3(e.a),'#6a5aa0',2.5,.4);burst(b2,'#2b2638',20,6,.26,1.5);shock(W3(e.b),'#9fd8f5',2.5,.35)}
     else if(e.k==='pois'){burst(W3(e,R.holder.position.y+1),'#7fe05a',4,2.5,.15,2)}
     else if(e.k==='marks'){shock(W3(f.b),'#9fd8f5',3+e.n,.4);burst(bossSurf(f),'#e9fff2',6+e.n*4,8,.2)}
-    else if(e.k==='consac'){shock(W3(e),'#ffe08a',e.r/10,.5);vfxGlyph(W3(e),'#ffe08a',e.r/10,e.life,.25);vfxGlyph(W3(e),'#fff3c4',e.r/10*.6,e.life,-.4)}
+    else if(e.k==='consac'){shock(W3(e),'#ffe08a',e.r/10,.5);vfxGlyph(W3(e),'#ffe08a',e.r/10,e.life,.25);vfxGlyph(W3(e),'#fff3c4',e.r/10*.6,e.life,-.4);R3.vfx.slice(-2).forEach(o=>o.follow=1)}
     else if(e.k==='nova'){shock(W3(e),'#ff7a3a',e.r/10,.45);vfxGlyph(W3(e),'#ffb04a',e.r/10*.9,.5,3);burst(W3(e,.4),'#ff6a2a',28,9,.25,1.2)}
     else if(e.k==='hex'){vfxGlyph(W3(f.b),'#9fd8f5',f.b.r/10+1.6,1.2,-.6);burst(W3(f.b,2),'#e8e4da',14,4,.16,1)}
     else if(e.k==='bite'){const bp=W3(e,.9);burst(bp,e.spirit?'#9fd8f5':'#e3d9c5',8,6,.16);burst(bp,'#c4231a',14,7,.2);shock(W3(e),'#c4483d',2.6,.35);f.shake=Math.max(f.shake,.18)}
@@ -4114,6 +4114,7 @@ function vfxSpikes(pos,col,n,r,h){const T=THREE,mat=LPM(col,{roughness:.8});for(
   const m=new T.Mesh(new T.ConeGeometry(.35*s2,h*s2,5),mat);m.position.set(pos.x+Math.cos(a)*d,-h,pos.z+Math.sin(a)*d);m.rotation.set((Math.random()-.5)*.5,Math.random()*3,(Math.random()-.5)*.5);m.castShadow=true;R3.scene.add(m);
   (R3.vfx||(R3.vfx=[])).push({m,t:-i*.025,life:.9,kind:'spike',h:h*s2})}}
 function updVfx(dt){const R=R3;if(!R.vfx)return;R.vfx=R.vfx.filter(o=>{o.t+=dt;const k=o.t/o.life;if(k>=1){R.scene.remove(o.m);disposeObj(o.m);return false}if(o.t<0)return true;
+  if(o.follow&&fight&&fight.consac){const z=W3(fight.consac);o.m.position.x=z.x;o.m.position.z=z.z}
   if(o.kind==='beam'){o.m.material.opacity=.6*(1-k);const s2=1+k*.6;o.m.scale.set(s2,o.up?1+k*1.5:1,s2)}
   else if(o.kind==='glyph'){o.mat.opacity=.9*(1-k*k);o.m.rotation.y+=dt*o.spin*2;const s2=.6+.5*Math.min(1,k*4);o.m.scale.set(s2,1,s2)}
   else if(o.kind==='spike'){const up=Math.min(1,o.t/.12),down=Math.max(0,(o.t-.6)/.3);o.m.position.y=-o.h*.5+o.h*.5*up-o.h*down}

@@ -897,7 +897,7 @@ const CLASSES={
     d:'Un anneau de feu jaillit autour de toi.',l5:'Repousse les invocations.'},
    {id:'manab',n:'Bouclier de mana',s:'Bouclier',role:'Défense',el:null,pa:2,cds:[14,13,12,11,10],t:'buff',def:1,v:[30,35,40,45,55],dur:5,unlock:4,
     d:'Réduit les dégâts subis pendant 5 s.',l5:'Réduction de 55 %.'},
-   {id:'meteor',n:'Météore',s:'Météore',role:'Gros dégâts',el:'feu',pa:5,min:42,max:52,cds:[12,11.5,11,10.5,10],rng:440,t:'dmg',wind:[1,.95,.9,.85,.75],unlock:6,
+   {id:'meteor',n:'Météore',s:'Météore',role:'Gros dégâts',el:'feu',pa:5,min:42,max:52,cds:[12,11.5,11,10.5,10],rng:800,t:'dmg',wind:[1,.95,.9,.85,.75],unlock:6,
     d:'Appelle un météore sur le gardien après une courte incantation.',l5:'Incantation plus courte.'}]},
  cra:{name:'Guette-Astre',tag:'Distance · Agilité',hp:113,base:{vit:0,for:0,int:0,agi:20,cha:0},cost:80,
   desc:'À distance : repousse, ralentit, monte en puissance.',
@@ -1907,7 +1907,7 @@ function doGuard(on){const f=fight;if(!f||f.over||f.paused)return;const p=f.p;
   if(!on){p.guard=false;return}
   if(p.down||p.leap||p.roll>0||p.frozen>0||p.drink>0||(p.parryCd||0)>0)return;
   if(p.st<8){txt(f,p.x,p.y,'Endurance','ok');return}
-  p.st-=8;p.stDelay=.4;p.parry=Math.max(RC().parry||.2,WPN().shield?.27:0);p.parryCd=.55;p.guard=true;p.cast=0;heavyRefund(f);if(f.swing&&!f.swing.done)f.swing=null;f.pending=[];f.buf=null}
+  p.st-=8;p.stDelay=.4;p.parry=Math.max(RC().parry||.2,WPN().shield?.27:0);p.parryCd=.55;p.guard=true;p.cast=0;heavyRefund(f);if(f.swing&&!f.swing.done)f.swing=null;f.pending=f.pending.filter(q=>q.w&&q.sp&&q.sp.rng>120);f.buf=null}
 /* Posture : chaque coup l'entame, les parades parfaites et les coups lourds surtout. Pleine, le gardien s'effondre. */
 function addPosture(f,v){v*=RC().post||1;if(f.coG){coAcc(0,v);return}if(f.post+v/(f.B.big||1)>=100&&!(f.brokenT>0))setTimeout(()=>achieve('brk'),0);const b=f.b;if(f.storm||b.jump||f.over||f.brokenT>0)return;f.post=Math.min(100,(f.post||0)+v/(f.B.big||1));f.postT=2.5;
   if(f.post>=100){f.post=0;f.brokenT=2.6;b.atk=null;b.dash=null;b.rec=Math.max(b.rec,2.6);b.vuln=Math.max(b.vuln,2.6);b.cool=Math.max(b.cool,3);f.hitstop=Math.max(f.hitstop||0,.18);f.shake=Math.max(f.shake,.5);
@@ -1924,7 +1924,7 @@ function doRoll(){
   let v=moveVec();if(!v.x&&!v.y){const a=angTo(f.b,p);v={x:Math.cos(a),y:Math.sin(a)}}
   p.charge=null;const l=Math.hypot(v.x,v.y);p.rdx=v.x/l;p.rdy=v.y/l;p.roll=.3;p.rhit=[];p.trT=0;if(hasA('ombre'))f.ms.ombre=f.t+1.8;p.guard=false;p.parry=0;
   const chain=f.t-(p.lastRoll??-9)<1.1;p.rchain=chain?(p.rchain||0)+1:0;p.lastRoll=f.t;
-  p.iframe=Math.max(.06,(.34+(RC().ifr||0))*(f.storm?.6:1)*Math.pow(.5,p.rchain));p.cast=0;heavyRefund(f);f.pending=[];f.swing=null;ev(f,'roll');if(hasS('course'))spells().forEach(x=>{if(f.cds[x.id])f.cds[x.id]=Math.max(0,f.cds[x.id]-.5)});
+  p.iframe=Math.max(.06,(.34+(RC().ifr||0))*(f.storm?.6:1)*Math.pow(.5,p.rchain));p.cast=0;heavyRefund(f);f.pending=f.pending.filter(q=>q.w&&q.sp&&q.sp.rng>120);f.swing=null;ev(f,'roll');if(hasS('course'))spells().forEach(x=>{if(f.cds[x.id])f.cds[x.id]=Math.max(0,f.cds[x.id]-.5)});
   TM(f).rolls++;p.st-=(voie('cel',4)?.7:1)*(WM('agile')?0:(f.buffs.some(x=>(x.id==='danse'||x.id==='crep')&&x.l5)?0:Math.max(4,(hasL('abysses')?11:18)+(RC().rollSt||0)-(hasA('vent')?5:0)))+(p.rchain||0)*8+(f.storm?6:0));p.stDelay=.45;
 }
 function doFlask(){
@@ -2184,7 +2184,7 @@ function update(f,dt){
   f.pending=f.pending.filter(q=>{q.t-=dt;if(q.t>0)return true;
     const T=q.tgt&&(q.tgt===b||q.tgt.alive)?q.tgt:b;
     if(q.proj){f.pproj.push({x:p.x,y:p.y,sp:q.sp,base:q.base,life:2,tgt:T});return false}
-    if(edge(p,T)<=q.sp.rng+55){f.fx.push({k:'slash',x:p.x,y:p.y,a:angTo(p,T),t:0,life:.25,r:q.sp.rng+PR+20,el:q.sp.el,big:1});f.shake=Math.max(f.shake,.15);applyDmg(f,q.sp,q.base,T)}
+    if(q.sp.rng>120||edge(p,T)<=q.sp.rng+55){f.fx.push({k:'slash',x:p.x,y:p.y,a:angTo(p,T),t:0,life:.25,r:q.sp.rng+PR+20,el:q.sp.el,big:1});f.shake=Math.max(f.shake,.15);applyDmg(f,q.sp,q.base,T)}
     else txt(f,p.x,p.y,'Raté','dim');return false});
   f.pproj=f.pproj.filter(q=>{q.life-=dt;if(q.ghost){q.x+=Math.cos(q.a)*PVPS*dt;q.y+=Math.sin(q.a)*PVPS*dt;return q.life>0&&Math.hypot(q.x-CX,q.y-CY)<ARR+30}
     if(f.pvp){if(q.a===undefined){q.a=Math.atan2(b.y-q.y,b.x-q.x);q.life=Math.min(q.life,1.3)}q.x+=Math.cos(q.a)*PVPS*dt;q.y+=Math.sin(q.a)*PVPS*dt;if(dist(q,b)<b.r+11){applyDmg(f,q.sp,q.base,b);return false}return q.life>0&&Math.hypot(q.x-CX,q.y-CY)<ARR+30}const T=q.tgt||b;if(T!==b&&!T.alive)return false;const a=Math.atan2(T.y-q.y,T.x-q.x);q.x+=Math.cos(a)*600*dt;q.y+=Math.sin(a)*600*dt;

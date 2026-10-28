@@ -1407,7 +1407,7 @@ let TCLK=performance.now();
 /* temps hors combat (menus entre les étages) compté aussi, mais plafonné à 3 min par étape pour ne pas punir les pauses */
 function tickClock(){const n=performance.now();if(run&&!fight&&ui.screen!=='home'){run.time=(run.time||0)+Math.min(180,(n-TCLK)/1000)}TCLK=n}
 let RUSHSV=null;
-function save(){try{const sv=PV.saved||(typeof BM!=='undefined'&&BM.saved);localStorage.setItem(KEY,JSON.stringify({meta:sv?Object.assign({},meta,{up:sv.up}):meta,run:sv?sv.run:RUSHSV&&run&&run.rush?RUSHSV:(run&&(run.pvp||run.tut||run.bm)?null:run)}))}catch(e){}}
+function save(){try{const sv=PV.saved||(typeof BM!=='undefined'&&BM.saved);localStorage.setItem(KEY,JSON.stringify({meta,run:sv?sv.run:RUSHSV&&run&&run.rush?RUSHSV:(run&&(run.pvp||run.tut||run.bm)?null:run)}))}catch(e){}}
 
 /* ===================== OUTILS ===================== */
 const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
@@ -1456,7 +1456,8 @@ const HEIRMAX=8,heirMul=()=>Math.min(1,.5+.06*((run&&run.floor)||1));
 function itemSum(k){let s=0;for(const sl in run.items){const it=run.items[sl];s+=(it.stats[k]||0)*(it.heir?heirMul():1)}s=Math.round(s);return s+(setBonus()[k]||0)}
 function statT(k){return (run.stats[k]||0)+itemSum(k)+(['for','int','agi','cha'].includes(k)?itemSum('all'):0)}
 /* améliorations du Temple : neutralisées pendant l'ascension du jour (scores comparables) */
-const UP=k=>(run&&run.daily&&!run.weekly)?0:((meta.up||{})[k]||0);
+/* tutoriel, duel et boss joueur : améliorations du temple ignorées sans jamais toucher à meta.up */
+const UP=k=>(run&&(run.tut||run.pvp||run.bm))?((typeof PVUP!=='undefined'&&PVUP[k])||0):(run&&run.daily&&!run.weekly)?0:((meta.up||{})[k]||0);
 /* paliers de caractéristique : passer un seuil débloque un vrai effet */
 const PAL={vit:{t:[60,150,260],d:['+4 % PV max','+8 % PV max · fioles +15 %','+12 % PV max · fioles +30 %']},
  for:{t:[50,120,200],d:['Coups lourds +8 %','Coups lourds +16 %','Coups lourds +25 %']},
@@ -1555,7 +1556,7 @@ const TUTS=[
 function startTutorial(){if(run&&!run.tut&&!PV.saved)PV.saved={run,up:meta.up};const cls=meta.sel&&meta.unlocked[meta.sel]?meta.sel:'iop';
   run={cls,race:meta.race||'plainois',lvl:3,pts:0,stats:Object.assign({},CLASSES[cls].base),items:{},spellLv:{},carried:0,floor:1,flasks:2,wpn:1,spPts:0,node:null,hpPct:100,bonus:0,pacts:[],asc:0,tal:[],tut:1,order:[0,1,2,3,4,5,6,7,8],paths:{},dmgSrc:{}};
   {const R=RC();for(const k in R.stats||{})run.stats[k]=(run.stats[k]||0)+R.stats[k]}
-  meta.up=Object.assign({},PVUP);run.hp=maxHp();
+  run.hp=maxHp();
   run.tutB=Object.assign({},DUMMY,{train:0,tut:1,hp:900,name:'Mannequin d’entraînement',lore:'Un combat guidé pour apprendre les bases. Rien n’est perdu ici.'});
   ui.screen='fight';fight=null;startFight()}
 function tutTick(f,dt){const T=f.tut,p=f.p;if(T.lx!==undefined)T.mv+=Math.hypot(p.x-T.lx,p.y-T.ly);T.lx=p.x;T.ly=p.y;
@@ -1569,7 +1570,7 @@ function parHud(f){const el=id('parity');if(!el)return;const P=f.ms.par||'impair
   el.innerHTML=`<b>${P==='pair'?'PAIR':'IMPAIR'}</b><span class="num">${t} s</span><small>Touchent : ${L.join(', ')||'rien'}</small>`}
 function tutHud(f){const el=id('tutp');if(!el||!f.tut)return;const T=f.tut,S=TUTS[T.step];if(!S)return;const k=T.step+'|'+(S.c?T[S.c]:'')+'|'+(T.flash>0?1:0);if(el.dataset.k===k)return;el.dataset.k=k;
   el.innerHTML=`<div class="tutdots">${TUTS.map((x,i)=>`<i class="${i<T.step?'ok':i===T.step?'on':''}"></i>`).join('')}</div><span class="label">Étape ${T.step+1} / ${TUTS.length}${T.flash>0?' · <b style="color:var(--ok)">réussie !</b>':''}</span><b class="tutt">${S.t}${S.n?` <small>${Math.min(S.n,T[S.c]||0)} / ${S.n}</small>`:''}</b><p>${S.d()}</p>`}
-function tutLeave(won){fight=null;if(PV.saved){run=PV.saved.run;meta.up=PV.saved.up;PV.saved=null}else run=null;teardown3D();document.body.style.overflow='';
+function tutLeave(won){fight=null;if(PV.saved){run=PV.saved.run;PV.saved=null}else run=null;teardown3D();document.body.style.overflow='';
   if(won){const first=!meta.tutDone;meta.tutDone=1;achieve('tuto');if(first)meta.souls+=60;ui.toast=(first?'Tutoriel terminé ! +60 grains au temple.':'Tutoriel terminé !')+(ui.toast?' · '+ui.toast:'')}
   ui.screen='home';ui.hub='menu';save();render()}
 function startTraining(v){if(!run)return;run.train={hp:run.hp,flasks:run.flasks,boss:v==='secret'&&meta.secretSeen?'secret':null};ui.trainHit=ui.trainHit||false;startFight()}
@@ -4727,7 +4728,7 @@ function pvpOn(e2,m){const f=fight&&fight.pvp?fight:null;
     else if(m.dm>0){if(f.pvMod==='soif'){const h=healP(Math.round(m.dm*.15));if(h)txt(f,f.p.x,f.p.y-14,'+'+h,'ok')}txt(f,b.x+(Math.random()*24-12),b.y,''+m.dm,'bone');b.hurt=.12;if(R3&&R3.cr&&R3.cr.pvp)R3.cr.hurt=.25}else txt(f,b.x,b.y,'Bloqué','dim')}
   else if(e2==='dead'){if(!f.over){f.bhp=0;endFight(true)}}}
 /* personnage tiré au sort, identique sur les deux écrans (même graine) */
-function pvpChar(seed,role,fc){const sv=run,svU=meta.up,R0=Math.random;meta.up=Object.assign({},PVUP);Math.random=mulberry(seed*13+7+(fc?Object.keys(CLASSES).indexOf(fc)*7919:0));
+function pvpChar(seed,role,fc){const sv=run,R0=Math.random;Math.random=mulberry(seed*13+7+(fc?Object.keys(CLASSES).indexOf(fc)*7919:0));
   try{const c0=pick(Object.keys(CLASSES)),cls=CLASSES[fc]?fc:c0,race=pick(Object.keys(RACES));
     run={cls,race,lvl:7,pts:0,stats:Object.assign({},CLASSES[cls].base),items:{},spellLv:{},carried:0,floor:6,flasks:2,wpn:3,spPts:0,node:null,hpPct:220,bonus:0,pacts:[],asc:0,tal:[],pvp:1,order:[0,1,2,3,4,5,6,7,8],paths:{},dmgSrc:{},daily:seed%100000+7};
     {const RR=RC();for(const k in RR.stats||{})run.stats[k]=(run.stats[k]||0)+RR.stats[k]}
@@ -4739,8 +4740,8 @@ function pvpChar(seed,role,fc){const sv=run,svU=meta.up,R0=Math.random;meta.up=O
     const W=Object.keys(WEAPONS).filter(k=>WEAPONS[k].cls===cls);if(W.length&&Math.random()<.4)run.wsel=pick(W);
     if(Math.random()<.35)run.inf=pick(Object.keys(INF));
     run.hp=maxHp();return run}
-  finally{run=sv;meta.up=svU;Math.random=R0}}
-function withRun(r,fn){const sv=run,svU=meta.up;run=r;meta.up=Object.assign({},PVUP);try{return fn()}finally{run=sv;meta.up=svU}}
+  finally{run=sv;Math.random=R0}}
+function withRun(r,fn){const sv=run;run=r;try{return fn()}finally{run=sv}}
 const PVARENAS=['bouftou','tofu','scara','wa','craq','krala','kimbo','obsi','hare'];
 function pvpHostStart(reset){if(PV.role!=='A'||!PV.opp)return;if(reset)PV.score=[0,0];const m={seed:1+Math.floor(Math.random()*9e8),round:reset?1:PV.round+1,score:PV.score.slice(),arena:pick(PVARENAS),mod:pick(Object.keys(PVMOD)),opts:shuffle(Object.keys(CLASSES)).slice(0,3)};pvpSend('start',m);pvpPickStart(m)}
 /* avant chaque manche : 3 classes tirées au sort, les mêmes pour les deux joueurs, chacun choisit la sienne */
@@ -4758,7 +4759,7 @@ function pvpPickPaint(){let el=id('pvpk');const P=PV.pk;if(!P){if(el)el.remove()
 function pvpRound(m){PV.seed=m.seed;PV.mod=m.mod;PV.round=m.round;PV.score=PV.role==='A'?m.score.slice():m.score.slice();PV.st='fight';PV.os=null;PV.last=performance.now();
   if(!PV.saved)PV.saved={run,up:meta.up};
   const me=pvpChar(m.seed,PV.role,m.mine),op=pvpChar(m.seed,PV.role==='A'?'B':'A',m.theirs);PV.me=me;PV.oppRun=op;
-  run=me;meta.up=Object.assign({},PVUP);run.hp=maxHp();
+  run=me;run.hp=maxHp();
   const oMax=withRun(op,()=>maxHp());
   THEMES.pvp=THEMES[m.arena]||THEMES.hare;GRADES.pvp=GRADES[m.arena]||GRADES.hare;
   const opn=PV.opp?PV.opp.pseudo:'Adversaire';
@@ -4801,7 +4802,7 @@ function pvpRoundOver(won){const f=fight;const i=pvpMe();if(won)PV.score[i]++;el
   const done=PV.score[0]>=2||PV.score[1]>=2;
   if(done&&PV.score[i]>=2){meta.pvpW=(meta.pvpW||0)+1;achieve('arena1');if(meta.pvpW>=10)achieve('arena10');save()}
   setTimeout(()=>{if(!fight||fight!==f)return;if(done){PV.st='end';PV.res={won:PV.score[i]>=2,score:PV.score.slice()};pvpLeaveFight()}else if(PV.role==='A')pvpHostStart(false)},3200)}
-function pvpLeaveFight(){fight=null;if(PV.saved){run=PV.saved.run;meta.up=PV.saved.up;PV.saved=null}teardown3D&&teardown3D();ui.screen='home';ui.hub='arena';if(PV.st==='fight')PV.st=PV.opp?'ready':'err';document.body.style.overflow='';render()}
+function pvpLeaveFight(){fight=null;if(PV.saved){run=PV.saved.run;PV.saved=null}teardown3D&&teardown3D();ui.screen='home';ui.hub='arena';if(PV.st==='fight')PV.st=PV.opp?'ready':'err';document.body.style.overflow='';render()}
 function pvpQuit(){pvpClose();PV.st='idle';PV.opp=null;PV.code='';if(fight&&fight.pvp)pvpLeaveFight();else render()}
 function creaturePvp(R){const o=PV.oppRun||{cls:'iop',race:'plainois',items:{}};const ch=buildCharacter({cls:o.cls,race:o.race,items:o.items,inf:o.inf,wsel:o.wsel});const g=new THREE.Group();g.add(ch.pg);
   return {g,ch,pvp:1,mat:ch.pm,rocks:[],ground:true,ownDeath:!!ch.kk,hurt:0,cast:0,sw:null,anim(c,dt,st){const K=c.ch.kk,o=PV.os||{};c.hurt-=dt;c.cast-=dt;
@@ -5429,7 +5430,7 @@ function bmBossDef(m){const B0=BOSSES.find(b=>b.id===m.boss)||BOSSES[0],n=m.hero
 function bmFight(m){BM.cur=m;BM.st='fight';BM.last=performance.now();BM.res=null;
   if(!BM.saved)BM.saved={run,up:meta.up};
   const me=m.heroes.find(h=>h.id===BM.id),cls=me?me.cls:'iop';
-  const r=pvpChar(m.seed+bmHash(BM.id),'A',cls);delete r.pvp;delete r.daily;r.bm=1;r.flasks=3;run=r;meta.up=Object.assign({},PVUP);run.hp=maxHp();
+  const r=pvpChar(m.seed+bmHash(BM.id),'A',cls);delete r.pvp;delete r.daily;r.bm=1;r.flasks=3;run=r;run.hp=maxHp();
   run.bmBoss=bmBossDef(m);ui.screen='fight';ui.hub='arena';if(fight&&R3&&R3.scene)teardown3D();fight=null;startFight()}
 function bmFightInit(f){const m=BM.cur,host=BM.role==='boss';f.bm=1;f.sc=1;f.addId=0;f.allies={};
   f.co=host?{role:'A',tgt:'me',next:1e9,dM:0,dA:0,mate:''}:{role:'B',tgt:'me',next:1e9,dM:0,dA:0,mate:''};
@@ -5523,7 +5524,7 @@ function bmEnd(f,heroesWon,why,fromHost){if(!f||f.over)return;f.over=true;
   if(heroesWon&&!host){achieve&&ACH.bm1&&achieve('bm1')}if(!heroesWon&&host&&heroesWon!==null){achieve&&ACH.bm2&&achieve('bm2')}
   BM.res={won:iWon,boss:f.B.name,why:why||null};
   setTimeout(()=>{if(fight===f)bmLeaveFight()},4200)}
-function bmLeaveFight(){fight=null;if(BM.saved){run=BM.saved.run;meta.up=BM.saved.up;BM.saved=null}try{teardown3D()}catch(e){}ui.screen='home';ui.hub='arena';ui.amode='boss';if(BM.st==='fight')BM.st=bmLive()?'lobby':'err';document.body.style.overflow='';save();render()}
+function bmLeaveFight(){fight=null;if(BM.saved){run=BM.saved.run;BM.saved=null}try{teardown3D()}catch(e){}ui.screen='home';ui.hub='arena';ui.amode='boss';if(BM.st==='fight')BM.st=bmLive()?'lobby':'err';document.body.style.overflow='';save();render()}
 /* rendu : les autres héros, leur aura, et les cercles de relève */
 function bmRender(R,f,dt){if(!R.bmA)return;for(const k in R.bmA){const A=f.allies[k],Y=R.bmA[k];if(!A||!Y)continue;Y.ch.pg.visible=!A.gone;coAllyRender(R,f,dt,A,Y);cosDraw(R,'h'+k,!A.down&&!f.over&&COS[A.aura]?A.aura:'',Y.ch.pg.position)}
   if(f.bmHost&&R.pg){R.pg.visible=false;R.pg.position.copy(W3(f.b,0));if(R.bg&&!R.bgFade){R.bgFade=1;R.bg.traverse(o=>{if(o.isMesh&&o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>{m.transparent=true;m.opacity=.55;m.depthWrite=false})}})}}

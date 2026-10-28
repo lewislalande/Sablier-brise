@@ -4377,7 +4377,7 @@ function syncTexts(f){
     if(!C)el.hidden=true;else{const v=W3(f.p,2).project(R3.camera),rc=box.getBoundingClientRect();el.hidden=false;
       const tk=C.s+'|'+(C.sub||'');if(el.dataset.k!==tk){el.dataset.k=tk;el.innerHTML='';el.append(C.s);if(C.sub){const sm=document.createElement('small');sm.textContent=C.sub;el.append(sm)}}
       const c=new THREE.Color(C.col||'#ffe0a0').lerp(new THREE.Color('#ffffff'),.35);el.style.setProperty('--c','#'+c.getHexString());
-      el.style.left=Math.min(innerWidth-120,Math.max(120,rc.left+(v.x+1)/2*w+150))+'px';el.style.top=Math.max(80,rc.top+(1-v.y)/2*h-40)+'px';
+      el.style.left=Math.min(innerWidth-120,Math.max(120,rc.left+(v.x+1)/2*w+150))+'px';el.style.top=Math.max(80,rc.top+(1-v.y)/2*h-115)+'px';
       el.style.opacity=Math.max(0,Math.min(1,(C.life-C.t)/.4));el.style.transform=`translate(-50%,-50%) scale(${C.t<.12?.6+C.t/.12*.5:C.t<.25?1.1-(C.t-.12)/.13*.1:1})`}}
   H.ftp.forEach((d,i)=>{const x=f.texts[i];if(!x||x.c==='cast'){if(!d.hidden)d.hidden=true;return}
     const v=W3(x,x.h+x.t*(x.life?.5:1.4)).project(R3.camera);if(v.z>1){d.hidden=true;return}

@@ -1273,7 +1273,7 @@ function auInit(){if(AU.ctx){if(AU.ctx.state==='suspended')AU.ctx.resume();retur
     AU.master=C.createGain();AU.master.connect(AU.soft);AU.sfx=C.createGain();AU.sfx.connect(AU.master);AU.music=C.createGain();AU.music.connect(AU.master);
     const n=C.sampleRate*1.5,b=C.createBuffer(1,n,C.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;AU.noise=b;
     // écho léger pour la musique
-    {const L=Math.round(C.sampleRate*1.6),ir=C.createBuffer(2,L,C.sampleRate);for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);for(let i=0;i<L;i++){const t=i/C.sampleRate;d[i]=t<.012?0:(Math.random()*2-1)*Math.pow(1-i/L,3.2)*(t<.06?1.4:1)}}AU.cv=C.createConvolver();AU.cv.buffer=ir;AU.revIn=C.createGain();AU.revIn.gain.value=1;const ro=C.createGain();ro.gain.value=.55;const rl=C.createBiquadFilter();rl.type='lowpass';rl.frequency.value=4200;AU.revIn.connect(AU.cv);AU.cv.connect(rl);rl.connect(ro);ro.connect(AU.sfx)}
+    {const L=Math.round(C.sampleRate*1.6),ir=C.createBuffer(2,L,C.sampleRate);for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);for(let i=0;i<L;i++){const t=i/C.sampleRate;d[i]=t<.012?0:(Math.random()*2-1)*Math.pow(1-i/L,3.2)*(t<.06?1.4:1)}}AU.cv=C.createConvolver();AU.cv.buffer=ir;AU.revIn=C.createGain();AU.revIn.gain.value=1;const ro=C.createGain();ro.gain.value=.45;const rl=C.createBiquadFilter();rl.type='lowpass';rl.frequency.value=2400;AU.revIn.connect(AU.cv);AU.cv.connect(rl);rl.connect(ro);ro.connect(AU.sfx)}
     AU.dl=C.createDelay(1);AU.dl.delayTime.value=.33;AU.fb=C.createGain();AU.fb.gain.value=.22;AU.dl.connect(AU.fb);AU.fb.connect(AU.dl);AU.dl.connect(AU.music);
     auVol();AU.on=true;smpLoad()}catch(e){AU.ctx=null}}
 const VOL=()=>Object.assign({m:.7,mu:.35,fx:.75,mute:false},meta.vol||{});
@@ -1304,7 +1304,7 @@ function smpLoad(){const C=AU.ctx;if(!C||AU.buf)return;AU.buf={};for(const k in 
   const pr=C.decodeAudioData(u.buffer,b=>{AU.buf[k]=b},()=>{});if(pr&&pr.catch)pr.catch(()=>{})}catch(_){}}}
 function smp(k,o){const C=AU.ctx,b=AU.buf&&AU.buf[k];if(!C||!b||VOL().rec===false||(AU.v||0)>28)return false;o=o||{};AU.v=(AU.v||0)+1;
   const s=C.createBufferSource(),g=C.createGain();s.buffer=b;s.playbackRate.value=(o.rate||1)*(.94+Math.random()*.12);g.gain.value=o.vol??.5;
-  let nd=s;if(o.lp||o.hp){const fl=C.createBiquadFilter();fl.type=o.lp?'lowpass':'highpass';fl.frequency.value=o.lp||o.hp;nd.connect(fl);nd=fl}nd.connect(g);g.connect(AU.sfx);if(AU.revIn&&(o.rev??.16)>0){const rg=C.createGain();rg.gain.value=o.rev??.16;g.connect(rg);rg.connect(AU.revIn)}s.onended=()=>{AU.v--;try{g.disconnect()}catch(_){}};s.start(C.currentTime+(o.delay||0));return true}
+  let nd=s;if(o.lp||o.hp){const fl=C.createBiquadFilter();fl.type=o.lp?'lowpass':'highpass';fl.frequency.value=o.lp||o.hp;nd.connect(fl);nd=fl}nd.connect(g);g.connect(AU.sfx);if(AU.revIn&&(o.rev??.08)>0){const rg=C.createGain();rg.gain.value=o.rev??.08;g.connect(rg);rg.connect(AU.revIn)}s.onended=()=>{AU.v--;try{g.disconnect()}catch(_){}};s.start(C.currentTime+(o.delay||0));return true}
 /* bruit d'impact selon ce qu'on frappe : chair, os, pierre, chitine, armure, écailles, bois, vase, glace */
 const MATB={bouftou:'flesh',tofu:'flesh',scara:'chitin',wa:'flesh',craq:'stone',krala:'slime',kimbo:'armor',obsi:'scale',hare:'flesh',secret:'bone',dummy:'wood'},
   MATA={bouftou:'flesh',tofu:'flesh',scaraf:'chitin',wabbit:'wood',roc:'stone',tentacule:'slime',glyphe:'armor',givre:'ice',rouage:'bone'};
@@ -1316,7 +1316,7 @@ function vox(o){const f=fight,V=f&&f.B&&VOX[f.B.id];if(!V)return;smvN(V[0],V[1],
 const FLOOR={bouftou:'fg',tofu:'fg',wa:'fg',krala:'fg',kimbo:'fw',obsi:'fs',scara:'fc',craq:'fc',hare:'fc',secret:'fw',pvp:'fc',dummy:'fg'};
 function footTick(f,R,dt){if(!AU.on||!f||f.over||VOL().rec===false)return;const k=FLOOR[f.B.id]||'fc';
   if(R.amp>.25&&!f.p.leap&&!f.p.down){R.stepT=(R.stepT||0)-dt;if(R.stepT<=0){R.stepT=f.p.roll>0?.18:.3;smv(k,{vol:k==='fs'?.32:.24,rate:.95+Math.random()*.15,rev:0})}}else R.stepT=0;
-  const b=f.b,sp=R.bsp||0;if(sp>30&&!b.jump&&(f.B.big||1)>=1.1&&!(f.ms.hide>0)){R.bstepT=(R.bstepT||0)-dt;if(R.bstepT<=0){R.bstepT=.55;smv('mn',{vol:.28,rate:.55+Math.random()*.1,lp:700})}}}
+  const b=f.b,sp=R.bsp||0;if(sp>30&&!b.jump&&(f.B.big||1)>=1.1&&!(f.ms.hide>0)){R.bstepT=(R.bstepT||0)-dt;if(R.bstepT<=0){R.bstepT=.55;smv('sH',{vol:.3,rate:.5+Math.random()*.08,lp:500,rev:0})}}}
 function voxCase(k){if(k==='stagger'||k==='roar'||k==='phase'){vox({vol:k==='stagger'?.7:.95});return true}return false}
 function impactMat(m,v,hv){const H=hv?1.2:1,V=x=>x*v*H;
   switch(m){
@@ -1324,16 +1324,16 @@ function impactMat(m,v,hv){const H=hv?1.2:1,V=x=>x*v*H;
   case 'stone':smv('mi',{vol:V(.85),rate:hv?.8:.95});if(hv)smv('mn',{vol:V(.4),rate:.65});break;
   case 'chitin':smv('wL',{vol:V(.55),rate:1.6});smv('pM',{vol:V(.35),rate:1.25,hp:700});break;
   case 'armor':smv(hv?'mH':'mM',{vol:V(.7),rate:hv?.95:1.05});smv('pM',{vol:V(.35),rate:.9,lp:1500});if(hv)smv('mt',{vol:V(.3),rate:.8});break;
-  case 'scale':smv(hv?'pH':'pM',{vol:V(.6),rate:.9});smv('pl',{vol:V(.18),rate:.8});break;
+  case 'scale':smv(hv?'pH':'pM',{vol:V(.65),rate:.88,rev:.04});smv('sM',{vol:V(.35),rate:.75,lp:1300,rev:0});break;
   case 'wood':smv(hv?'wH':'wM',{vol:V(.7),rate:1});break;
   case 'slime':smv(hv?'sH':'sM',{vol:V(.75),rate:.72,lp:1400});noise(.18,{ft:'lowpass',f:900,to:180,vol:V(.18)});tone(300,.14,{to:90,vol:V(.1)});break;
   case 'ice':smv('gl',{vol:V(.55),rate:hv?1:1.15});smv('mi',{vol:V(.2),rate:1.4});break;
-  default:smv(hv?'pH':'pM',{vol:V(.9),rate:hv?.9:1});smv('sH',{vol:V(.35),rate:.8,lp:1200});if(hv)smv('mn',{vol:V(.25),rate:.7,lp:900})}}
+  default:smv(hv?'pH':'pM',{vol:V(.75),rate:hv?.85:.95,rev:.04});smv(hv?'sH':'sM',{vol:V(.5),rate:.8,lp:1400,rev:0});if(hv)noise(.14,{ft:'lowpass',f:260,vol:V(.25)})}}
 function sfx(k,e){if(AU.on&&(k==='stagger'||k==='roar'||k==='phase')&&voxCase(k))return;if(!AU.on)return;const now=performance.now(),gap={hit:45,burn:120,bite:90,zhit:60,block:60,swing:40,cast:40}[k]||25;if(now-(AU.last[k]||0)<gap)return;AU.last[k]=now;e=e||{};
   switch(k){
   case 'swing':{const H=e.heavy;smv('sw',{vol:H?.75:.5,rate:H?.72:1.05,rev:H?.15:.05});if(H)noise(.4,{ft:'lowpass',f:380,vol:.2,a:.22});break}
   case 'shoot':noise(.12,{f:2600,to:1400,q:4,vol:.12});tone(e.cls==='cra'?520:340,.12,{type:'triangle',to:e.cls==='cra'?260:200,vol:.08});break;
-  case 'hit':{const m=e.mat||'flesh',v=e.pos?.65:1,hv=e.crit||e.sid==='wh'||e.boom;impactMat(m,v,hv);if(e.crit){tone(1200,.12,{type:'triangle',vol:.08});noise(.08,{f:2500,vol:.1})}break}
+  case 'hit':{const m=e.mat||'flesh',v=e.pos?.65:1,hv=e.crit||e.sid==='wh'||e.boom;impactMat(m,v,hv);if(e.crit)smv('pH',{vol:.45*v,rate:.7,rev:.05});break}
   case 'heart':tone(55,.18,{vol:.25});tone(50,.2,{vol:.2,delay:.2});break;
   case 'phit':smv(e.heavy?'pH':'pM',{vol:e.heavy?.95:.75,rate:e.heavy?.8:.95});smv('sH',{vol:.45,rate:.75,lp:1100});smp('hurt',{vol:e.heavy?.45:.3,rate:e.heavy?.85:1});break;
   case 'roll':smv('ch',{vol:.5,rate:1.1,rev:0});noise(.2,{f:500,to:250,q:.6,vol:.08});break;
@@ -1341,8 +1341,8 @@ function sfx(k,e){if(AU.on&&(k==='stagger'||k==='roar'||k==='phase')&&voxCase(k)
   case 'block':smv('ph',{vol:.7,rate:1.05});smv('mM',{vol:.35,rate:1.1});break;
   case 'gbreak':smp('impact',{vol:.6,rate:.75});tone(300,.4,{type:'sawtooth',to:80,vol:.2,lp:1200});noise(.3,{f:600,vol:.25});break;
   case 'wind':{const w=Math.min(1.6,Math.max(.3,e.w||.6));if(e.heavy||Math.random()<.35)vox({vol:e.heavy?.85:.5});if(e.heavy){tone(52,w,{type:'sawtooth',to:44,vol:.16,lp:320,a:w*.8});noise(w,{ft:'lowpass',f:200,to:900,vol:.22,a:w*.85});tone(104,w*.9,{type:'sawtooth',to:88,vol:.05,lp:500,a:w*.7})}else{noise(Math.min(.45,w),{f:500,to:1600,q:1.5,vol:.1,a:Math.min(.45,w)*.8})}break}
-  case 'strike':case 'bland':case 'wslam':case 'quake':smv('mn',{vol:.85,rate:.62,rev:.35});smp('land',{vol:.6,rate:.85});tone(48,.45,{type:'sine',to:30,vol:.3});break;
-  case 'zhit':smv('mn',{vol:.55,rate:.85});smp('land',{vol:.35,rate:1.1});break;
+  case 'strike':case 'bland':case 'wslam':case 'quake':smv('sH',{vol:.9,rate:.55,lp:900,rev:.25});smp('land',{vol:.75,rate:.8,rev:.2});tone(46,.5,{type:'sine',to:30,vol:.32});noise(.35,{ft:'lowpass',f:420,to:120,vol:.22});break;
+  case 'zhit':smv('sH',{vol:.6,rate:.7,lp:1100,rev:.15});smp('land',{vol:.45,rate:.95});noise(.25,{ft:'lowpass',f:600,to:150,vol:.15});break;
   case 'phase':smp('boss',{vol:.8});tone(98,2.2,{type:'triangle',vol:.3,send:1});tone(147,2,{type:'triangle',vol:.18,send:1});tone(196,1.8,{vol:.12,send:1});noise(.8,{ft:'lowpass',f:300,vol:.3});break;
   case 'storm':tone(60,2.5,{type:'triangle',to:120,vol:.18,lp:400,a:.4});noise(1.6,{ft:'lowpass',f:300,to:900,vol:.12,a:.4});break;
   case 'stormEnd':[523,659,784].forEach((f2,i)=>tone(f2,.5,{type:'triangle',vol:.14,delay:i*.07}));break;

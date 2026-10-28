@@ -4339,7 +4339,7 @@ function render3D(dt){
 function occSetup(S){const T=THREE,L=[];S.updateMatrixWorld(true);
   const visit=(o,dep)=>{if(!(o.isMesh||o.isGroup||o.type==='Object3D')||o.isInstancedMesh)return;const bx=new T.Box3().setFromObject(o);if(bx.isEmpty())return;const sz=bx.getSize(new T.Vector3());
     if(Math.max(sz.x,sz.z)>18||sz.y>40){if(dep<3&&o.children.length){o.children.forEach(c=>visit(c,dep+1));return}if(Math.max(sz.x,sz.z)>60||sz.y>80)return}
-    if(sz.y<1.4||bx.max.y<1.6)return;const mats=[];o.traverse(m=>{if(m.isMesh&&m.material&&!Array.isArray(m.material)){m.material=m.material.clone();m.material.userData.op0=m.material.opacity;m.material.userData.tr0=m.material.transparent;mats.push(m.material)}});
+    if(sz.y<1.4||bx.max.y<1.6)return;const mats=[];o.traverse(m=>{if(m.isMesh&&m.material&&!Array.isArray(m.material)&&!m.material.transparent&&m.material.depthWrite!==false){m.material=m.material.clone();m.material.userData.dw0=m.material.depthWrite;m.material.userData.op0=m.material.opacity;m.material.userData.tr0=m.material.transparent;mats.push(m.material)}});
     if(mats.length)L.push({bx,mats,a:1})};
   S.children.forEach(c=>visit(c,0));R3.occ=L}
 function occFrame(R,f,dt){const L=R.occ;if(!L||!L.length)return;const T=THREE,cam=R.camera.position,ray=occFrame.ray||(occFrame.ray=new T.Ray()),hit=new T.Vector3(),pts=[R.pg.position.clone().setY(1.2)];
@@ -4347,7 +4347,7 @@ function occFrame(R,f,dt){const L=R.occ;if(!L||!L.length)return;const T=THREE,ca
   const k=1-Math.exp(-dt*10);
   for(const o of L){let blk=false;for(const P of pts){const d=cam.distanceTo(P);ray.origin.copy(cam);ray.direction.copy(P).sub(cam).normalize();if(ray.intersectBox(o.bx,hit)&&cam.distanceTo(hit)<d-.6&&!o.bx.containsPoint(P)){blk=true;break}}
     const tg=blk?.22:1;if(Math.abs(o.a-tg)<.005&&o.a===tg)continue;o.a+=(tg-o.a)*k;if(Math.abs(o.a-tg)<.01)o.a=tg;
-    for(const m of o.mats){const fade=o.a<.995;m.transparent=fade||m.userData.tr0;m.opacity=(m.userData.op0??1)*o.a;m.depthWrite=!fade;if(m.transparent!==m.userData._t){m.userData._t=m.transparent;m.needsUpdate=true}}}}
+    for(const m of o.mats){const fade=o.a<.995;m.transparent=fade||m.userData.tr0;m.opacity=(m.userData.op0??1)*o.a;m.depthWrite=fade?false:m.userData.dw0!==false;if(m.transparent!==m.userData._t){m.userData._t=m.transparent;m.needsUpdate=true}}}}
 function syncTexts(f){
   if(!R3||!R3.camera||!H.ft)return;const box=H.ft,w=box.clientWidth,h=box.clientHeight;
   while(H.ftp.length<f.texts.length){const d=document.createElement('div');d.className='ft';box.appendChild(d);H.ftp.push(d)}

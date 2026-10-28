@@ -505,6 +505,7 @@ footer button{background:none;border:0;color:var(--dim);text-decoration:underlin
 .aprev{display:flex;gap:14px;align-items:center;margin-top:10px;flex-wrap:wrap}.aprevf{position:relative;width:180px;height:225px;border-radius:12px;overflow:hidden;background:radial-gradient(circle at 50% 70%,#1d2230,#0c0e13)}.aprevf img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}.aprevf canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.aprevt{display:flex;flex-direction:column;gap:4px;max-width:320px}
 .ach.todo{opacity:.55;filter:grayscale(.7)}.ach.todo[style]{opacity:.8;filter:none;border-style:dashed;border-color:color-mix(in srgb,var(--ac) 45%,var(--line))}.ach.todo:hover{opacity:1;filter:none}
 .pal{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;width:100%}.pal .pl{font-size:11.5px;border:1px solid var(--line);border-radius:6px;padding:2px 6px;color:var(--dim)}.pal .pl b{margin-right:4px;color:var(--bone)}.pal .pl.on{border-color:var(--ok);color:var(--ok)}.pal .pl.on b{color:var(--ok)}.pal em{font-size:11.5px;color:var(--ember);font-style:normal;align-self:center}
+.mem{color:#e8c070;font-size:12.5px;letter-spacing:.02em}.mem b{color:var(--bone);font-weight:600}
 .heirp{text-align:left;max-width:760px;margin:10px auto}.heir{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px;margin-top:8px}.heiri{border:1px solid var(--line);border-radius:8px;padding:7px 9px;display:flex;flex-direction:column;gap:2px;font-size:12.5px;text-align:left;background:none;color:inherit;cursor:pointer}.heiri.on{border-color:var(--ember);background:color-mix(in srgb,var(--ember) 10%,transparent)}.heiri b{font-size:13px}.heiri small{color:var(--dim)}.heiri[disabled]{opacity:.45;cursor:default}
 .bmmod{background:rgba(40,12,24,.85);border:1px solid #c44a6a;border-radius:8px;padding:5px 9px;font-size:12.5px;color:#f3d6de}.bmmod b{color:#ff8aa8}.bmslot.ult{border-color:#c44a6a}.bmslot.ult b{color:#ff8aa8}
 .lc-voie{border:1px solid var(--vc);border-left:4px solid var(--vc);border-radius:6px;padding:5px 8px;margin:4px 0 6px;background:color-mix(in srgb,var(--vc) 12%,transparent);display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px}
@@ -951,19 +952,19 @@ const PHASES={
   {at:.12,n:'Dernière seconde',d:'Intouchable 8 s : anneaux du temps.',storm:{dur:8,pat:'rings'}}],
  bouftou:[{at:.6,evo:{corne:{n:'Double coup de corne',repeat:2,gap:.35,half:.7,r:160}},n:'Appel du troupeau',d:'Invoque 3 Rejetons, des Grondecorne en miniature. Grondecorne subit −50% tant qu\u2019ils vivent.',adds:[['bouftou',3]],link:.5},
           {at:.3,n:'Rage des moissons',evo:{charge:{n:'Charge furieuse',repeat:3,gap:.35,wind:.8},pietine:{n:'Onde de piétinement',k:'ring',r1:0,r2:100,grow:95,repeat:3,gap:.3,wind:.8,dmg:16}},d:'+25% de dégâts, plus rapide, charge deux fois plus souvent.',dmg:1.25,spd:1.2,seq:['corne','charge','pietine','charge']}],
- tofu:[{at:.5,evo:{tempete:{n:'Ouragan de plumes',radial:1,count:14,speed:290,dmg:7,repeat:4,gap:.3,spin:.22},picore:{n:'Bec frénétique',repeat:4,gap:.25}},n:'La nuée',d:'Invoque 5 Plumets rapides et fragiles.',adds:[['tofu',5]],spd:1.15}],
+ tofu:[{at:.5,evo:{tempete:{n:'Ouragan de plumes',radial:1,count:14,speed:290,dmg:7,repeat:4,gap:.3,spin:.22},picore:{n:'Bec frénétique',repeat:4,gap:.25}},n:'La nuée',d:'Invoque 3 Plumets rapides et fragiles.',adds:[['tofu',3]],spd:1.15}],
  scara:[{at:.55,evo:{bond:{n:'Double bond',repeat:2,gap:.5},mord:{n:'Morsure frénétique',r:165,half:.75,repeat:2,gap:.35}},n:'Le nid s’éveille',d:'Invoque 2 Aragnées (la Tisseuse subit −50% de dégâts tant qu\u2019elles vivent). Les toiles tombent plus souvent.',adds:[['scaraf',2]],link:.5,fx:f=>{f.ms.webFast=1}},
         {at:.25,n:'Pluie de venin',d:'Intouchable 7 s : des gouttes de venin s’abattent sur toi. Ne t’arrête pas.',storm:{dur:7,pat:'rain'}}],
  wa:[{at:.6,n:'Les Radicelles surgissent',d:'Invoque 3 Radicelles.',adds:[['wabbit',3]]},
      {at:.3,n:'Sève affolée',evo:{wak:{n:'Trois rayons de sève',multi:[-.6,0,.6],w:80,wind:1.2},bond:{n:'Envols en série',repeat:3,gap:.35},tourb:{n:'Tempête de feuilles',count:16,repeat:3,gap:.4}},d:'+20% de dégâts, +30% de vitesse, bulbes et feuilles plus fréquents.',dmg:1.2,spd:1.3,seq:['cawotte','bond','tourb','coup','wak','ronces']}],
  craq:[{at:.5,evo:{seisme:{n:'Séisme double',r1:40,r2:150,grow:110,repeat:2,gap:.5},poing:{n:'Poings de roche',r:170,half:.65,repeat:2,gap:.4},ebou:{n:'Grand éboulement',count:7,onP:3}},n:'Éveil des rochers',d:'Invoque 2 Golems éveillés, des Basalte en miniature. Basalte frappe plus fort et plus vite.',adds:[['roc',2]],wind:.9,dmg:1.15}],
- krala:[{at:.5,evo:{encre:{n:'Déluge de vase',count:5,spread:.9,repeat:2,gap:.35},tent:{n:'Marée de geysers',count:5,onP:2},leurre:{n:'Double rayon',multi:[-.35,.35]}},n:'Les leurres s\u2019allument',d:'4 Leurres flottants crachent de la vase. Mâchevase est invulnérable tant qu\u2019ils brillent.',adds:[['tentacule',4]],link:1}],
+ krala:[{at:.5,evo:{encre:{n:'Déluge de vase',count:5,spread:.9,repeat:2,gap:.35},tent:{n:'Marée de geysers',count:5,onP:2},leurre:{n:'Double rayon',multi:[-.35,.35]}},n:'Les leurres s\u2019allument',d:'3 Leurres flottants crachent de la vase. Mâchevase est invulnérable tant qu\u2019ils brillent.',adds:[['tentacule',3]],link:1}],
  kimbo:[{at:.6,evo:{dague:{n:'Éventail de dagues',count:7,spread:.9},ombre:{n:'Pas de l’ombre redoublé',repeat:2,gap:.45},lame:{n:'Double entaille',repeat:2,gap:.35}},n:'Doubles d’ombre',d:'Invoque 2 Doubles d’ombre (boss −50% tant qu\u2019ils vivent).',adds:[['glyphe',2]],link:.5},
         {at:.42,n:'Jugement',d:'Intouchable 8 s : des anneaux de glyphes partent de l’Arbitre. Glisse-toi dans les brèches.',storm:{dur:8,pat:'rings'}},
         {at:.25,n:'Glyphes affolés',evo:{fatal:{n:'Double exécution',repeat:2,gap:.7},ruee:{n:'Ruées en chaîne',repeat:3}},d:'La parité change toutes les 3 s. Attaques plus rapides.',wind:.85,fx:f=>{f.ms.parFast=1}}],
  obsi:[{at:.6,evo:{pic:{n:'Éventail d’obsidienne',multi:[-.45,0,.45],repeat:2,gap:.45}},n:'Hiver éternel',d:'+20% de dégâts, attaques plus rapides.',dmg:1.2,wind:.9},
        {at:.45,n:'Tempête blanche',d:'Intouchable 8 s : la glace pleut sur toi et laisse des plaques glissantes. Reste près des braises.',storm:{dur:7,pat:'rain',pool:'ice'}},
-       {at:.3,n:'Éclats de givre',evo:{souffle:{n:'Souffle polaire',r:260,half:.6,repeat:2,gap:.4}},d:'Invoque 4 Éclats qui foncent sur toi et explosent.',adds:[['givre',4]]}],
+       {at:.3,n:'Éclats de givre',evo:{souffle:{n:'Souffle polaire',r:260,half:.6,repeat:2,gap:.4}},d:'Invoque 3 Éclats qui foncent sur toi et explosent.',adds:[['givre',3]]}],
  hare:[{at:.75,n:'Les rouages tournent',d:'Invoque 2 Rouages (Régent −50% tant qu\u2019ils vivent).',adds:[['rouage',2]],link:.5},
        {at:.6,n:'Arrêt du temps',d:'Intouchable 9 s : seul un cercle de lumière est sûr à chaque sonnerie.',storm:{dur:9,pat:'safe'}},
        {at:.35,n:'Les heures s’effondrent',d:'Intouchable 9 s : pluie d’aiguilles et cercles de lumière en alternance.',storm:{dur:9,pat:'mix'}},
@@ -1475,8 +1476,17 @@ function setCounts(rn){const c={};for(const sl in (rn||run).items){const it=(rn|
 function setB(S,t){const o={};if(!S||!S.b[t])return o;let U=null,main=null;try{if(run){U=usefulStats();main=mainStat()}}catch(_){}
   for(const k in S.b[t]){const kk=U&&['for','int','agi','cha'].includes(k)&&!U.has(k)?main:k;o[kk]=(o[kk]||0)+S.b[t][k]}return o}
 function setBonus(rn){const o={},c=setCounts(rn);for(const id in c){const S=SETS[id];if(!S)continue;[2,3,4].forEach(t=>{if(c[id]>=t){const B2=setB(S,t);for(const k in B2)o[k]=(o[k]||0)+B2[k]}})}return o}
-const HEIRMAX=8,heirMul=()=>Math.min(1,.5+.06*((run&&run.floor)||1));
-function itemSum(k){let s=0;for(const sl in run.items){const it=run.items[sl];s+=(it.stats[k]||0)*(it.heir?heirMul():1)}s=Math.round(s);return s+(setBonus()[k]||0)}
+const HEIRMAX=8,heirMul=()=>Math.min(1,.7+.1*((run&&run.floor)||1));
+/* Mémoire : une pièce héritée progresse à chaque gardien vaincu en la portant (3 gardiens par niveau, niveau 5 max).
+   +12 % de stats par niveau ; niveau 3 : sa rune compte double ; niveau 5 (Ancestrale) : elle compte pour 2 pièces de sa voie. */
+const memLv=it=>Math.min(5,1+Math.floor(((it&&it.mem)||0)/3));
+const heirMulOf=it=>heirMul()*(1+.12*(memLv(it)-1));
+const MEMP=[[1,'Bonus à 70 %, 100 % dès l’étage IV'],[2,'+12 % de stats'],[3,'Sa rune compte double'],[4,'+36 % de stats'],[5,'Ancestrale : compte pour 2 pièces de sa voie, +48 % de stats']];
+function memHtml(it){const L=memLv(it),x=(it.mem||0)%3,nx=MEMP.find(m=>m[0]===L+1);return `<span class="mem">${'★'.repeat(L)}${'☆'.repeat(5-L)} <b>Mémoire ${L}</b>${L<5?` · ${x}/3 gardiens`:''}</span>${nx?`<small class="dim">Niv. ${nx[0]} : ${nx[1]}</small>`:'<small style="color:var(--ember)">Mémoire complète</small>'}`}
+function memGain(){if(!run||run.daily||run.weekly)return;const st=meta.stash||[],ups=[];
+  for(const sl in run.items){const it=run.items[sl];if(!it||!it.heir||!it.uid)continue;const S=st.find(x=>x.uid===it.uid);if(!S)continue;const L0=memLv(S);S.mem=(S.mem||0)+1;it.mem=S.mem;if(memLv(S)>L0)ups.push(`${S.name||'Pièce'} : Mémoire ${memLv(S)}`)}
+  if(ups.length)ui.toast='Héritage — '+ups.join(' · ')+(ui.toast?' · '+ui.toast:'')}
+function itemSum(k){let s=0;for(const sl in run.items){const it=run.items[sl];s+=(it.stats[k]||0)*(it.heir?heirMulOf(it):1)}s=Math.round(s);return s+(setBonus()[k]||0)}
 function statT(k){return (run.stats[k]||0)+itemSum(k)+(['for','int','agi','cha'].includes(k)?itemSum('all'):0)}
 /* améliorations du Temple : neutralisées pendant l'ascension du jour (scores comparables) */
 /* tutoriel, duel et boss joueur : améliorations du temple ignorées sans jamais toucher à meta.up */
@@ -1521,7 +1531,7 @@ function newRun(daily){
   run={cls:c,lvl:1,pts:(D?0:UP('pts'))*5,stats:Object.assign({},CLASSES[c].base),items:{},spellLv:{},carried:0,floor:1,flasks:3+(D?0:UP('flask')),wpn:1,spPts:1,node:null,hpPct:100,bonus:0};
   run.order=[0,1,2,3,4,5,6,7,8];run.paths={};run.dmgSrc={};run.asc=D?0:Math.min(meta.ascSel||0,meta.ascMax||0);run.race=D?D.race:(meta.race||'plainois');run.pacts=D?D.pacts:(meta.pacts||[]).filter(k=>PACTS[k]);if(D)run.daily=todaySeed();run.tal=D?[]:talSel(c).slice(0,talPts(c));if(WKS){run.daily=weekSeed();run.weekly=1;run.wmods=WKS.mods;run.pacts=WKS.pacts;run.asc=0;run.tal=[]}if(PK('secheresse'))run.flasks=Math.max(1,run.flasks-1);{const R=RC();for(const k in R.stats||{})run.stats[k]=(run.stats[k]||0)+R.stats[k];run.pts+=R.pts||0;if(R.fb){run.fb=(run.fb||0)+R.fb;run.flasks+=R.fb}}
   if(meta.sablier){const it=legItem('sablier');run.items[it.slot]=it}
-  if(!D&&!WKS)(meta.heirSel||[]).forEach(i=>{const it=meta.stash&&meta.stash[i];if(it){const c2=JSON.parse(JSON.stringify(it));c2.heir=1;run.items[slotKey(c2)]=c2}});
+  if(!D&&!WKS)(meta.heirSel||[]).forEach(i=>{const it=meta.stash&&meta.stash[i];if(it){it.uid=it.uid||Math.random().toString(36).slice(2,10);const c2=JSON.parse(JSON.stringify(it));c2.heir=1;run.items[slotKey(c2)]=c2}});
   if(SL(6))run.flasks=Math.max(1,run.flasks-1);
   if(WM('vamp'))run.flasks=0;if(WM('fiole'))run.flasks=1;
   if(ML(1))run.pts+=3;if(ML(2))run.spPts+=1;if(ML(3))run.wpn=2;if(ML(6)){run.fb=(run.fb||0)+1;run.flasks++}
@@ -1543,7 +1553,7 @@ const VOIES={
  fur:{n:'Fureur',r:'Dégâts',c:'#ff7a52',ic:'⚔',t:[[2,'+10 % de dégâts'],[4,'+6 % de critique, critiques +25 % plus forts'],[6,'Carnage : chaque coup porté +2 % de dégâts (jusqu’à +20 %), perdu quand tu es touché']]},
  rem:{n:'Rempart',r:'Résistance',c:'#6fb4ff',ic:'⛨',t:[[2,'−10 % de dégâts subis'],[4,'+15 % de PV max, fioles +25 %'],[6,'Inflexible : une fois par combat, un coup mortel te laisse à 1 PV, invulnérable 1,5 s']]},
  cel:{n:'Célérité',r:'Vitesse',c:'#7fe08a',ic:'➶',t:[[2,'+10 % de vitesse de déplacement'],[4,'Sorts −15 % de recharge, roulade −30 % d’endurance'],[6,'Tempo : chaque esquive réussie avance tes recharges de 1 s et donne +30 % de vitesse 2 s']]}};
-function voieN(k,rn){rn=rn||run;if(!rn||!rn.items)return 0;let n=0;for(const s in rn.items){const it=rn.items[s];if(it&&it.arch===k)n++}return n}
+function voieN(k,rn){rn=rn||run;if(!rn||!rn.items)return 0;let n=0;for(const s in rn.items){const it=rn.items[s];if(it&&it.arch===k)n+=it.heir&&memLv(it)>=5?2:1}return n}
 const voie=(k,t)=>voieN(k)>=t;
 const spdPct=()=>run?Math.min(40,itemSum('spd')+(voie('cel',2)?10:0)):0;
 const cdrPct=()=>run?Math.min(40,itemSum('cdr')+(voie('cel',4)?15:0)):0;
@@ -1602,7 +1612,7 @@ const RUNES={
  riposte:{n:'Riposte',e:'arcane',d:n=>`Une parade parfaite réduit les recharges de tes sorts de ${2*n} s`},
  alchimie:{n:'Alchimie',e:'arcane',d:n=>`Boire une fiole donne +${25*n} % de dégâts pendant 5 s`}};
 const RUNEE={foudre:['Foudre','#ffe27a'],feu:['Feu','#ff7a3a'],givre:['Givre','#8fd8ff'],sang:['Sang','#ff4a6a'],ombre:['Ombre','#b48cff'],arcane:['Arcane','#9be0c8']};
-function runeN(id){if(!run||!run.items)return 0;let n=0;for(const k in run.items){const it=run.items[k];if(it&&it.rune===id)n++}return n}
+function runeN(id){if(!run||!run.items)return 0;let n=0;for(const k in run.items){const it=run.items[k];if(it&&it.rune===id)n+=it.heir&&memLv(it)>=3?2:1}return n}
 function runeEcoles(){const c={};if(run&&run.items)for(const k in run.items){const it=run.items[k];if(it&&it.rune&&RUNES[it.rune]){const e=RUNES[it.rune].e;c[e]=(c[e]||0)+1}}return c}
 const runeHtml=(it,short)=>{if(!it||!it.rune||!RUNES[it.rune])return '';const R=RUNES[it.rune],E=RUNEE[R.e];return `<span class="rune" style="--rc:${E[1]}"><b>✦ ${R.n}</b>${short?'':` <small>${E[0]} · ${R.d(1)}</small>`}</span>`};
 function runeMul(f,sp,crit){if(!run)return 1;let m=1;const n=k=>runeN(k),hp=run.hp/maxHp();
@@ -1770,7 +1780,7 @@ function summon(f,k,n){const A=ADD[k],b=f.b;if(PK('horde'))n*=2;
   for(let i=0;i<n;i++){let x,y;
     if(A.spd){const a=Math.random()*Math.PI*2;x=b.x+Math.cos(a)*(b.r+45);y=b.y+Math.sin(a)*(b.r+45)}
     else{const a=i/n*Math.PI*2+Math.random()*.4;x=CX+Math.cos(a)*205;y=CY+Math.sin(a)*205}
-    const hp=Math.max(45,Math.round(f.bmax*A.hp*1.6));const o={k,A,x,y,r:A.r,hp,max:hp,alive:true,cool:1+Math.random()*1.2,atk:null,hurt:0,link:!!f.ms.curLink,id:(f.addId=(f.addId||0)+1)};
+    const hp=Math.max(40,Math.round(f.bmax*A.hp*.95));const o={k,A,x,y,r:A.r,hp,max:hp,alive:true,cool:1+Math.random()*1.2,atk:null,hurt:0,link:!!f.ms.curLink,id:(f.addId=(f.addId||0)+1)};
     clampArena(o,o.r);f.adds.push(o);ev(f,'summon',{x:o.x,y:o.y,col:A.col})}}
 function killAdd(f,a){if(!a.alive)return;if(runeN('moisson')&&!a.opet){const h=healP(Math.round(maxHp()*.06*runeN('moisson')));if(h)txt(f,f.p.x,f.p.y-14,'+'+h,'ok')}{const fb=f.buffs&&f.buffs.find(x=>x.id==='furor'&&x.l5);if(fb&&(fb.ext||0)<4){fb.t+=1;fb.ext=(fb.ext||0)+1;txt(f,f.p.x,f.p.y-34,'Rage +1 s','ember')}}const wasLink=a.link;a.alive=false;a.atk=null;ev(f,'adeath',{x:a.x,y:a.y,col:a.A.col});
   if(f.tgt===a)f.tgt=null;
@@ -1793,14 +1803,14 @@ function updAdds(f,dt){const p0=f.p,b=f.b;
   f.adds.forEach(a=>{if(!a.alive)return;const p=coAddT(f,a,p0);a.hurt-=dt;const A=a.A;
     a.vx=a.vx||0;a.vy=a.vy||0;
     if(a.atk){a.vx*=Math.max(0,1-dt*10);a.vy*=Math.max(0,1-dt*10);a.x+=a.vx*dt;a.y+=a.vy*dt;
-      a.atk.t+=dt;if(A.atk==='shot'&&a.atk.t<a.atk.wind*.55)a.atk.ang=angTo(a,p);if(a.atk.t>=a.atk.wind){resolveAdd(f,a);a.atk=null;a.cool=A.cd*.7*(.8+Math.random()*.4)}return}
+      a.atk.t+=dt;if(A.atk==='shot'&&a.atk.t<a.atk.wind*.55)a.atk.ang=angTo(a,p);if(A.spd&&A.atk==='slam'&&a.atk.t<a.atk.wind*.8){a.atk.ang=angTo(a,p);const sp2=A.spd*.3*(f.ms.pspd||1);a.x+=Math.cos(a.atk.ang)*sp2*dt;a.y+=Math.sin(a.atk.ang)*sp2*dt;clampArena(a,a.r)}if(a.atk.t>=a.atk.wind){resolveAdd(f,a);a.atk=null;a.cool=A.cd*.7*(.8+Math.random()*.4)}return}
     a.cool-=dt;const d=dist(a,p),an=angTo(a,p);
     if(A.spd){const want=(A.keep||0)+a.r+PR+6,spd=A.spd*(f.ms.pspd||1);let dx=0,dy=0;
       if(d>want){const k=Math.min(1,(d-want)/40);dx=Math.cos(an)*spd*k;dy=Math.sin(an)*spd*k}
       else if(A.keep&&d<want-60){dx=-Math.cos(an)*spd*.6;dy=-Math.sin(an)*spd*.6}
       [b,...f.adds].forEach(o=>{if(o===a||(o!==b&&!o.alive))return;const dd=dist(a,o),Rr=a.r+o.r+22;if(dd<Rr&&dd>0){const k=(Rr-dd)/Rr*spd*1.4;dx+=(a.x-o.x)/dd*k;dy+=(a.y-o.y)/dd*k}});
       const ac=Math.min(1,dt*7);a.vx+=(dx-a.vx)*ac;a.vy+=(dy-a.vy)*ac;a.x+=a.vx*dt;a.y+=a.vy*dt;clampArena(a,a.r)}
-    if(a.cool<=0&&d<A.trig+a.r)a.atk={t:0,wind:A.wind*windMul(f)/1.15,ang:an}});
+    if(a.cool<=0&&d<A.trig+a.r+(A.spd&&A.atk==='slam'?40:0))a.atk={t:0,wind:A.wind*windMul(f)/1.15,ang:an}});
 }
 // Collisions : le boss et les invocations fixes ne bougent pas ; les invocations mobiles s'écartent ;
 // le joueur n'est jamais poussé par une invocation mobile (c'est elle qui cède).
@@ -1813,6 +1823,7 @@ function resolveBodies(f){const p=f.p,b=f.b,E=f.adds.filter(a=>a.alive),mob=o=>o
     [b,...E].forEach(o=>{if(o===b&&b.jump)return;const s=sep(p,o,o.r+PR);if(!s)return;if(mob(o)){o.x-=s.nx*s.o;o.y-=s.ny*s.o;const vn=o.vx*-s.nx+o.vy*-s.ny;if(vn<0){o.vx+=s.nx*vn;o.vy+=s.ny*vn}}else{p.x+=s.nx*s.o;p.y+=s.ny*s.o}});
     E.forEach(a=>clampArena(a,a.r));clampArena(p,PR)}}
 function resolveAdd(f,a){const A=a.A,p=f.p,raw=A.dmg*1.5*dmgMult(f),fxd={gel:A.gel,slow:A.slow,n:A.n||'Invocation'};
+  if(A.spd&&A.atk==='slam'){const d=dist(a,p),an=angTo(a,p),L=Math.min(Math.max(0,d-a.r-PR-6),60);a.x+=Math.cos(an)*L;a.y+=Math.sin(an)*L;clampArena(a,a.r);a.vx=Math.cos(an)*L*4;a.vy=Math.sin(an)*L*4}
   if(A.atk==='slam'||A.atk==='boom'){if(dist(a,p)<A.ar+PR)hurtP(f,raw,fxd);bmOthers(f,o=>{if(dist(a,o)<A.ar+PR)bmHit(o,raw,fxd)});if(f.co&&f.co.role==='A'&&f.ally&&!f.ally.down&&dist(a,f.ally)<A.ar+PR)coHit(f,raw,fxd);ev(f,'astrike',{x:a.x,y:a.y,r:A.ar,boom:A.atk==='boom'});if(A.atk==='boom')killAdd(f,a)}
   else if(A.atk==='shot'){const an=a.atk.ang;f.proj.push({x:a.x+Math.cos(an)*a.r,y:a.y+Math.sin(an)*a.r,vx:Math.cos(an)*360,vy:Math.sin(an)*360,r:8,dmg:raw,d:fxd,life:3})}
   else if(A.atk==='radial'){for(let i=0;i<A.count;i++){const an=i/A.count*Math.PI*2+Math.random()*.4;f.proj.push({x:a.x+Math.cos(an)*a.r,y:a.y+Math.sin(an)*a.r,vx:Math.cos(an)*220,vy:Math.sin(an)*220,r:8,dmg:raw,d:fxd,life:3})}}
@@ -4731,7 +4742,7 @@ function rSheet(S){if(!S)return '';return `<div class="sheet">
     <div class="row"><button class="btn primary" data-a="copysheet">Copier le résumé</button><span class="dim" style="font-size:12px">Clic droit sur le portrait pour copier l\u2019image.</span></div>
     <textarea id="sheettxt" readonly hidden style="width:100%;min-height:120px;background:var(--well);color:var(--bone);border:1px solid var(--line);font:inherit;font-size:13px"></textarea>
   </div></div>`}
-function win(){if(run&&run.tut){tutLeave(true);return}
+function win(){if(run&&run.tut){tutLeave(true);return}if(run&&!run.train&&!(fight&&fight.B&&fight.B.echo))memGain();
   if(run&&run.secret){heirSnap();cx().boss.secret=Object.assign(cx().boss.secret||{},{w:1},fight&&!fight.hits?{nh:1}:{});(meta.mast||(meta.mast={}))[run.cls]=mastXp(run.cls)+500;const g=Math.round(1500*(1+meta.cycle*.5)*(1+.15*heatOf(run.pacts))*(fight&&!fight.hits?2:1));meta.souls+=g;achieve('secret');if(fight&&!fight.hits)achieve('secretnh');
     ui.end=ui.end||{souls:0,cycle:meta.cycle,cls:RC().n+' '+CLS().name,sheet:makeSheet(true)};ui.end.secret={won:1,g,nohit:fight&&!fight.hits};ui.end.sheet=Object.assign(makeSheet(true),{best:ui.end.sheet&&ui.end.sheet.best,newBest:ui.end.sheet&&ui.end.sheet.newBest,secret:1});
     meta.secretWins=(meta.secretWins||0)+1;if(!run.daily){const E=ladEntry(true,1,fight&&!fight.hits,ui.end.ladCyc||0);ui.end.lad=E.score;ladSubmit(E)}ui.endRun=(!run.daily&&!run.coop&&!run.train)?run:null;fight=null;run=null;ui.screen='win';save();render();return}
@@ -4780,12 +4791,12 @@ function heirSnap(){if(!run||run.pvp||run.bm||run.rush||run.daily||run.tut||run.
 function heirStat(it){const ks=Object.entries(it.stats||{}).slice(0,4).map(([k,v])=>`+${v} ${STATN[k]||k}`).join(' · ');return ks+(it.rune&&RUNES[it.rune]?' · ✦ '+RUNES[it.rune].n:'')}
 function heirPanel(){const H=ui.heir;if(!H||!H.items.length)return '';const left=H.n-H.taken.length,st=meta.stash||[];
   return `<section class="panel heirp"><div class="between"><span class="label">Héritage</span><span class="dim">Coffre : ${st.length} / ${HEIRMAX}</span></div>
-  <p class="dim" style="font-size:13px;margin:4px 0 0">${left>0?`Garde <b style="color:var(--ember)">${left} pièce${left>1?'s':''}</b> pour tes prochaines ascensions. Au départ, tu pourras en équiper 2 : leurs bonus commencent à 50 % et montent avec les étages (100 % à l’étage IX).`:'Pièces gardées dans le coffre du temple.'}${st.length>=HEIRMAX&&left>0?' Le coffre est plein : la plus ancienne pièce sera remplacée.':''}</p>
+  <p class="dim" style="font-size:13px;margin:4px 0 0">${left>0?`Garde <b style="color:var(--ember)">${left} pièce${left>1?'s':''}</b> pour tes prochaines ascensions. Au départ, tu pourras en équiper 2. Chaque gardien vaincu en la portant nourrit sa <b>Mémoire</b> : plus de stats, rune doublée, puis pièce Ancestrale qui compte double pour sa voie.`:'Pièces gardées dans le coffre du temple.'}${st.length>=HEIRMAX&&left>0?' Le coffre est plein : la plus ancienne pièce sera remplacée.':''}</p>
   <div class="heir">${H.items.map((it,i)=>{const t=H.taken.includes(i);return `<button class="heiri ${t?'on':''}" data-a="heirkeep" data-v="${i}" ${t||left<=0?'disabled':''}><b style="color:${it.leg?'#e8b04a':it.set?SETS[it.set].col:'var(--bone)'}">${esc(it.name||it.n||'Objet')}</b><small>${esc(heirStat(it))}</small>${it.pow?`<small style="color:var(--ember)">${esc(it.pow)}</small>`:''}<small>${t?'✓ Gardée':'Garder'}</small></button>`}).join('')}</div></section>`}
 function heirPick(){const st=meta.stash||[];if(!st.length)return '';const sel=meta.heirSel||[];
   return `<section class="panel"><div class="between"><span class="label">Héritage · coffre du temple</span><span class="dim">${sel.length} / 2 équipée${sel.length>1?'s':''}</span></div>
-  <p class="dim" style="font-size:13px;margin:4px 0 0">Choisis jusqu’à 2 pièces gardées de tes ascensions précédentes : tu commences avec. Leurs bonus démarrent à 50 % et atteignent 100 % à l’étage IX. Pas d’héritage pour les défis du jour et de la semaine.</p>
-  <div class="heir">${st.map((it,i)=>{const on=sel.includes(i);return `<div class="heiri ${on?'on':''}" style="cursor:default"><b style="color:${it.leg?'#e8b04a':it.set?SETS[it.set].col:'var(--bone)'}">${esc(it.name||it.n||'Objet')}</b><small>${esc(heirStat(it))}</small>${it.pow?`<small style="color:var(--ember)">${esc(it.pow)}</small>`:''}<span class="row" style="gap:4px;margin-top:4px"><button class="btn sm ${on?'primary':''}" data-a="heirsel" data-v="${i}" ${!on&&sel.length>=2?'disabled':''}>${on?'Équipée':'Équiper'}</button><button class="btn sm" data-a="heirdel" data-v="${i}" title="Retirer du coffre">Jeter</button></span></div>`}).join('')}</div></section>`}
+  <p class="dim" style="font-size:13px;margin:4px 0 0">Choisis jusqu’à 2 pièces gardées de tes ascensions précédentes : tu commences avec. Elles démarrent à 70 % (100 % dès l’étage IV) et gagnent en <b>Mémoire</b> à chaque gardien vaincu : +12 % de stats par niveau, rune doublée au niveau 3, comptent pour 2 pièces de leur voie au niveau 5. Pas d’héritage pour les défis du jour et de la semaine.</p>
+  <div class="heir">${st.map((it,i)=>{const on=sel.includes(i);return `<div class="heiri ${on?'on':''}" style="cursor:default"><b style="color:${it.leg?'#e8b04a':it.set?SETS[it.set].col:'var(--bone)'}">${esc(it.name||it.n||'Objet')}</b><small>${esc(heirStat(it))}</small>${it.arch&&VOIES[it.arch]?`<small style="color:${VOIES[it.arch].c}">${VOIES[it.arch].ic} ${VOIES[it.arch].r}</small>`:''}${it.pow?`<small style="color:var(--ember)">${esc(it.pow)}</small>`:''}${memHtml(it)}<span class="row" style="gap:4px;margin-top:4px"><button class="btn sm ${on?'primary':''}" data-a="heirsel" data-v="${i}" ${!on&&sel.length>=2?'disabled':''}>${on?'Équipée':'Équiper'}</button><button class="btn sm" data-a="heirdel" data-v="${i}" title="Retirer du coffre">Jeter</button></span></div>`}).join('')}</div></section>`}
 function die(){if(run&&run.bm){if(fight)bmEnd(fight,null,'Combat quitté');return}heirSnap();if(run&&run.endless)return endlessEnd('die');if(run&&run.secret){ui.end=ui.end||{souls:0,cycle:meta.cycle,cls:RC().n+' '+CLS().name,sheet:makeSheet(true)};ui.end.secret={won:0};fight=null;run=null;ui.screen='win';save();render();return}if(run&&run.daily){const sc=dailyScore(false);runRec(sc,false);ui.dailyLast=sc;ui.dailyLbl=run.weekly?'du défi de la semaine':'de l’ascension du jour'}
   const kept=Math.floor(run.carried/2),left=run.carried-kept;meta.souls+=kept;
   ui.end={floor:run.floor,boss:BOSSAT(run.floor).name,souls:left,kept,lost:meta.stain?meta.stain.souls:0,sheet:makeSheet(false),mast:gainMast(false)};
@@ -5303,7 +5314,7 @@ function act(a,v){
     case 'pvpjoin': {const el=id('pvpcode'),c=((el&&el.value)||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);if(c.length===4)pvpConnect(c,'B');else{ui.toast='Le code fait 4 caractères.';render()}} break;
     case 'pvpgo': pvpHostStart(true); break;
     case 'pvppick': pvpPickCls(v); break;
-    case 'heirkeep': {const H=ui.heir,i=+v;if(!H||H.taken.includes(i)||H.taken.length>=H.n||!H.items[i])break;const st=meta.stash||(meta.stash=[]);if(st.length>=HEIRMAX){st.shift();meta.heirSel=(meta.heirSel||[]).map(x=>x-1).filter(x=>x>=0)}const it=Object.assign({},H.items[i]);delete it.heir;st.push(it);H.taken.push(i);save();render()} break;
+    case 'heirkeep': {const H=ui.heir,i=+v;if(!H||H.taken.includes(i)||H.taken.length>=H.n||!H.items[i])break;const st=meta.stash||(meta.stash=[]);if(st.length>=HEIRMAX){st.shift();meta.heirSel=(meta.heirSel||[]).map(x=>x-1).filter(x=>x>=0)}const it=Object.assign({},H.items[i]);delete it.heir;it.uid=it.uid||Math.random().toString(36).slice(2,10);it.mem=it.mem||0;st.push(it);H.taken.push(i);save();render()} break;
     case 'heirsel': {const i=+v,S=meta.heirSel||(meta.heirSel=[]);const j=S.indexOf(i);if(j>=0)S.splice(j,1);else if(S.length<2)S.push(i);save();render()} break;
     case 'heirdel': {const i=+v,st=meta.stash||[];if(!st[i])break;st.splice(i,1);meta.heirSel=(meta.heirSel||[]).filter(x=>x!==i).map(x=>x>i?x-1:x);save();render()} break;
     case 'bmnew': {const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<4;i++)c+=A[Math.floor(Math.random()*A.length)];bmConnect(c,'boss')} break;
@@ -5888,7 +5899,7 @@ function rProg(){const sp=spAffordable(),pt=run.pts>0;let tab=ui.ptab||(pt&&!sp?
     <div id="sec-${tab}">${tab==='stats'?rStatsP():rSpellsP()}</div></section>`}
 function rGear(){
   const c=setCounts(),sb=setBonus();
-  return `<section class="panel"><span class="label">Équipement</span><div class="list">${SLOTS.map(sl=>{const it=run.items[sl];return `<div class="it"><span class="row" style="gap:6px">${it?`<span class="pip" style="--c:${it.col||'var(--dim)'}"></span>${esc(it.name)}${runeHtml(it,1)}${it.arch&&VOIES[it.arch]?` <span class="chip" style="color:${VOIES[it.arch].c};border-color:${VOIES[it.arch].c}">${VOIES[it.arch].ic} ${VOIES[it.arch].r}</span>`:''}${it.alt?` <span class="chip" style="color:${ALTCOL}" title="${esc(ALTS[it.alt].d)}">Altération</span>`:it.leg?' <span class="chip" style="color:var(--ember)">Légendaire</span>':''}`:`<span class="dim">${sl} : vide</span>`}</span><span class="dim num" style="text-align:right">${it?Object.entries(it.stats).map(([k,v])=>`+${v} ${STATN[k]}`).join(' · '):''}</span></div>`}).join('')}</div>
+  return `<section class="panel"><span class="label">Équipement</span><div class="list">${SLOTS.map(sl=>{const it=run.items[sl];return `<div class="it"><span class="row" style="gap:6px">${it?`<span class="pip" style="--c:${it.col||'var(--dim)'}"></span>${esc(it.name)}${runeHtml(it,1)}${it.arch&&VOIES[it.arch]?` <span class="chip" style="color:${VOIES[it.arch].c};border-color:${VOIES[it.arch].c}">${VOIES[it.arch].ic} ${VOIES[it.arch].r}</span>`:''}${it.heir?` <span class="chip" style="color:#e8c070" title="Pièce héritée">${'★'.repeat(memLv(it))} Héritage</span>`:''}${it.alt?` <span class="chip" style="color:${ALTCOL}" title="${esc(ALTS[it.alt].d)}">Altération</span>`:it.leg?' <span class="chip" style="color:var(--ember)">Légendaire</span>':''}`:`<span class="dim">${sl} : vide</span>`}</span><span class="dim num" style="text-align:right">${it?Object.entries(it.stats).map(([k,v])=>`+${v} ${STATN[k]}`).join(' · '):''}</span></div>`}).join('')}</div>
   ${Object.values(run.items).some(x=>x&&x.alt)?`<div class="alts">${Object.values(run.items).filter(x=>x&&x.alt).map(x=>`<div><b style="color:${ALTCOL}">${esc(x.name)}</b> <span class="dim" style="font-size:13px">${ALTS[x.alt].d}</span></div>`).join('')}${Object.keys(SYNS).filter(hasS).map(k=>`<div class="synon"><b>Synergie · ${SYNS[k].n}</b> <span style="font-size:13px">${SYNS[k].d}</span></div>`).join('')}</div>`:''}
   ${voiesPanel()}${(()=>{const L=Object.keys(RUNES).filter(k=>runeN(k)),E=runeEcoles();if(!L.length)return '';return `<div class="runes"><span class="label">Runes actives</span>${L.map(k=>`<div><b style="color:${RUNEE[RUNES[k].e][1]}">✦ ${RUNES[k].n}${runeN(k)>1?' ×'+runeN(k):''}</b> <span class="dim" style="font-size:13px">${RUNES[k].d(runeN(k))}</span></div>`).join('')}${Object.entries(E).filter(([e,c])=>c>=2).map(([e,c])=>`<div class="synon"><b>Résonance ${RUNEE[e][0]}</b> <span style="font-size:13px">${c} runes : +${c>=3?16:8} % de dégâts</span></div>`).join('')}</div>`})()}
   ${Object.keys(c).length?`<div class="sets">${Object.entries(c).map(([id,n])=>{const S=SETS[id];return `<div><b style="color:${S.col}">${S.n}</b> <span class="num dim">${n}/4</span><span class="dim" style="font-size:13px">${[2,3,4].map(t=>`<span style="color:${n>=t?'var(--bone)':'var(--dim)'}">${t} pièces : ${Object.entries(setB(S,t)).map(([k,v])=>`+${v} ${STATN[k]}`).join(', ')}</span>`).join(' · ')}</span></div>`}).join('')}</div>`:''}

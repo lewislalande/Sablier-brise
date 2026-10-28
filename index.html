@@ -1825,6 +1825,7 @@ function chainAtk(f,key,d,left){const b=f.b;b.face=angTo(b,f.p);const a={key,d,t
 function startAtk(f){
   const key=nextKey(f),d=(f.atkX&&f.atkX[key])||f.B.atks[key],b=f.b;f.step++;b.wait=0;
   if(d.k==='special'){d.fx(f);say(f,d.n);b.cool=d.cool||1.1;return}
+  {const AN=TM(f).atkN,nm=d.n||key;AN[nm]=(AN[nm]||0)+1}
   const a={key,d,t:0,wind:(d.wind||.8)*windMul(f),rep:d.repeat||1,ang:b.face??angTo(b,f.p),gen:(f.gen2=(f.gen2||0)+1),rk:0};
   setupTargets(f,a);b.atk=a;say(f,d.n);ev(f,'wind',{heavy:!!d.heavy,w:a.wind});
 }
@@ -1865,13 +1866,13 @@ function resolveAtk(f,a){
 }
 function hurtP(f,raw,d){
   const p=f.p;if(f.over)return false;if(p.virt)return false;if(!p.ghost&&!p.down&&p.iframe<=0&&runeN('egide')&&f.t>=(f.ms.egT||0)){f.ms.egT=f.t+Math.max(5,12/runeN('egide'));txt(f,p.x,p.y,'Égide','frost');ev(f,'parry');return false}if(p.ghost){if(p.bmid)bmHit(p,raw,d);else coHit(f,raw,d);return false}if(p.down)return false;if(f.co)raw=coDR(f,raw);if(f.ms.ward>f.t)raw*=.6;
-  if(p.iframe>0){txt(f,p.x,p.y,'Esquivé','frost');if(!(f.ms.dgSnd>f.t)){f.ms.dgSnd=f.t+.25;ev(f,'dodge');if(voie('cel',6)){f.ms.tempoT=f.t+2;for(const k in f.cds)if(f.cds[k]>0)f.cds[k]=Math.max(0,f.cds[k]-1);txt(f,p.x,p.y-30,'Tempo','ok')}}if(runeN('contre'))f.ms.rnDodge=f.t+2.5;if(p.roll>0&&f.gel)f.gel=0;if(p.roll>0&&hasA('esquive')&&!(f.ms.pendT>f.t)&&!f.storm&&!f.b.jump){const b=f.b;f.ms.pendT=f.t+4;f.frz=Math.max(f.frz||0,.7);b.atk=null;b.dash=null;b.rec=Math.max(b.rec,.7);b.cool=Math.max(b.cool,1.1);ev(f,'freeze');txt(f,p.x,p.y-20,'Pendule','frost');if(hasS('horsT'))spells().forEach(x=>f.cds[x.id]=0)}if(p.roll>0&&hasL('gelano')&&!(f.ms.lierreCd>0)){p.st=Math.min(stMax(),p.st+25);f.ms.lierre=1;f.ms.lierreCd=.4;txt(f,p.x,p.y-20,'Lierre','ok')}return false}
+  if(p.iframe>0){txt(f,p.x,p.y,'Esquivé','frost');TM(f).dodge++;if(!(f.ms.dgSnd>f.t)){f.ms.dgSnd=f.t+.25;ev(f,'dodge');if(voie('cel',6)){f.ms.tempoT=f.t+2;for(const k in f.cds)if(f.cds[k]>0)f.cds[k]=Math.max(0,f.cds[k]-1);txt(f,p.x,p.y-30,'Tempo','ok')}}if(runeN('contre'))f.ms.rnDodge=f.t+2.5;if(p.roll>0&&f.gel)f.gel=0;if(p.roll>0&&hasA('esquive')&&!(f.ms.pendT>f.t)&&!f.storm&&!f.b.jump){const b=f.b;f.ms.pendT=f.t+4;f.frz=Math.max(f.frz||0,.7);b.atk=null;b.dash=null;b.rec=Math.max(b.rec,.7);b.cool=Math.max(b.cool,1.1);ev(f,'freeze');txt(f,p.x,p.y-20,'Pendule','frost');if(hasS('horsT'))spells().forEach(x=>f.cds[x.id]=0)}if(p.roll>0&&hasL('gelano')&&!(f.ms.lierreCd>0)){p.st=Math.min(stMax(),p.st+25);f.ms.lierre=1;f.ms.lierreCd=.4;txt(f,p.x,p.y-20,'Lierre','ok')}return false}
   if(f.buffs.some(x=>x.id==='bdiv')){txt(f,p.x,p.y,'Bouclier divin','ember');return false}
   const ub=d&&(d.unblock||d.k==='ring'||d.k==='safe');
   if(!ub&&p.parry>0){perfectParry(f);return false}
-  if(!ub&&p.guard){const sh=WPN().shield,cost=(raw*.8+6)*(sh?.5:1);if(p.st>=cost){p.st-=cost;p.stDelay=.6;const r0=raw;raw*=sh?(d&&d.heavy?.25:.1):(d&&d.heavy?.4:.2);ev(f,'block');if(hasA('epines')&&!f.storm)applyDmg(f,{id:'ronces',n:'Ronces',el:'terre',t:'dmg',altfx:1,chain:1,fixed:Math.max(1,Math.round((r0-raw)*2))},1,f.b);if(sh)f.resent=Math.min(5,(f.resent||0)+1)}else{p.st=0;p.guard=false;if(!f.buffs.some(x=>x.id==='crep')){p.frozen=.4;say(f,'Garde brisée');ev(f,'gbreak')}}}
+  if(!ub&&p.guard){const sh=WPN().shield,cost=(raw*.8+6)*(sh?.5:1);if(p.st>=cost){p.st-=cost;p.stDelay=.6;const r0=raw;raw*=sh?(d&&d.heavy?.25:.1):(d&&d.heavy?.4:.2);ev(f,'block');TM(f).block++;if(hasA('epines')&&!f.storm)applyDmg(f,{id:'ronces',n:'Ronces',el:'terre',t:'dmg',altfx:1,chain:1,fixed:Math.max(1,Math.round((r0-raw)*2))},1,f.b);if(sh)f.resent=Math.min(5,(f.resent||0)+1)}else{p.st=0;p.guard=false;if(!f.buffs.some(x=>x.id==='crep')){p.frozen=.4;say(f,'Garde brisée');ev(f,'gbreak')}}}
   const bas=f.buffs.find(x=>x.id==='bastion'),tgd=f.buffs.find(x=>x.id==='tguard');
-  let dm=raw*(f.weaken>0?1-(f.weakenAmt||.4):1)*(1-resT()/100)*(bas?1-bas.v/100:1)*(tgd?.7:1)*(WM('agile')?1.25:1)*(voie('rem',2)?.9:1);dm=Math.max(1,Math.round(dm));if(f.ms.carn){if(f.ms.carn>=5)txt(f,p.x,p.y-30,'Carnage perdu','dim');f.ms.carn=0}
+  let dm=raw*(f.weaken>0?1-(f.weakenAmt||.4):1)*(1-resT()/100)*(bas?1-bas.v/100:1)*(tgd?.7:1)*(WM('agile')?1.25:1)*(voie('rem',2)?.9:1);dm=Math.max(1,Math.round(dm));{const T=TM(f),k=(d&&(d.n||d.k))||'Autre';T.taken[k]=(T.taken[k]||0)+dm;T.hitN[k]=(T.hitN[k]||0)+1;T.killer=k;T.low=Math.min(T.low,Math.max(0,(run.hp-dm)/maxHp()))}if(f.ms.carn){if(f.ms.carn>=5)txt(f,p.x,p.y-30,'Carnage perdu','dim');f.ms.carn=0}
   run.hp=Math.max(0,run.hp-dm);p.hurt=.25;if(runeN('ronces')&&dm>0&&!f.pvp&&f.b&&!f.over)f.bombs.push({t:.05,sp:{id:'ronce',n:'Ronces',el:'terre',t:'dmg',fixed:Math.max(1,Math.round(dm*.3*runeN('ronces'))),chain:1,pure:1},base:0,tgt:f.b});f.lastHit=f.t;if(!f.hits&&!f.pvp)say(f,'Coup reçu : légendaire perdu');f.hits=(f.hits||0)+1;ev(f,'phit',{heavy:d&&d.heavy});if(d&&d.heavy)f.hitstop=Math.max(f.hitstop||0,.1);f.shake=Math.max(f.shake,d&&d.heavy?.35:.18);
   txt(f,p.x,p.y,'−'+dm,'hurt');ev(f,'phit2',{pct:dm/maxHp()});
   const unst=f.buffs.some(x=>x.id==='crep');
@@ -1922,12 +1923,12 @@ function doRoll(){
   p.charge=null;const l=Math.hypot(v.x,v.y);p.rdx=v.x/l;p.rdy=v.y/l;p.roll=.3;p.rhit=[];p.trT=0;if(hasA('ombre'))f.ms.ombre=f.t+1.8;p.guard=false;p.parry=0;
   const chain=f.t-(p.lastRoll??-9)<1.1;p.rchain=chain?(p.rchain||0)+1:0;p.lastRoll=f.t;
   p.iframe=Math.max(.06,(.34+(RC().ifr||0))*(f.storm?.6:1)*Math.pow(.5,p.rchain));p.cast=0;heavyRefund(f);f.pending=[];f.swing=null;ev(f,'roll');if(hasS('course'))spells().forEach(x=>{if(f.cds[x.id])f.cds[x.id]=Math.max(0,f.cds[x.id]-.5)});
-  p.st-=(voie('cel',4)?.7:1)*(WM('agile')?0:(f.buffs.some(x=>(x.id==='danse'||x.id==='crep')&&x.l5)?0:Math.max(4,(hasL('abysses')?11:18)+(RC().rollSt||0)-(hasA('vent')?5:0)))+(p.rchain||0)*8+(f.storm?6:0));p.stDelay=.45;
+  TM(f).rolls++;p.st-=(voie('cel',4)?.7:1)*(WM('agile')?0:(f.buffs.some(x=>(x.id==='danse'||x.id==='crep')&&x.l5)?0:Math.max(4,(hasL('abysses')?11:18)+(RC().rollSt||0)-(hasA('vent')?5:0)))+(p.rchain||0)*8+(f.storm?6:0));p.stDelay=.45;
 }
 function doFlask(){
   const f=fight;if(!f||f.over||f.paused)return;const p=f.p;
   if(p.down||run.flasks<1||p.drink>0||p.roll>0||p.frozen>0||run.hp>=maxHp())return;
-  run.flasks--;p.drink=.9;ev(f,'drink');f.gel=0;if(runeN('alchimie'))f.buffs.push({n:'Alchimie',id:'alch',v:25*runeN('alchimie'),t:5,dur:5});
+  run.flasks--;p.drink=.9;ev(f,'drink');TM(f).flasks++;f.gel=0;if(runeN('alchimie'))f.buffs.push({n:'Alchimie',id:'alch',v:25*runeN('alchimie'),t:5,dur:5});
 }
 function castSpell(i,free){
   const f=fight;if(!f||!run)return;const sp=spells()[i];if(sp&&(sp.unstop||sp.id==='bdiv')&&f.p.frozen>0&&!f.over&&!(f.cds[sp.id]>0)&&unlocked(sp)){f.p.frozen=0;f.p.slow=0;f.gel=0}if(!sp||(!free&&!canAct(f))||f.over)return;
@@ -1938,7 +1939,7 @@ function castSpell(i,free){
   if((sp.t==='dmg'||sp.t==='leap')&&sp.rng&&edge(p,b)>sp.rng){txt(f,p.x,p.y,'Trop loin','dim');return}
   if(!free&&hasA('surcharge')&&(p.mp??0)>=mpMax()-.5&&['dmg','leap','nova','trap','order','zone'].includes(sp.t)){f.ms.surch=sp.id;f.ms.surchT=f.t+4;txt(f,p.x,p.y-30,'Surcharge','frost')}
   if(WPN().holy&&f.holy&&sp.t!=='buff'&&sp.fx!=='holyheal'&&!free){const m=f.holy;f.holy=0;f.ms.holyM={m,id:sp.id,t:f.t};const h=healP(Math.round(maxHp()*.01*m));if(h)txt(f,p.x,p.y-20,'+'+h,'ok')}
-  if(hpc){run.hp-=hpc;txt(f,p.x,p.y-12,'−'+hpc,'blood')}else p.mp-=cost;if(free)txt(f,p.x,p.y-30,'Contretemps','frost');else{f.cds[sp.id]=spellCd(sp);f.lastSpell=i}p.cast=.2;p.face=angTo(p,b);ev(f,'cast',{sid:sp.id,el:sp.el,w:sp.wind&&!sp.proj?at(sp.wind,lv):0});if(!f.bmHost)callout(f,p.x,p.y,sp.s||sp.n,sp.col||COL[sp.el]||'#e8dcc0',spellTag(sp,lv));talCast(f,sp);if(f.tut)f.tut.cast++;if(f.pvp)pvpAct('s',{sid:sp.id,el:sp.el,proj:sp.proj&&sp.t==='dmg'?1:0});if(hasL('glyphe')){f.ms.gly=Math.min(5,(f.ms.gly||0)+1);f.ms.glyT=6}
+  if(hpc){run.hp-=hpc;txt(f,p.x,p.y-12,'−'+hpc,'blood')}else p.mp-=cost;if(free)txt(f,p.x,p.y-30,'Contretemps','frost');else{f.cds[sp.id]=spellCd(sp);f.lastSpell=i}{const C=TM(f).casts;C[sp.id]=(C[sp.id]||0)+1}p.cast=.2;p.face=angTo(p,b);ev(f,'cast',{sid:sp.id,el:sp.el,w:sp.wind&&!sp.proj?at(sp.wind,lv):0});if(!f.bmHost)callout(f,p.x,p.y,sp.s||sp.n,sp.col||COL[sp.el]||'#e8dcc0',spellTag(sp,lv));talCast(f,sp);if(f.tut)f.tut.cast++;if(f.pvp)pvpAct('s',{sid:sp.id,el:sp.el,proj:sp.proj&&sp.t==='dmg'?1:0});if(hasL('glyphe')){f.ms.gly=Math.min(5,(f.ms.gly||0)+1);f.ms.glyT=6}
   if(sp.t==='blink'){const face=b.face??angTo(b,p),m=b.r+PR+8,from={x:p.x,y:p.y};p.x=b.x-Math.cos(face)*m;p.y=b.y-Math.sin(face)*m;clampArena(p,PR);p.face=angTo(p,b);p.iframe=Math.max(p.iframe,.25);f.ms.shadow=1;f.ms.lost=.5;if(lv>=5)p.st=Math.min(stMax(),p.st+25);ev(f,'blink',{a:from,b:{x:p.x,y:p.y}});return}
   if(sp.t==='leap'){const a=angTo(b,p),m=b.r+PR+4;p.leap={fx:p.x,fy:p.y,tx:b.x+Math.cos(a)*m,ty:b.y+Math.sin(a)*m,t:0,life:.3,sp,base:rnd(sp.min,sp.max),tgt:b};p.iframe=.36;p.cast=.32;return}
   if(sp.t==='dmg'){
@@ -2116,7 +2117,7 @@ function altAfter(f,sp,base,d,T){
   if(WM('vamp')&&MPHIT[sp.id]&&!sp.chain){f.vLeech=(f.vLeech||0)+d*.05;if(f.vLeech>=1){const n=Math.floor(f.vLeech);f.vLeech-=n;healP(n)}}
   if(!sp.echoA&&!sp.chain&&!sp.splashed&&kOn('echo',sp.id))f.bombs.push({t:.35,sp:Object.assign({},sp,{echoA:1,fx:null,chain:1,inf:null}),base:base*.4,tgt:T});
   if(!sp.chain&&kOn('leech',sp.id)){const h=healP(Math.round(d*.15));if(h)txt(f,f.p.x,f.p.y,'+'+h,'ok')}
-  if(run&&!f.B.train){const src=sp.altfx?'Altérations':sp.echoA?'Échos de sort':MPHIT[sp.id]||sp.id==='quake'||sp.wave?'Arme':sp.id==='pet'?'Familier':(sp.n||'Autres');const D=run.dmgSrc||(run.dmgSrc={});D[src]=(D[src]||0)+d;if(d>(run.maxHit||0)){run.maxHit=d;run.maxHitBy=sp.n||src}}
+  if(run&&!f.B.train){const src=sp.altfx?'Altérations':sp.echoA?'Échos de sort':MPHIT[sp.id]||sp.id==='quake'||sp.wave?'Arme':sp.id==='pet'?'Familier':(sp.n||'Autres');const D=run.dmgSrc||(run.dmgSrc={});D[src]=(D[src]||0)+d;{const TD=TM(f).dealt;TD[src]=(TD[src]||0)+d}if(d>(run.maxHit||0)){run.maxHit=d;run.maxHitBy=sp.n||src}}
   if(hasA('rebond')&&!sp.echoA&&!sp.chain&&isSpell(sp)&&!sp.splashed)f.bombs.push({t:.4,sp:Object.assign({},sp,{echoA:1,fx:null,chain:1,inf:null}),base:base*(hasS('reso')?.8:.4),tgt:T});
   if(sp.echoA&&hasS('hemo')){const h=healP(Math.round(d*.25));if(h)txt(f,f.p.x,f.p.y,'+'+h,'ok')}
   if(sp.id==='wl'&&hasA('elan')&&f.cds.wh>0)f.cds.wh=Math.max(0,f.cds.wh-.4);
@@ -2252,8 +2253,25 @@ function bossStep(f,dt,p){const b=f.b,B=f.B;
   if(f.ms.reinf&&!f.storm){const Rf=f.ms.reinf;Rf.t-=dt;const tot=Rf.adds.reduce((a,x)=>a+x[1],0),alive=f.adds.filter(a=>a.alive).length;
     if(Rf.t<=0){Rf.t=20;if(alive<tot){const [k]=pick(Rf.adds);f.ms.curLink=0;summon(f,k,1);f.ms.curLink=0;say(f,'Le gardien appelle des renforts')}}}
 }
+/* ===================== SUIVI DES COMBATS =====================
+   À la fin de chaque combat d'ascension, une ligne résumée part vers la table « fights » (même Supabase que le classement) :
+   classe, gardien, issue, dégâts par source, coups reçus par attaque, esquives… pour équilibrer sur de vraies parties. */
+const TMV=1;
+function TM(f){return f.tm||(f.tm={dealt:{},taken:{},hitN:{},atkN:{},casts:{},dodge:0,block:0,rolls:0,flasks:0,low:1,killer:null})}
+function tmSend(f,won){try{
+  if(!run||!f||f.pvp||f.tut||run.tut||run.pvp||run.bm||f.B.train||run.train||f.bmHero||f.bmHost)return;if(!(LADDER_API.url&&LADDER_API.key))return;
+  const T=TM(f),rid=run.rid||(run.rid=Math.random().toString(36).slice(2,10)),R=o=>{const r={};for(const k in o)r[k]=Math.round(o[k]);return r};
+  const items=Object.entries(run.items||{}).map(([sl,it])=>({s:sl,a:it.arch||null,set:it.set||null,leg:it.leg||null,alt:it.alt||null,r:it.rune||null}));
+  const data={asc:run.asc||0,heat:heatOf(run.pacts),mut:f.mut?1:0,endless:run.endless?1:0,coop:f.co?1:0,daily:run.daily?1:0,rush:run.rush?1:0,mini:run.mini?1:0,
+    lvl:run.lvl,hpMax:maxHp(),hpEnd:Math.max(0,Math.round(run.hp)),flasksLeft:run.flasks,stats:Object.assign({},run.stats),alloc:run.allocAll||null,
+    voies:{fur:voieN('fur'),rem:voieN('rem'),cel:voieN('cel')},items,spells:Object.fromEntries(spells().map(x=>[x.id,lvOf(x)])),wpn:run.wsel||null,tal:run.tal||[],pacts:run.pacts||[],
+    dealt:R(T.dealt),taken:R(T.taken),hitN:T.hitN,atkN:T.atkN,casts:T.casts,dodge:T.dodge,parry:f.ms.parries||0,block:T.block,rolls:T.rolls,flasks:T.flasks,low:Math.round(T.low*100)/100,
+    killer:won?null:T.killer,phase:f.ms.ph||0,bossLeft:won?0:Math.round(f.bhp/f.bmax*100)/100,dps:Math.round((f.bmax-f.bhp)/Math.max(1,f.t))};
+  const body={v:TMV,pseudo:ladName(meta.pseudo)||null,run_id:rid,cls:run.cls,race:run.race||null,boss:f.B.id,floor:run.floor,won:!!won,secs:Math.round(f.t),data};
+  fetch(LADDER_API.url.replace(/\/+$/,'')+'/rest/v1/fights',{method:'POST',keepalive:true,headers:Object.assign({'Content-Type':'application/json',Prefer:'return=minimal'},ladH()),body:JSON.stringify(body)}).catch(()=>{});
+}catch(e){}}
 function endFight(won){
-  const f=fight;if(!f||f.over)return;if(f.pvp){f.over=true;ev(f,won?'bdeath':'pdeath');pvpRoundOver(won);return}if(f.coG&&!f.coEnd&&won)return;if(f.co&&f.co.role==='A')coSend('cend',{won:won?1:0});if(won&&f.p.down){f.p.down=false;run.hp=Math.max(1,Math.round(maxHp()*.3))}f.over=true;if(run){run.ftime=(run.ftime||0)+f.t;run.time=(run.time||0)+f.t;if(!f.B.train){run.parries=(run.parries||0)+(f.ms.parries||0);if(won&&!f.B.echo){const bt=run.bossT||(run.bossT={});bt[f.B.id]=Math.round(f.t)}}}if(f.achMsg)ui.toast=f.achMsg.join(' · ');
+  const f=fight;if(!f||f.over)return;if(f.pvp){f.over=true;ev(f,won?'bdeath':'pdeath');pvpRoundOver(won);return}if(f.coG&&!f.coEnd&&won)return;if(f.co&&f.co.role==='A')coSend('cend',{won:won?1:0});if(won&&f.p.down){f.p.down=false;run.hp=Math.max(1,Math.round(maxHp()*.3))}f.over=true;tmSend(f,won);if(run){run.ftime=(run.ftime||0)+f.t;run.time=(run.time||0)+f.t;if(!f.B.train){run.parries=(run.parries||0)+(f.ms.parries||0);if(won&&!f.B.echo){const bt=run.bossT||(run.bossT={});bt[f.B.id]=Math.round(f.t)}}}if(f.achMsg)ui.toast=f.achMsg.join(' · ');
   ev(f,won?'bdeath':'pdeath');f.msg=null;
   if(won)f.adds.forEach(a=>killAdd(f,a));
   if(won){f.slow=2.6;f.cine={t:0};f.hitstop=0;id('stage')&&id('stage').classList.add('flash');setTimeout(()=>{const s2=id('stage');s2&&s2.classList.remove('flash')},200)}
@@ -5305,11 +5323,11 @@ function act(a,v){
     case 'aura': ui.auraPrev=v||'';if(!v||cosOk(v)){meta.aura=v&&cosOk(v)?v:'';save()}render(); break;
     case 'asc': meta.ascSel=Math.max(0,Math.min(meta.ascMax||0,+v));save();render(); break;
     case 'fight': if(needPath()){render();break}if(unspent()&&ui.confirm!=='unspent'){ui.confirm='unspent';render();break}ui.confirm=null;if(coRun()&&!run.train&&!run.mini){coReady(false);break}startFight(); break;
-    case 'autopts':{const k=topStat();run.stats[k]=(run.stats[k]||0)+run.pts*ptVal(k);if(k==='vit')run.hp+=run.pts*3;run.pts=0;save();render()} break;
+    case 'autopts':{const k=topStat();{const AA=run.allocAll||(run.allocAll={});AA[k]=(AA[k]||0)+run.pts}run.stats[k]=(run.stats[k]||0)+run.pts*ptVal(k);if(k==='vit')run.hp+=run.pts*3;run.pts=0;save();render()} break;
     case 'goto':{ui.confirm=null;if(v==='sec-stats'||v==='sec-spells'){ui.ptab=v==='sec-stats'?'stats':'spells';v='sec-prog'}render();const el=document.getElementById(v);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})} break;
-    case 'pt': {const [k,nn]=v.split(':');const n=nn==='all'?run.pts:Math.min(+nn,run.pts);if(n<1)break;run.pts-=n;const add=n*ptVal(k);const L0=palLv(k);run.stats[k]=(run.stats[k]||0)+add;if(PAL[k]&&palLv(k)>L0)ui.toast=`Palier ${STATN[k]} ${PAL[k].t[palLv(k)-1]} atteint : ${PAL[k].d[palLv(k)-1]} !`;if(k==='vit')run.hp+=add;const A=run.alloc||(run.alloc={});A[k]=(A[k]||0)+n;save();render()} break;
-    case 'ptm': {const A=run.alloc||(run.alloc={}),k=v,n=Math.min(1,A[k]||0);if(n<1)break;A[k]-=n;run.pts+=n;const add=n*ptVal(k);run.stats[k]=(run.stats[k]||0)-add;if(k==='vit')run.hp=Math.max(1,Math.min(maxHp(),run.hp-add));save();render()} break;
-    case 'ptreset': {const A=run.alloc||{};for(const k in A){const n=A[k];if(!n)continue;run.pts+=n;const add=n*ptVal(k);run.stats[k]=(run.stats[k]||0)-add;if(k==='vit')run.hp=Math.max(1,Math.min(maxHp(),run.hp-add))}run.alloc={};save();render()} break;
+    case 'pt': {const [k,nn]=v.split(':');const n=nn==='all'?run.pts:Math.min(+nn,run.pts);if(n<1)break;run.pts-=n;const add=n*ptVal(k);const L0=palLv(k);run.stats[k]=(run.stats[k]||0)+add;if(PAL[k]&&palLv(k)>L0)ui.toast=`Palier ${STATN[k]} ${PAL[k].t[palLv(k)-1]} atteint : ${PAL[k].d[palLv(k)-1]} !`;if(k==='vit')run.hp+=add;const A=run.alloc||(run.alloc={});A[k]=(A[k]||0)+n;const AA=run.allocAll||(run.allocAll={});AA[k]=(AA[k]||0)+n;save();render()} break;
+    case 'ptm': {const A=run.alloc||(run.alloc={}),k=v,n=Math.min(1,A[k]||0);if(n<1)break;A[k]-=n;run.pts+=n;if(run.allocAll&&run.allocAll[k])run.allocAll[k]-=n;const add=n*ptVal(k);run.stats[k]=(run.stats[k]||0)-add;if(k==='vit')run.hp=Math.max(1,Math.min(maxHp(),run.hp-add));save();render()} break;
+    case 'ptreset': {const A=run.alloc||{};for(const k in A){const n=A[k];if(!n)continue;run.pts+=n;if(run.allocAll&&run.allocAll[k])run.allocAll[k]-=n;const add=n*ptVal(k);run.stats[k]=(run.stats[k]||0)-add;if(k==='vit')run.hp=Math.max(1,Math.min(maxHp(),run.hp-add))}run.alloc={};save();render()} break;
     case 'ptab': ui.ptab=v;render(); break;
     case 'mtab': ui.ptab=v;render();{const el=id('sec-prog');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})} break;
     case 'spdown':{const sp=spells().find(x=>x.id===v),S=run.spAlloc||(run.spAlloc={});if(!sp||!S[v])break;const lv=lvOf(sp);if(lv<=1)break;run.spellLv[v]=lv-1;run.spPts=(run.spPts??1)+spCost(lv-1);S[v]--;save();render()} break;

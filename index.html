@@ -1273,6 +1273,7 @@ function auInit(){if(AU.ctx){if(AU.ctx.state==='suspended')AU.ctx.resume();retur
     AU.master=C.createGain();AU.master.connect(AU.soft);AU.sfx=C.createGain();AU.sfx.connect(AU.master);AU.music=C.createGain();AU.music.connect(AU.master);
     const n=C.sampleRate*1.5,b=C.createBuffer(1,n,C.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;AU.noise=b;
     // écho léger pour la musique
+    {const L=Math.round(C.sampleRate*1.6),ir=C.createBuffer(2,L,C.sampleRate);for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);for(let i=0;i<L;i++){const t=i/C.sampleRate;d[i]=t<.012?0:(Math.random()*2-1)*Math.pow(1-i/L,3.2)*(t<.06?1.4:1)}}AU.cv=C.createConvolver();AU.cv.buffer=ir;AU.revIn=C.createGain();AU.revIn.gain.value=1;const ro=C.createGain();ro.gain.value=.55;const rl=C.createBiquadFilter();rl.type='lowpass';rl.frequency.value=4200;AU.revIn.connect(AU.cv);AU.cv.connect(rl);rl.connect(ro);ro.connect(AU.sfx)}
     AU.dl=C.createDelay(1);AU.dl.delayTime.value=.33;AU.fb=C.createGain();AU.fb.gain.value=.22;AU.dl.connect(AU.fb);AU.fb.connect(AU.dl);AU.dl.connect(AU.music);
     auVol();AU.on=true;smpLoad()}catch(e){AU.ctx=null}}
 const VOL=()=>Object.assign({m:.7,mu:.35,fx:.75,mute:false},meta.vol||{});
@@ -1282,11 +1283,11 @@ function tone(f0,dur,o){const C=AU.ctx;if(!C||(AU.v||0)>28)return;o=o||{};AU.v=(
   os.type=o.type||'sine';os.frequency.setValueAtTime(f0,t);if(o.to)os.frequency.exponentialRampToValueAtTime(Math.max(20,o.to),t+dur);if(o.det)os.detune.value=o.det;
   const v=o.vol??.3,a=o.a??.005;g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(v,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
   let node=os;if(o.lp){const fl=C.createBiquadFilter();fl.type='lowpass';fl.frequency.value=o.lp;node.connect(fl);node=fl}
-  node.connect(g);g.connect(o.bus||AU.sfx);if(o.send)g.connect(AU.dl);os.onended=()=>{AU.v--;try{g.disconnect()}catch(_){}};os.start(t);os.stop(t+dur+.05)}
+  node.connect(g);g.connect(o.bus||AU.sfx);if(o.rev&&AU.revIn){const rg=C.createGain();rg.gain.value=o.rev;g.connect(rg);rg.connect(AU.revIn)}if(o.send)g.connect(AU.dl);os.onended=()=>{AU.v--;try{g.disconnect()}catch(_){}};os.start(t);os.stop(t+dur+.05)}
 function noise(dur,o){const C=AU.ctx;if(!C||(AU.v||0)>28)return;o=o||{};AU.v=(AU.v||0)+1;const t=C.currentTime+(o.delay||0),src=C.createBufferSource(),fl=C.createBiquadFilter(),g=C.createGain();
   src.buffer=AU.noise;src.loop=true;fl.type=o.ft||'bandpass';fl.frequency.setValueAtTime(o.f||1200,t);if(o.to)fl.frequency.exponentialRampToValueAtTime(Math.max(30,o.to),t+dur);fl.Q.value=o.q??1;
   const v=o.vol??.3;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+(o.a??.004));g.gain.exponentialRampToValueAtTime(.0001,t+dur);
-  src.connect(fl);fl.connect(g);g.connect(o.bus||AU.sfx);src.onended=()=>{AU.v--;try{g.disconnect()}catch(_){}};src.start(t,Math.random());src.stop(t+dur+.05)}
+  src.connect(fl);fl.connect(g);g.connect(o.bus||AU.sfx);if(o.rev&&AU.revIn){const rg=C.createGain();rg.gain.value=o.rev;g.connect(rg);rg.connect(AU.revIn)}src.onended=()=>{AU.v--;try{g.disconnect()}catch(_){}};src.start(t,Math.random());src.stop(t+dur+.05)}
 const ELS={terre:()=>{tone(90,.25,{type:'triangle',to:50,vol:.35});noise(.2,{ft:'lowpass',f:400,vol:.25})},
   feu:()=>{noise(.35,{f:900,to:2600,q:.7,vol:.25});tone(180,.2,{type:'sawtooth',to:90,vol:.08,lp:900})},
   air:()=>{noise(.3,{f:2400,to:5200,q:3,vol:.18});tone(900,.2,{to:1500,vol:.06})},
@@ -1301,14 +1302,14 @@ function smpLoad(){const C=AU.ctx;if(!C||AU.buf)return;AU.buf={};for(const k in 
   const pr=C.decodeAudioData(u.buffer,b=>{AU.buf[k]=b},()=>{});if(pr&&pr.catch)pr.catch(()=>{})}catch(_){}}}
 function smp(k,o){const C=AU.ctx,b=AU.buf&&AU.buf[k];if(!C||!b||VOL().rec===false||(AU.v||0)>28)return false;o=o||{};AU.v=(AU.v||0)+1;
   const s=C.createBufferSource(),g=C.createGain();s.buffer=b;s.playbackRate.value=(o.rate||1)*(.94+Math.random()*.12);g.gain.value=o.vol??.5;
-  let nd=s;if(o.lp||o.hp){const fl=C.createBiquadFilter();fl.type=o.lp?'lowpass':'highpass';fl.frequency.value=o.lp||o.hp;nd.connect(fl);nd=fl}nd.connect(g);g.connect(AU.sfx);s.onended=()=>{AU.v--;try{g.disconnect()}catch(_){}};s.start(C.currentTime+(o.delay||0));return true}
+  let nd=s;if(o.lp||o.hp){const fl=C.createBiquadFilter();fl.type=o.lp?'lowpass':'highpass';fl.frequency.value=o.lp||o.hp;nd.connect(fl);nd=fl}nd.connect(g);g.connect(AU.sfx);if(AU.revIn&&(o.rev??.16)>0){const rg=C.createGain();rg.gain.value=o.rev??.16;g.connect(rg);rg.connect(AU.revIn)}s.onended=()=>{AU.v--;try{g.disconnect()}catch(_){}};s.start(C.currentTime+(o.delay||0));return true}
 /* bruit d'impact selon ce qu'on frappe : chair, os, pierre, chitine, armure, écailles, bois, vase, glace */
 const MATB={bouftou:'flesh',tofu:'flesh',scara:'chitin',wa:'flesh',craq:'stone',krala:'slime',kimbo:'armor',obsi:'scale',hare:'flesh',secret:'bone',dummy:'wood'},
   MATA={bouftou:'flesh',tofu:'flesh',scaraf:'chitin',wabbit:'wood',roc:'stone',tentacule:'slime',glyphe:'armor',givre:'ice',rouage:'bone'};
 const smv=(k,o)=>smp(k+Math.floor(Math.random()*3),o);
 const FLOOR={bouftou:'fg',tofu:'fg',wa:'fg',krala:'fg',kimbo:'fw',obsi:'fs',scara:'fc',craq:'fc',hare:'fc',secret:'fw',pvp:'fc',dummy:'fg'};
 function footTick(f,R,dt){if(!AU.on||!f||f.over||VOL().rec===false)return;const k=FLOOR[f.B.id]||'fc';
-  if(R.amp>.25&&!f.p.leap&&!f.p.down){R.stepT=(R.stepT||0)-dt;if(R.stepT<=0){R.stepT=f.p.roll>0?.18:.3;smv(k,{vol:k==='fs'?.32:.24,rate:.95+Math.random()*.15})}}else R.stepT=0;
+  if(R.amp>.25&&!f.p.leap&&!f.p.down){R.stepT=(R.stepT||0)-dt;if(R.stepT<=0){R.stepT=f.p.roll>0?.18:.3;smv(k,{vol:k==='fs'?.32:.24,rate:.95+Math.random()*.15,rev:0})}}else R.stepT=0;
   const b=f.b,sp=R.bsp||0;if(sp>30&&!b.jump&&(f.B.big||1)>=1.1&&!(f.ms.hide>0)){R.bstepT=(R.bstepT||0)-dt;if(R.bstepT<=0){R.bstepT=.55;smv('mn',{vol:.28,rate:.55+Math.random()*.1,lp:700})}}}
 function impactMat(m,v,hv){const H=hv?1.2:1,V=x=>x*v*H;
   switch(m){
@@ -1323,17 +1324,17 @@ function impactMat(m,v,hv){const H=hv?1.2:1,V=x=>x*v*H;
   default:smv(hv?'pH':'pM',{vol:V(.9),rate:hv?.9:1});smv('sH',{vol:V(.35),rate:.8,lp:1200});if(hv)smv('mn',{vol:V(.25),rate:.7,lp:900})}}
 function sfx(k,e){if(!AU.on)return;const now=performance.now(),gap={hit:45,burn:120,bite:90,zhit:60,block:60,swing:40,cast:40}[k]||25;if(now-(AU.last[k]||0)<gap)return;AU.last[k]=now;e=e||{};
   switch(k){
-  case 'swing':noise(.16,{f:e.heavy?700:1400,to:e.heavy?2400:4000,q:1.5,vol:e.heavy?.22:.14});break;
+  case 'swing':{const H=e.heavy,d=H?.42:.2;noise(d,{f:H?350:900,to:H?1500:2600,q:2.2,vol:H?.3:.17,a:d*.55});noise(d*.9,{ft:'lowpass',f:H?380:700,vol:H?.22:.08,a:d*.5});if(H)noise(d*.7,{f:2600,to:5200,q:4,vol:.06,a:d*.6,delay:.05});break}
   case 'shoot':noise(.12,{f:2600,to:1400,q:4,vol:.12});tone(e.cls==='cra'?520:340,.12,{type:'triangle',to:e.cls==='cra'?260:200,vol:.08});break;
   case 'hit':{const m=e.mat||'flesh',v=e.pos?.65:1,hv=e.crit||e.sid==='wh'||e.boom;impactMat(m,v,hv);if(e.crit){tone(1200,.12,{type:'triangle',vol:.08});noise(.08,{f:2500,vol:.1})}break}
   case 'heart':tone(55,.18,{vol:.25});tone(50,.2,{vol:.2,delay:.2});break;
   case 'phit':smv(e.heavy?'pH':'pM',{vol:e.heavy?.95:.75,rate:e.heavy?.8:.95});smv('sH',{vol:.45,rate:.75,lp:1100});smp('hurt',{vol:e.heavy?.45:.3,rate:e.heavy?.85:1});break;
   case 'roll':noise(.22,{f:500,to:250,q:.6,vol:.16});break;
-  case 'parry':smv('mt',{vol:.85,rate:1.15});smv('bl',{vol:.3,rate:1.4,delay:.02});tone(1760,.5,{type:'triangle',vol:.1});break;
+  case 'parry':smv('mt',{vol:.9,rate:1.15,rev:.5});smv('bl',{vol:.35,rate:1.4,delay:.02,rev:.6});smv('mn',{vol:.3,rate:.9});break;
   case 'block':smv('ph',{vol:.7,rate:1.05});smv('mM',{vol:.35,rate:1.1});break;
   case 'gbreak':smp('impact',{vol:.6,rate:.75});tone(300,.4,{type:'sawtooth',to:80,vol:.2,lp:1200});noise(.3,{f:600,vol:.25});break;
-  case 'wind':tone(e.heavy?70:110,e.heavy?.7:.35,{type:'triangle',to:e.heavy?140:150,vol:e.heavy?.14:.07,lp:400,a:.08});break;
-  case 'strike':case 'bland':case 'wslam':case 'quake':smv('mn',{vol:.85,rate:.62});smp('land',{vol:.6,rate:.85});tone(48,.45,{type:'sine',to:30,vol:.3});break;
+  case 'wind':{const w=Math.min(1.6,Math.max(.3,e.w||.6));if(e.heavy){tone(52,w,{type:'sawtooth',to:44,vol:.16,lp:320,a:w*.8});noise(w,{ft:'lowpass',f:200,to:900,vol:.22,a:w*.85});tone(104,w*.9,{type:'sawtooth',to:88,vol:.05,lp:500,a:w*.7})}else{noise(Math.min(.45,w),{f:500,to:1600,q:1.5,vol:.1,a:Math.min(.45,w)*.8})}break}
+  case 'strike':case 'bland':case 'wslam':case 'quake':smv('mn',{vol:.85,rate:.62,rev:.35});smp('land',{vol:.6,rate:.85});tone(48,.45,{type:'sine',to:30,vol:.3});break;
   case 'zhit':smv('mn',{vol:.55,rate:.85});smp('land',{vol:.35,rate:1.1});break;
   case 'phase':smp('boss',{vol:.8});tone(98,2.2,{type:'triangle',vol:.3,send:1});tone(147,2,{type:'triangle',vol:.18,send:1});tone(196,1.8,{vol:.12,send:1});noise(.8,{ft:'lowpass',f:300,vol:.3});break;
   case 'storm':tone(60,2.5,{type:'triangle',to:120,vol:.18,lp:400,a:.4});noise(1.6,{ft:'lowpass',f:300,to:900,vol:.12,a:.4});break;
@@ -1354,7 +1355,7 @@ function sfx(k,e){if(!AU.on)return;const now=performance.now(),gap={hit:45,burn:
   case 'cast':(ELS[e.el]||(()=>{tone(660,.3,{type:'triangle',vol:.1,send:1});tone(990,.25,{vol:.06,delay:.04,send:1})}))();break;
   case 'bdeath':smp('big_kill',{vol:.85});tone(70,2,{type:'sawtooth',to:30,vol:.25,lp:400});noise(1.6,{ft:'lowpass',f:800,to:100,vol:.35});
     [523,659,784,1047].forEach((f2,i)=>tone(f2,.9,{type:'triangle',vol:.14,delay:.8+i*.12,send:1}));break;
-  case 'pdeath':[392,330,262,196].forEach((f2,i)=>tone(f2,.8,{type:'triangle',vol:.14,delay:i*.18,send:1,lp:1500}));break;
+  case 'pdeath':smv('bl',{vol:.7,rate:.5,rev:.9});[55,82.4,110].forEach((f2,i)=>tone(f2,2.6,{type:'sawtooth',vol:.09,lp:520,a:.25,delay:.05*i,rev:.6}));noise(1.8,{ft:'lowpass',f:300,to:80,vol:.18,a:.3});break;
   case 'chstart':tone(220,.25,{type:'triangle',to:330,vol:.06});break;
   case 'chtier':tone(330*Math.pow(1.26,e.n||1),.3,{type:'triangle',vol:.1+.03*(e.n||1)});if(e.n>=3)tone(1320,.5,{vol:.08,delay:.05});break;
   case 'chwave':smp('land',{vol:.7,rate:.8});tone(60,.8,{to:30,vol:.45});noise(.6,{ft:'lowpass',f:900,to:120,vol:.35});break;
@@ -1791,7 +1792,7 @@ function startAtk(f){
   const key=nextKey(f),d=(f.atkX&&f.atkX[key])||f.B.atks[key],b=f.b;f.step++;b.wait=0;
   if(d.k==='special'){d.fx(f);say(f,d.n);b.cool=d.cool||1.1;return}
   const a={key,d,t:0,wind:(d.wind||.8)*windMul(f),rep:d.repeat||1,ang:b.face??angTo(b,f.p),gen:(f.gen2=(f.gen2||0)+1),rk:0};
-  setupTargets(f,a);b.atk=a;say(f,d.n);ev(f,'wind',{heavy:!!d.heavy});
+  setupTargets(f,a);b.atk=a;say(f,d.n);ev(f,'wind',{heavy:!!d.heavy,w:a.wind});
 }
 function setupTargets(f,a){
   const d=a.d,p=f.p;

@@ -712,7 +712,7 @@ const CLASSES={
    {id:'bond',n:'Saut de brèche',s:'Brèche',role:'Rapprochement',el:'terre',pa:3,min:12,max:16,cds:[6,5.5,5,4.5,4],rng:320,t:'leap',unlock:1,
     d:'Bondit jusqu\u2019au boss et frappe à l\u2019atterrissage. Invulnérable pendant le saut.',l5:'L\u2019atterrissage ouvre la garde du boss pendant 2 s.'},
    {id:'colere',n:'Courroux d\u2019Orvane',s:'Courroux',role:'Gros dégâts',el:'terre',pa:5,min:34,max:42,cds:[10,9.5,9,8.5,8],rng:58,t:'dmg',wind:[.7,.65,.6,.55,.45],unlock:1,
-    d:'Charge un coup énorme au contact. Tu peux bouger pendant la charge (plus lentement) ; rouler ou parer l’annule.',l5:'Charge très courte : 0,45 s.'},
+    d:'Charge un coup énorme au contact. Tu peux bouger pendant la charge (plus lentement). Rouler ou parer l’annule sans perdre la recharge ; un coup reçu l’interrompt.',l5:'Charge très courte : 0,45 s.'},
    {id:'intim',n:'Cri d\u2019enclume',s:'Cri',role:'Défense',el:'terre',pa:2,min:6,max:8,cds:[8,7.5,7,6.5,6],rng:60,t:'dmg',fx:'weaken',v:[25,30,35,40,45],dur:4,unlock:3,
     d:'Un coup qui affaiblit le boss : ses attaques font moins mal pendant 4 s.',l5:'Interrompt aussi l\u2019attaque en préparation (sauf coups puissants).'},
    {id:'puiss',n:'Forge intérieure',s:'Forge',role:'Renfort',el:null,pa:2,cds:[16,15,14,13,12],t:'buff',v:[20,25,30,37,45],dur:6,unlock:4,
@@ -1874,7 +1874,7 @@ function hurtP(f,raw,d){
   if(!ub&&p.parry>0){perfectParry(f);return false}
   if(!ub&&p.guard){const sh=WPN().shield,cost=(raw*.8+6)*(sh?.5:1);if(p.st>=cost){p.st-=cost;p.stDelay=.6;const r0=raw;raw*=sh?(d&&d.heavy?.25:.1):(d&&d.heavy?.4:.2);ev(f,'block');TM(f).block++;if(hasA('epines')&&!f.storm)applyDmg(f,{id:'ronces',n:'Ronces',el:'terre',t:'dmg',altfx:1,chain:1,fixed:Math.max(1,Math.round((r0-raw)*2))},1,f.b);if(sh)f.resent=Math.min(5,(f.resent||0)+1)}else{p.st=0;p.guard=false;if(!f.buffs.some(x=>x.id==='crep')){p.frozen=.4;say(f,'Garde brisée');ev(f,'gbreak')}}}
   const bas=f.buffs.find(x=>x.id==='bastion'),tgd=f.buffs.find(x=>x.id==='tguard');
-  let dm=raw*(f.weaken>0?1-(f.weakenAmt||.4):1)*(1-resT()/100)*(bas?1-bas.v/100:1)*(tgd?.7:1)*(WM('agile')?1.25:1)*(voie('rem',2)?.9:1);dm=Math.max(1,Math.round(dm));{const T=TM(f),k=(d&&(d.n||d.k))||'Autre';T.taken[k]=(T.taken[k]||0)+dm;T.hitN[k]=(T.hitN[k]||0)+1;T.killer=k;T.low=Math.min(T.low,Math.max(0,(run.hp-dm)/maxHp()))}if(f.ms.carn){if(f.ms.carn>=5)txt(f,p.x,p.y-30,'Carnage perdu','dim');f.ms.carn=0}
+  let dm=raw*(f.weaken>0?1-(f.weakenAmt||.4):1)*(1-resT()/100)*(bas?1-bas.v/100:1)*(tgd?.7:1)*(WM('agile')?1.25:1)*(voie('rem',2)?.9:1);dm=Math.max(1,Math.round(dm));if(f.pending.some(q=>q.w&&q.sp&&q.sp.rng<=120)&&!(d&&d.hz)){chargeStop(f,false);p.cast=0}{const T=TM(f),k=(d&&(d.n||d.k))||'Autre';T.taken[k]=(T.taken[k]||0)+dm;T.hitN[k]=(T.hitN[k]||0)+1;T.killer=k;T.low=Math.min(T.low,Math.max(0,(run.hp-dm)/maxHp()))}if(f.ms.carn){if(f.ms.carn>=5)txt(f,p.x,p.y-30,'Carnage perdu','dim');f.ms.carn=0}
   run.hp=Math.max(0,run.hp-dm);p.hurt=.25;if(runeN('ronces')&&dm>0&&!f.pvp&&f.b&&!f.over)f.bombs.push({t:.05,sp:{id:'ronce',n:'Ronces',el:'terre',t:'dmg',fixed:Math.max(1,Math.round(dm*.3*runeN('ronces'))),chain:1,pure:1},base:0,tgt:f.b});f.lastHit=f.t;if(!f.hits&&!f.pvp)say(f,'Coup reçu : légendaire perdu');f.hits=(f.hits||0)+1;ev(f,'phit',{heavy:d&&d.heavy});if(d&&d.heavy)f.hitstop=Math.max(f.hitstop||0,.1);f.shake=Math.max(f.shake,d&&d.heavy?.35:.18);
   txt(f,p.x,p.y,'−'+dm,'hurt');ev(f,'phit2',{pct:dm/maxHp()});
   const unst=f.buffs.some(x=>x.id==='crep');
@@ -1907,7 +1907,7 @@ function doGuard(on){const f=fight;if(!f||f.over||f.paused)return;const p=f.p;
   if(!on){p.guard=false;return}
   if(p.down||p.leap||p.roll>0||p.frozen>0||p.drink>0||(p.parryCd||0)>0)return;
   if(p.st<8){txt(f,p.x,p.y,'Endurance','ok');return}
-  p.st-=8;p.stDelay=.4;p.parry=Math.max(RC().parry||.2,WPN().shield?.27:0);p.parryCd=.55;p.guard=true;p.cast=0;heavyRefund(f);if(f.swing&&!f.swing.done)f.swing=null;f.pending=f.pending.filter(q=>q.w&&q.sp&&q.sp.rng>120);f.buf=null}
+  p.st-=8;p.stDelay=.4;p.parry=Math.max(RC().parry||.2,WPN().shield?.27:0);p.parryCd=.55;p.guard=true;p.cast=0;heavyRefund(f);if(f.swing&&!f.swing.done)f.swing=null;chargeStop(f,true);f.buf=null}
 /* Posture : chaque coup l'entame, les parades parfaites et les coups lourds surtout. Pleine, le gardien s'effondre. */
 function addPosture(f,v){v*=RC().post||1;if(f.coG){coAcc(0,v);return}if(f.post+v/(f.B.big||1)>=100&&!(f.brokenT>0))setTimeout(()=>achieve('brk'),0);const b=f.b;if(f.storm||b.jump||f.over||f.brokenT>0)return;f.post=Math.min(100,(f.post||0)+v/(f.B.big||1));f.postT=2.5;
   if(f.post>=100){f.post=0;f.brokenT=2.6;b.atk=null;b.dash=null;b.rec=Math.max(b.rec,2.6);b.vuln=Math.max(b.vuln,2.6);b.cool=Math.max(b.cool,3);f.hitstop=Math.max(f.hitstop||0,.18);f.shake=Math.max(f.shake,.5);
@@ -1918,13 +1918,17 @@ function perfectParry(f){addPosture(f,30);if(runeN('riposte'))spells().forEach(x
   if(dist(p,b)<b.r+260&&!b.jump&&!f.storm){const rep=f.t-(f.ms.lastParry??-99)<6,k=rep?.5:1;f.ms.lastParry=f.t;b.atk=null;b.dash=null;b.rec=Math.max(b.rec,.55*k);b.vuln=Math.max(b.vuln,.8*k);b.cool=Math.max(b.cool,.75*k);ev(f,'stagger')}}
 /* coup lourd annulé avant l'impact (roulade, parade) : pas de temps de recharge */
 function heavyRefund(f){const S=f.swing;if(!S||!S.heavy)return;if(S.melee?S.done:!f.pending.some(q=>q.sp&&q.sp.id==='wh'))return;f.cds.wh=0}
+/* sort chargé interrompu : annulé par toi (roulade, parade) = recharge et mana rendues ; coupé par un coup = tout est perdu */
+function chargeStop(f,manual){const p=f.p;let n=0;f.pending=f.pending.filter(q=>{if(!q.w||!q.sp)return !manual;if(q.sp.rng>120)return true;
+    if(manual){f.cds[q.sp.id]=0;if(q.mp)p.mp=Math.min(mpMax(),p.mp+q.mp);if(q.hp)run.hp=Math.min(maxHp(),run.hp+q.hp);n++}else{txt(f,p.x,p.y-30,'Interrompu','blood');}return false});
+  if(manual&&n)txt(f,p.x,p.y-30,'Annulé : recharge rendue','dim')}
 function doRoll(){
   const f=fight;if(!f||f.over||f.paused)return;const p=f.p;
   if(p.down||p.leap||p.roll>0||p.frozen>0||p.drink>0||p.st<1)return;
   let v=moveVec();if(!v.x&&!v.y){const a=angTo(f.b,p);v={x:Math.cos(a),y:Math.sin(a)}}
   p.charge=null;const l=Math.hypot(v.x,v.y);p.rdx=v.x/l;p.rdy=v.y/l;p.roll=.3;p.rhit=[];p.trT=0;if(hasA('ombre'))f.ms.ombre=f.t+1.8;p.guard=false;p.parry=0;
   const chain=f.t-(p.lastRoll??-9)<1.1;p.rchain=chain?(p.rchain||0)+1:0;p.lastRoll=f.t;
-  p.iframe=Math.max(.06,(.34+(RC().ifr||0))*(f.storm?.6:1)*Math.pow(.5,p.rchain));p.cast=0;heavyRefund(f);f.pending=f.pending.filter(q=>q.w&&q.sp&&q.sp.rng>120);f.swing=null;ev(f,'roll');if(hasS('course'))spells().forEach(x=>{if(f.cds[x.id])f.cds[x.id]=Math.max(0,f.cds[x.id]-.5)});
+  p.iframe=Math.max(.06,(.34+(RC().ifr||0))*(f.storm?.6:1)*Math.pow(.5,p.rchain));p.cast=0;heavyRefund(f);chargeStop(f,true);f.swing=null;ev(f,'roll');if(hasS('course'))spells().forEach(x=>{if(f.cds[x.id])f.cds[x.id]=Math.max(0,f.cds[x.id]-.5)});
   TM(f).rolls++;p.st-=(voie('cel',4)?.7:1)*(WM('agile')?0:(f.buffs.some(x=>(x.id==='danse'||x.id==='crep')&&x.l5)?0:Math.max(4,(hasL('abysses')?11:18)+(RC().rollSt||0)-(hasA('vent')?5:0)))+(p.rchain||0)*8+(f.storm?6:0));p.stDelay=.45;
 }
 function doFlask(){
@@ -1949,7 +1953,7 @@ function castSpell(i,free){
     if(sp.fx==='stack'){const n=f.stacks[sp.id]||0;base+=n*at(sp.v,lv);f.stacks[sp.id]=n+(lv>=5?2:1)}
     const w=at(sp.wind,lv);
     if(sp.proj){const n=sp.count?(lv>=5?5:sp.count):1;for(let k=0;k<n;k++){const off=n>1?(k/(n-1)-.5)*1.1:0;f.pproj.push({x:p.x+Math.cos(p.face+Math.PI/2)*off*30,y:p.y+Math.sin(p.face+Math.PI/2)*off*30,sp,base:n>1?rnd(sp.min,sp.max):base,life:2,tgt:b})}}
-    else if(w){p.cast=w;f.pending.push({t:w,w,sp,base,tgt:b})}
+    else if(w){p.cast=w;f.pending.push({t:w,w,sp,base,tgt:b,mp:hpc?0:cost,hp:hpc,cd:f.cds[sp.id]})}
     else{if(sp.rng<120)f.fx.push({k:'slash',x:p.x,y:p.y,a:p.face,t:0,life:.18,r:sp.rng+PR+10,el:sp.el});applyDmg(f,sp,base,b)}
   }else if(sp.t==='heal'){if(sp.res)f.resent=Math.min(5,(f.resent||0)+sp.res);let hb=healCalc(sp,rnd(sp.min,sp.max));if(sp.fx==='holyheal'&&f.holy){const m=f.holy;hb=Math.round(hb*(1+.15*m));f.holy=0;txt(f,p.x,p.y-30,'Ferveur ×'+m,'ember')}const h=healP(hb);txt(f,p.x,p.y,'+'+h,'ok');if(lv>=5)f.ms.hot=5}
   else if(sp.t==='zone'){let zb=rnd(sp.min,sp.max);if(f.ms.holyM&&f.ms.holyM.id===sp.id){zb*=1+.15*f.ms.holyM.m;txt(f,p.x,p.y-40,'Ferveur ×'+f.ms.holyM.m,'ember');f.ms.holyM=null}f.consac={x:p.x,y:p.y,r:sp.r,t:sp.dur,sp,base:zb,tick:0,l5:lv>=5};ev(f,'consac',{x:p.x,y:p.y,r:sp.r,life:sp.dur})}

@@ -507,6 +507,9 @@ footer button{background:none;border:0;color:var(--dim);text-decoration:underlin
 .pal{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;width:100%}.pal .pl{font-size:11.5px;border:1px solid var(--line);border-radius:6px;padding:2px 6px;color:var(--dim)}.pal .pl b{margin-right:4px;color:var(--bone)}.pal .pl.on{border-color:var(--ok);color:var(--ok)}.pal .pl.on b{color:var(--ok)}.pal em{font-size:11.5px;color:var(--ember);font-style:normal;align-self:center}
 .heirp{text-align:left;max-width:760px;margin:10px auto}.heir{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px;margin-top:8px}.heiri{border:1px solid var(--line);border-radius:8px;padding:7px 9px;display:flex;flex-direction:column;gap:2px;font-size:12.5px;text-align:left;background:none;color:inherit;cursor:pointer}.heiri.on{border-color:var(--ember);background:color-mix(in srgb,var(--ember) 10%,transparent)}.heiri b{font-size:13px}.heiri small{color:var(--dim)}.heiri[disabled]{opacity:.45;cursor:default}
 .bmmod{background:rgba(40,12,24,.85);border:1px solid #c44a6a;border-radius:8px;padding:5px 9px;font-size:12.5px;color:#f3d6de}.bmmod b{color:#ff8aa8}.bmslot.ult{border-color:#c44a6a}.bmslot.ult b{color:#ff8aa8}
+.lc-voie{border:1px solid var(--vc);border-left:4px solid var(--vc);border-radius:6px;padding:5px 8px;margin:4px 0 6px;background:color-mix(in srgb,var(--vc) 12%,transparent);display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px}
+.lc-voie b{color:var(--vc);font-size:15px;letter-spacing:.03em}.lc-voie span{font-size:12.5px;color:var(--bone)}.lc-voie i{display:flex;gap:3px;margin-left:auto}.lc-voie u{width:9px;height:9px;border-radius:2px;border:1px solid var(--vc);display:block}.lc-voie u.on{background:var(--vc)}.lc-voie u.st{margin-right:4px}.lc-voie small{flex-basis:100%;font-size:12.5px;color:var(--dim)}.lc-voie small.up{color:var(--ok)}
+.voies .off{color:var(--dim)}.voies .on{color:var(--bone)}
 .rune{display:inline-flex;gap:4px;align-items:baseline;margin-left:6px;color:var(--rc);font-size:12.5px}.rune b{color:var(--rc);font-weight:600}.rune small{color:var(--dim)}.lc-rune{margin:2px 0 4px;font-size:13px}.lc-rune .rune{margin-left:0;flex-wrap:wrap}.lc-rune .rune b{font-size:14px}.runes{display:flex;flex-direction:column;gap:4px;margin-top:10px}
 </style>
 
@@ -524,7 +527,7 @@ footer button{background:none;border:0;color:var(--dim);text-decoration:underlin
 <script>
 /* ===================== DONNÉES ===================== */
 const EL={terre:{n:'Terre',s:'for'},feu:{n:'Feu',s:'int'},air:{n:'Air',s:'agi'},eau:{n:'Eau',s:'cha'}};
-const STATN={end:'Endurance max',all:'Tous éléments',vit:'Vitalité',for:'Force',int:'Intelligence',agi:'Agilité',cha:'Chance',dmg:'Dommages',res:'% Résistance',crit:'% Critique',pct:'% Dommages',soin:'Soins (fioles ×2, sorts de soin)'};
+const STATN={spd:'% Vitesse',cdr:'% Recharge des sorts',end:'Endurance max',all:'Tous éléments',vit:'Vitalité',for:'Force',int:'Intelligence',agi:'Agilité',cha:'Chance',dmg:'Dommages',res:'% Résistance',crit:'% Critique',pct:'% Dommages',soin:'Soins (fioles ×2, sorts de soin)'};
 const ROMAN=Array.from({length:100},(_,n)=>{let r='',x=n;[[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']].forEach(([v,c])=>{while(x>=v){r+=c;x-=v}});return r});
 const LV5=[1,1.25,1.5,1.8,2.2];
 const at=(a,lv)=>Array.isArray(a)?a[lv-1]:a;
@@ -1483,17 +1486,17 @@ const PAL={vit:{t:[60,150,260],d:['+4 % PV max','+8 % PV max · fioles +15 %','+
  agi:{t:[50,120,200],d:['+2 % critique','+4 % critique · critiques ×1,45','+7 % critique · critiques ×1,5']},
  cha:{t:[50,120,200],d:['Sorts +5 % de dégâts','Sorts +10 % de dégâts','Sorts +15 % de dégâts']}};
 const palLv=k=>{if(!run||!PAL[k])return 0;const v=statT(k);return PAL[k].t.filter(x=>v>=x).length};
-function maxHp(){return Math.round([1,1.04,1.08,1.12][palLv('vit')]*(CLS().hp+UP('vit')*10+(run.lvl-1)*6+statT('vit'))*run.hpPct/100*(RC().hp||1)*(hasA('verre')?.65:1)*(1+talE('hp')/100)*(WM('verre')?.65:1))}
+function maxHp(){return Math.round([1,1.04,1.08,1.12][palLv('vit')]*(CLS().hp+UP('vit')*10+(run.lvl-1)*6+statT('vit'))*run.hpPct/100*(RC().hp||1)*(hasA('verre')?.65:1)*(1+talE('hp')/100)*(WM('verre')?.65:1)*(voie('rem',4)?1.15:1))}
 const stMax=()=>100+UP('pa')*25+itemSum('end')+(RC().end||0)+talE('st');
 const stRegen=()=>Math.min(85,Math.round((42+statT('agi')*.1)*(RC().regen||1)));
 const resT=()=>Math.min(40,itemSum('res')+(RC().res||0));
-const critC=()=>Math.min(70,Math.round((run&&hasS('rasoir')&&run.hp<maxHp()*.35?25:0)+5+(RC().crit||0)+statT('agi')/8+itemSum('crit')+(WPN().crit||0)+(run&&run.inf==='foudre'?10:0)+talE('crit')+[0,2,4,7][palLv('agi')]));
+const critC=()=>Math.min(70,Math.round((run&&hasS('rasoir')&&run.hp<maxHp()*.35?25:0)+5+(RC().crit||0)+statT('agi')/8+itemSum('crit')+(WPN().crit||0)+(run&&run.inf==='foudre'?10:0)+talE('crit')+[0,2,4,7][palLv('agi')]+(voie('fur',4)?6:0)));
 const infPow=()=>1+.15*(wRank()-1);
-const pctDmg=()=>(WM('verre')?40:0)+(WM('hate')?20:0)+UP('pow')*5+run.bonus+(ML(4)?5:0)+(ML(7)?5:0)+itemSum('pct')+(RC().pct||0);
+const pctDmg=()=>(voie('fur',2)?10:0)+(fight&&voie('fur',6)?(fight.ms.carn||0)*2:0)+(WM('verre')?40:0)+(WM('hate')?20:0)+UP('pow')*5+run.bonus+(ML(4)?5:0)+(ML(7)?5:0)+itemSum('pct')+(RC().pct||0);
 const flaskMax=()=>WM('vamp')?0:WM('fiole')?1:Math.max(1,3+UP('flask')+(run&&run.fb||0)-(PK('secheresse')?1:0)-(SL(6)?1:0)+(run&&hasS('alchi')?1:0));
-const flaskHeal=()=>WM('fiole')?maxHp():Math.round([1,1,1.15,1.3][palLv('vit')]*(RC().flask||1)*(maxHp()*.35*(1+UP('flaskPow')*.1)+(run?itemSum('soin')*2:0))*(hasL('cawotte')?2:1)*(hasA('bourse')?.7:1)*(hasA('rouage')?.8:1)*(SL(2)?.85:1));
+const flaskHeal=()=>WM('fiole')?maxHp():Math.round([1,1,1.15,1.3][palLv('vit')]*(RC().flask||1)*(maxHp()*.35*(1+UP('flaskPow')*.1)+(run?itemSum('soin')*2:0))*(hasL('cawotte')?2:1)*(hasA('bourse')?.7:1)*(hasA('rouage')?.8:1)*(SL(2)?.85:1)*(voie('rem',4)?1.25:1));
 const lvOf=sp=>run.spellLv[sp.id]||1;
-const spellCd=sp=>(hasA('rouage')?.8:1)*at(sp.cds,lvOf(sp))*(fight&&fight.ms.p2?.5:1)*(1+talE('cd',sp.id)/100)*(WM('arcane')?.65:1);
+const spellCd=sp=>(1-cdrPct()/100)*(hasA('rouage')?.8:1)*at(sp.cds,lvOf(sp))*(fight&&fight.ms.p2?.5:1)*(1+talE('cd',sp.id)/100)*(WM('arcane')?.65:1);
 const unlocked=sp=>sp.unlock-(run.libAdv&&sp.unlock>=4?1:0)<=run.lvl;
 const MPREG=5,MPHIT={wl:3,wh:8};
 const mpMax=()=>100+UP('pa')*15+(RC().mp||0)+talE('mp');
@@ -1531,7 +1534,22 @@ function arriveFloor(){
 function makeNodes(){const opts=shuffle(['forge','parch','autel','divin','divin'].filter(k=>(k!=='divin'||wRank()<5)));return ['repos',...[...new Set(opts)].slice(0,2)]}
 function usefulStats(){const U=new Set(['vit','res','crit','pct','dmg','soin']),w=CLS().wpn;U.add(EL[w.el].s);
   spells().forEach(sp=>{if(sp.el&&EL[sp.el]&&(sp.t!=='buff'))U.add(sp.stat||EL[sp.el].s);if(sp.t==='heal')U.add('int')});if(w.pet)U.add('for');return U}
-function genItem(taken,usedSlots){
+/* ===================== VOIES D'ÉQUIPEMENT =====================
+   Chaque pièce suit une voie : Fureur (dégâts), Rempart (résistance) ou Célérité (vitesse, recharges).
+   Plus tu portes de pièces d'une même voie, plus elle te transforme : 2, 4 puis 6 pièces. */
+const VOIES={
+ fur:{n:'Fureur',r:'Dégâts',c:'#ff7a52',ic:'⚔',t:[[2,'+10 % de dégâts'],[4,'+6 % de critique, critiques +25 % plus forts'],[6,'Carnage : chaque coup porté +2 % de dégâts (jusqu’à +20 %), perdu quand tu es touché']]},
+ rem:{n:'Rempart',r:'Résistance',c:'#6fb4ff',ic:'⛨',t:[[2,'−10 % de dégâts subis'],[4,'+15 % de PV max, fioles +25 %'],[6,'Inflexible : une fois par combat, un coup mortel te laisse à 1 PV, invulnérable 1,5 s']]},
+ cel:{n:'Célérité',r:'Vitesse',c:'#7fe08a',ic:'➶',t:[[2,'+10 % de vitesse de déplacement'],[4,'Sorts −15 % de recharge, roulade −30 % d’endurance'],[6,'Tempo : chaque esquive réussie avance tes recharges de 1 s et donne +30 % de vitesse 2 s']]}};
+function voieN(k,rn){rn=rn||run;if(!rn||!rn.items)return 0;let n=0;for(const s in rn.items){const it=rn.items[s];if(it&&it.arch===k)n++}return n}
+const voie=(k,t)=>voieN(k)>=t;
+const spdPct=()=>run?Math.min(40,itemSum('spd')+(voie('cel',2)?10:0)):0;
+const cdrPct=()=>run?Math.min(40,itemSum('cdr')+(voie('cel',4)?15:0)):0;
+function voieHtml(it,old){if(!it.arch||!VOIES[it.arch])return '';const V=VOIES[it.arch],n=withItem(it,()=>voieN(it.arch)),before=voieN(it.arch),nx=V.t.find(x=>x[0]>n),hit=V.t.filter(x=>x[0]<=n&&x[0]>before);
+  return `<div class="lc-voie" style="--vc:${V.c}"><b>${V.ic} ${V.r}</b><span>Voie ${V.n==='Rempart'?'du':'de la'} ${V.n} · ${n}/6</span><i>${[0,1,2,3,4,5].map(i=>`<u class="${i<n?'on':''}${[1,3,5].includes(i)?' st':''}"></u>`).join('')}</i>${hit.length?hit.map(x=>`<small class="up">✦ Débloque : ${x[1]}</small>`).join(''):nx?`<small>À ${nx[0]} pièces : ${nx[1]}</small>`:'<small class="up">Voie complète</small>'}</div>`}
+function voiesPanel(){const L=Object.keys(VOIES).map(k=>[k,voieN(k)]).filter(x=>x[1]>0);if(!L.length)return '';
+  return `<div class="runes voies"><span class="label">Voies</span>${L.map(([k,n])=>{const V=VOIES[k];return `<div><b style="color:${V.c}">${V.ic} ${V.n} · ${n} pièce${n>1?'s':''}</b>${V.t.map(x=>`<span class="${n>=x[0]?'on':'off'}" style="font-size:13px;display:block">${n>=x[0]?'✓':'·'} ${x[0]} : ${x[1]}</span>`).join('')}</div>`}).join('')}</div>`}
+function genItem(taken,usedSlots,arch){
   usedSlots=usedSlots||[];
   const f=run.floor;let B=BOSSAT(run.floor);
   {const beat=Array.from({length:Math.max(0,f-1)},(_,i)=>BOSSAT(i+1)),cnt=setCounts(),began=Object.keys(cnt).filter(id=>SETS[id]&&cnt[id]<4&&(beat.some(x=>x.id===id)||id===B.id)),older=beat.filter(x=>SETS[x.id]);
@@ -1547,8 +1565,11 @@ function genItem(taken,usedSlots){
   const pref=(S?S.stats:B.loot).map(fix),keys=[pref[0]],pool=Object.keys(roll).filter(k=>U.has(k)&&(!ELS.includes(k)||k===main||(run.stats[k]||0)>=(run.stats[main]||0)*.6)),n=f>=5?3:2;
   if(!keys.includes(main)&&Math.random()<.5)keys.push(main);
   while(keys.length<n){const k=Math.random()<.4?pref[1]:pick(pool);if(!keys.includes(k))keys.push(k)}
+  roll.spd=()=>rnd(3,4+Math.ceil(f/2));roll.cdr=()=>rnd(3,4+Math.ceil(f/2));roll.pct=()=>rnd(4,5+f*2);
+  arch=arch||pick(['fur','rem','cel']);
+  const AK={fur:[main,'pct','crit'],rem:['vit','res','soin'],cel:['spd','cdr',main]}[arch],nk=f>=4?3:2;keys.length=0;AK.slice(0,nk).forEach(k=>keys.push(k));
   const stats={};keys.forEach(k=>stats[k]=roll[k]());
-  const it={slot,name:`${slot} ${B.de}`,stats,set:S?B.id:null,col:S?S.col:null,hat:S?S.hat:null};
+  const it={slot,name:`${slot} ${B.de}`,stats,arch,set:S?B.id:null,col:S?S.col:null,hat:S?S.hat:null};
   if(Math.random()<Math.min(.9,.45+.05*f)){const ks=Object.keys(RUNES),mine=Object.values(run.items||{}).map(x=>x&&x.rune).filter(Boolean),pref=ks.filter(k=>mine.some(m=>RUNES[m].e===RUNES[k].e));it.rune=pref.length&&Math.random()<.4?pick(pref):pick(ks)}
   return it;
 }
@@ -1844,13 +1865,13 @@ function resolveAtk(f,a){
 }
 function hurtP(f,raw,d){
   const p=f.p;if(f.over)return false;if(p.virt)return false;if(!p.ghost&&!p.down&&p.iframe<=0&&runeN('egide')&&f.t>=(f.ms.egT||0)){f.ms.egT=f.t+Math.max(5,12/runeN('egide'));txt(f,p.x,p.y,'Égide','frost');ev(f,'parry');return false}if(p.ghost){if(p.bmid)bmHit(p,raw,d);else coHit(f,raw,d);return false}if(p.down)return false;if(f.co)raw=coDR(f,raw);if(f.ms.ward>f.t)raw*=.6;
-  if(p.iframe>0){txt(f,p.x,p.y,'Esquivé','frost');if(!(f.ms.dgSnd>f.t)){f.ms.dgSnd=f.t+.25;ev(f,'dodge')}if(runeN('contre'))f.ms.rnDodge=f.t+2.5;if(p.roll>0&&f.gel)f.gel=0;if(p.roll>0&&hasA('esquive')&&!(f.ms.pendT>f.t)&&!f.storm&&!f.b.jump){const b=f.b;f.ms.pendT=f.t+4;f.frz=Math.max(f.frz||0,.7);b.atk=null;b.dash=null;b.rec=Math.max(b.rec,.7);b.cool=Math.max(b.cool,1.1);ev(f,'freeze');txt(f,p.x,p.y-20,'Pendule','frost');if(hasS('horsT'))spells().forEach(x=>f.cds[x.id]=0)}if(p.roll>0&&hasL('gelano')&&!(f.ms.lierreCd>0)){p.st=Math.min(stMax(),p.st+25);f.ms.lierre=1;f.ms.lierreCd=.4;txt(f,p.x,p.y-20,'Lierre','ok')}return false}
+  if(p.iframe>0){txt(f,p.x,p.y,'Esquivé','frost');if(!(f.ms.dgSnd>f.t)){f.ms.dgSnd=f.t+.25;ev(f,'dodge');if(voie('cel',6)){f.ms.tempoT=f.t+2;for(const k in f.cds)if(f.cds[k]>0)f.cds[k]=Math.max(0,f.cds[k]-1);txt(f,p.x,p.y-30,'Tempo','ok')}}if(runeN('contre'))f.ms.rnDodge=f.t+2.5;if(p.roll>0&&f.gel)f.gel=0;if(p.roll>0&&hasA('esquive')&&!(f.ms.pendT>f.t)&&!f.storm&&!f.b.jump){const b=f.b;f.ms.pendT=f.t+4;f.frz=Math.max(f.frz||0,.7);b.atk=null;b.dash=null;b.rec=Math.max(b.rec,.7);b.cool=Math.max(b.cool,1.1);ev(f,'freeze');txt(f,p.x,p.y-20,'Pendule','frost');if(hasS('horsT'))spells().forEach(x=>f.cds[x.id]=0)}if(p.roll>0&&hasL('gelano')&&!(f.ms.lierreCd>0)){p.st=Math.min(stMax(),p.st+25);f.ms.lierre=1;f.ms.lierreCd=.4;txt(f,p.x,p.y-20,'Lierre','ok')}return false}
   if(f.buffs.some(x=>x.id==='bdiv')){txt(f,p.x,p.y,'Bouclier divin','ember');return false}
   const ub=d&&(d.unblock||d.k==='ring'||d.k==='safe');
   if(!ub&&p.parry>0){perfectParry(f);return false}
   if(!ub&&p.guard){const sh=WPN().shield,cost=(raw*.8+6)*(sh?.5:1);if(p.st>=cost){p.st-=cost;p.stDelay=.6;const r0=raw;raw*=sh?(d&&d.heavy?.25:.1):(d&&d.heavy?.4:.2);ev(f,'block');if(hasA('epines')&&!f.storm)applyDmg(f,{id:'ronces',n:'Ronces',el:'terre',t:'dmg',altfx:1,chain:1,fixed:Math.max(1,Math.round((r0-raw)*2))},1,f.b);if(sh)f.resent=Math.min(5,(f.resent||0)+1)}else{p.st=0;p.guard=false;if(!f.buffs.some(x=>x.id==='crep')){p.frozen=.4;say(f,'Garde brisée');ev(f,'gbreak')}}}
   const bas=f.buffs.find(x=>x.id==='bastion'),tgd=f.buffs.find(x=>x.id==='tguard');
-  let dm=raw*(f.weaken>0?1-(f.weakenAmt||.4):1)*(1-resT()/100)*(bas?1-bas.v/100:1)*(tgd?.7:1)*(WM('agile')?1.25:1);dm=Math.max(1,Math.round(dm));
+  let dm=raw*(f.weaken>0?1-(f.weakenAmt||.4):1)*(1-resT()/100)*(bas?1-bas.v/100:1)*(tgd?.7:1)*(WM('agile')?1.25:1)*(voie('rem',2)?.9:1);dm=Math.max(1,Math.round(dm));if(f.ms.carn){if(f.ms.carn>=5)txt(f,p.x,p.y-30,'Carnage perdu','dim');f.ms.carn=0}
   run.hp=Math.max(0,run.hp-dm);p.hurt=.25;if(runeN('ronces')&&dm>0&&!f.pvp&&f.b&&!f.over)f.bombs.push({t:.05,sp:{id:'ronce',n:'Ronces',el:'terre',t:'dmg',fixed:Math.max(1,Math.round(dm*.3*runeN('ronces'))),chain:1,pure:1},base:0,tgt:f.b});f.lastHit=f.t;if(!f.hits&&!f.pvp)say(f,'Coup reçu : légendaire perdu');f.hits=(f.hits||0)+1;ev(f,'phit',{heavy:d&&d.heavy});if(d&&d.heavy)f.hitstop=Math.max(f.hitstop||0,.1);f.shake=Math.max(f.shake,d&&d.heavy?.35:.18);
   txt(f,p.x,p.y,'−'+dm,'hurt');ev(f,'phit2',{pct:dm/maxHp()});
   const unst=f.buffs.some(x=>x.id==='crep');
@@ -1859,6 +1880,7 @@ function hurtP(f,raw,d){
   if(f.B.train&&run.hp<=0){run.hp=maxHp();txt(f,p.x,p.y,'PV remis à fond','ok')}
   if(run.hp<=0&&hasL('emeraude')&&!f.ms.revived&&!PK('fragile')){f.ms.revived=1;run.hp=Math.round(maxHp()*.4);p.iframe=2;f.msg={txt:'Le Cocon d’émeraude te relève',t:2.4,big:1};ev(f,'revive')}
   if(run.hp<=0&&UP('rez')>0&&!run.rezUsed&&!PK('fragile')){run.rezUsed=1;run.hp=Math.round(maxHp()*(UP('rez')>1?.5:.3));p.iframe=2.5;f.msg={txt:'Le Sablier de secours se retourne',t:2.6,big:1};ev(f,'revive');f.hitstop=Math.max(f.hitstop||0,.2)}
+  if(run.hp<=0&&voie('rem',6)&&!f.ms.infl&&!PK('fragile')&&!f.bmHero){f.ms.infl=1;run.hp=1;p.iframe=1.5;f.msg={txt:'Inflexible',t:2,big:1};ev(f,'revive')}
   if(run.hp<=0&&WPN().undying&&!f.ms.undying&&!PK('fragile')){f.ms.undying=1;run.hp=1;p.iframe=2;f.msg={txt:'Refus de mourir',t:2.2,big:1};ev(f,'revive')}
   if(run.hp<=0&&f.bmHero){bmDown(f);return true}
   if(run.hp<=0){if(coDown(f))return true;if(f.co)coSend('cdn',{});endFight(false)}
@@ -1900,7 +1922,7 @@ function doRoll(){
   p.charge=null;const l=Math.hypot(v.x,v.y);p.rdx=v.x/l;p.rdy=v.y/l;p.roll=.3;p.rhit=[];p.trT=0;if(hasA('ombre'))f.ms.ombre=f.t+1.8;p.guard=false;p.parry=0;
   const chain=f.t-(p.lastRoll??-9)<1.1;p.rchain=chain?(p.rchain||0)+1:0;p.lastRoll=f.t;
   p.iframe=Math.max(.06,(.34+(RC().ifr||0))*(f.storm?.6:1)*Math.pow(.5,p.rchain));p.cast=0;heavyRefund(f);f.pending=[];f.swing=null;ev(f,'roll');if(hasS('course'))spells().forEach(x=>{if(f.cds[x.id])f.cds[x.id]=Math.max(0,f.cds[x.id]-.5)});
-  p.st-=WM('agile')?0:(f.buffs.some(x=>(x.id==='danse'||x.id==='crep')&&x.l5)?0:Math.max(4,(hasL('abysses')?11:18)+(RC().rollSt||0)-(hasA('vent')?5:0)))+(p.rchain||0)*8+(f.storm?6:0);p.stDelay=.45;
+  p.st-=(voie('cel',4)?.7:1)*(WM('agile')?0:(f.buffs.some(x=>(x.id==='danse'||x.id==='crep')&&x.l5)?0:Math.max(4,(hasL('abysses')?11:18)+(RC().rollSt||0)-(hasA('vent')?5:0)))+(p.rchain||0)*8+(f.storm?6:0));p.stDelay=.45;
 }
 function doFlask(){
   const f=fight;if(!f||f.over||f.paused)return;const p=f.p;
@@ -2016,7 +2038,7 @@ function applyDmg(f,sp,base,T){sp._b=base;
   if(T!==b){if(!T.alive)return;const lv=lvOf(sp);
     if(sp.fx==='bomb'){f.bombs.push({t:1,sp:Object.assign({},sp,{fx:'boom'}),base,tgt:T});txt(f,T.x,T.y,'Mèche','ember');return}
     let d=Math.max(1,Math.round(dmgBase(sp,base,lv)*(1+buffPct()/100))),crit=false;
-    if(altCrit(f,sp)||Math.random()*100<critC()){d=Math.round(d*1.4);crit=true}d=Math.round(d*runeMul(f,sp,crit));
+    if(altCrit(f,sp)||Math.random()*100<critC()){d=Math.round(d*1.4*(voie('fur',4)?1.25:1));crit=true}d=Math.round(d*runeMul(f,sp,crit));
     d=altPre(f,sp,d);T.hp-=d;if(f.coG)coAcc(d,0,T);if(f.pvp&&T.opet){T.pend=performance.now();pvpSend('peth',{i:T.pid,d:Math.round(d)})}T.hurt=.12;wpnPow(f,sp,d,T);ev(f,'hit',{el:sp.el,col:sp.col,crit,pos:{x:T.x,y:T.y},h:T.r/10*2+.4,sid:sp.id,cls:run.cls,mat:MATA[T.k]||'flesh'});if(sp.inf)infProc(f,sp,d,T,sp.id==='wh');
     txt(f,T.x+(Math.random()*20-10),T.y,(crit?d+'!':''+d),crit?'ember':'bone');
     if(sp.fx==='push'){const a=angTo(f.p,T),pv=at(sp.v,lv);T.x+=Math.cos(a)*pv;T.y+=Math.sin(a)*pv;clampArena(T,T.r)}
@@ -2056,7 +2078,8 @@ function applyDmg(f,sp,base,T){sp._b=base;
   const rip=(sp.id==='wl'||sp.id==='wh')&&f.ms.riposte>0;if(rip){f.ms.riposte=0;d=Math.round(d*1.5);txt(f,b.x,b.y-30,'Riposte','ember')}
   const forced=altCrit(f,sp)||rip||fx5||sp.id==='epee'&&lv>=5&&b.vuln>0;
   const cc=critC()+(f.buffs.some(x=>x.id==='tir'&&x.l5)?15:0)+(f.buffs.some(x=>x.id==='danse')?20:0);
-  if(forced||Math.random()*100<cc){d=Math.round(d*[1.4,1.4,1.45,1.5][palLv('agi')]);crit=true;if(hasA('croc')){const h=healP(Math.round(maxHp()*.02*(hasS('veille')&&f.ms.ward>f.t?2:1)));if(h)txt(f,f.p.x,f.p.y-16,'+'+h,'ok')}if(RC().critBurn){const L=f.burn||(f.burn=[]);if(L.length>=3)L.shift();L.push({t:3,dps:d*.06})}if(hasL('turquoise'))spells().forEach(x=>{if(f.cds[x.id])f.cds[x.id]=Math.max(0,f.cds[x.id]-.5)})}
+  if(forced||Math.random()*100<cc){d=Math.round(d*[1.4,1.4,1.45,1.5][palLv('agi')]*(voie('fur',4)?1.25:1));crit=true;if(hasA('croc')){const h=healP(Math.round(maxHp()*.02*(hasS('veille')&&f.ms.ward>f.t?2:1)));if(h)txt(f,f.p.x,f.p.y-16,'+'+h,'ok')}if(RC().critBurn){const L=f.burn||(f.burn=[]);if(L.length>=3)L.shift();L.push({t:3,dps:d*.06})}if(hasL('turquoise'))spells().forEach(x=>{if(f.cds[x.id])f.cds[x.id]=Math.max(0,f.cds[x.id]-.5)})}
+  if(!sp.tick&&!sp.chain&&voie('fur',6)&&(T===b)){f.ms.carn=Math.min(10,(f.ms.carn||0)+1)}
   if(link)d=Math.max(1,Math.round(d*(1-link)));
   if(f.frz>0)d=Math.round(d*(f.ms.stopL5?1.3:1.15));
   if(f.brokenT>0)d=Math.round(d*1.3);
@@ -2150,7 +2173,7 @@ function update(f,dt){
   if(p.leap){const L=p.leap;L.t+=dt;const k=Math.min(1,L.t/L.life);p.x=L.fx+(L.tx-L.fx)*k;p.y=L.fy+(L.ty-L.fy)*k;
     if(k>=1){p.leap=null;f.fx.push({k:'slash',x:p.x,y:p.y,a:angTo(p,b),t:0,life:.3,r:70,el:L.sp.el,big:1});f.shake=Math.max(f.shake,.22);ev(f,'land');applyDmg(f,L.sp,L.base,L.tgt);if(lvOf(L.sp)>=5&&L.tgt===b)b.vuln=Math.max(b.vuln,2)}}
   else if(p.roll>0){p.roll-=dt;const rs=(hasL('abysses')?730:540)*(RC().roll||1);p.x+=p.rdx*rs*dt;p.y+=p.rdy*rs*dt}
-  else if(p.frozen<=0&&!p.down){const v=moveVec();const spd=175*(RC().spd||1)*(1+.1*runeN('leger'))*(hasA('vent')?1.15:1)*(p.charge?.7:1)*(p.slow>0?.55:1)*(p.drink>0?.35:1)*(p.cast>0?.65:1)*(p.guard?.45:1);p.x+=v.x*spd*dt;p.y+=v.y*spd*dt;if(R3&&R3.cam&&R3.cam.lock)p.face=angTo(p,curT(f));else if(v.x||v.y)p.face=Math.atan2(v.y,v.x)}
+  else if(p.frozen<=0&&!p.down){const v=moveVec();const spd=175*(RC().spd||1)*(1+.1*runeN('leger'))*(hasA('vent')?1.15:1)*(p.charge?.7:1)*(p.slow>0?.55:1)*(p.drink>0?.35:1)*(p.cast>0?.65:1)*(p.guard?.45:1)*(1+spdPct()/100)*(f.ms.tempoT>f.t?1.3:1);p.x+=v.x*spd*dt;p.y+=v.y*spd*dt;if(R3&&R3.cam&&R3.cam.lock)p.face=angTo(p,curT(f));else if(v.x||v.y)p.face=Math.atan2(v.y,v.x)}
   clampArena(p,PR);
   if(f.ptr)altTick(f,dt);
   if(f.consac){const z=f.consac;z.x=f.p.x;z.y=f.p.y;z.t-=dt;z.tick-=dt;if(z.tick<=0){z.tick=.5;enemies(f).forEach(o=>{if(dist(z,o)<z.r+o.r)applyDmg(f,Object.assign({},z.sp,{chain:1,tick:1}),z.base,o)});if(z.l5&&dist(z,f.p)<z.r){const h=healP(Math.max(1,Math.round(maxHp()*.006)));if(h)txt(f,f.p.x,f.p.y,'+'+h,'ok')}}if(z.t<=0||f.over)f.consac=null}
@@ -2481,7 +2504,7 @@ const KK={ready:false,chars:{},clips:[],h:{}};
 Object.values(CLASSES).forEach(C=>C.spells.forEach(sp=>{if(sp.cds)sp.cds=sp.cds.map(x=>Math.round(x*.75*10)/10)}));
 const KKMAP={iop:'knight',gard:'knight',cra:'ranger',eni:'mage',chrono:'mage',rog:'rogue',bers:'barbarian',beast:'hooded',pal:'knight',necro:'sk_mage',reven:'sk_warrior',spect:'sk_rogue',moine:'qt_monk',clerc:'qt_cleric',sorc:'qt_wizard'};
 /* équilibrage par classe (ascension) : vise ~50 % de victoires contre le Régent */
-const CLSPW={iop:1.04,rog:.94,gard:1.01,chrono:.92,beast:1,bers:.8,pal:.75,necro:.9,reven:.99,spect:1.19,moine:1.13,clerc:.78,sorc:1.15,cra:.98,eni:.79};
+const CLSPW={iop:1.06,rog:.95,gard:1.01,chrono:.87,beast:1.03,bers:.83,pal:.68,necro:.9,reven:1.03,spect:1.19,moine:1.15,clerc:.75,sorc:1.12,cra:.99,eni:.74};
 const VC=c=>CLASSES[c]&&CLASSES[c].like||c;
 /* modèles avec leurs propres animations (Quaternius) : noms ramenés à ceux du jeu */
 const QTMAP={Idle_A:['Idle_Weapon','Idle'],Running_A:['Run_Weapon','Run'],Death_A:['Death'],Hit_A:['RecieveHit'],Use_Item:['PickUp'],Jump_Idle:['Roll'],Throw:['Spell1','Punch','Attack'],Atk1:['Sword_Attack','Staff_Attack','Attack','Punch'],Atk2:['Sword_AttackFast','Spell2','Attack2','Punch'],'1H_Melee_Attack_Chop':['Sword_Attack','Staff_Attack','Attack','Punch']};
@@ -4683,7 +4706,7 @@ function win(){if(run&&run.tut){tutLeave(true);return}
   }
   run.lvl++;run.pts+=5;run.spPts=(run.spPts??1)+1;ui.newSp=spells().filter(s=>s.unlock-(run.libAdv&&s.unlock>=4?1:0)===run.lvl).map(s=>s.n);run.hp=Math.min(maxHp(),run.hp+6+Math.round(maxHp()*.12));
   ui.newW=null;seeded(()=>{if(Math.random()<(nohit?.35:.12))ui.newW=grantWeapon()});
-  ui.gain=gg;ui.wagerWon=!!wg;ui.loot=[];if(ui.nohit&&ui.nohit!=='owned')ui.loot.push(legItem(ui.nohit));const nL=(wg||perk==='butin')?4:3;seeded(()=>{while(ui.loot.length<nL)ui.loot.push(genItem(ui.loot.map(x=>x.leg).filter(Boolean),ui.loot.map(x=>x.slot)));if(perk==='butin'||mutd||Math.random()<.3){const a=randAlt(null,ui.loot.map(x=>x.alt).filter(Boolean));if(a){let j=-1;for(let q=ui.loot.length-1;q>=0;q--)if(!ui.loot[q].leg){j=q;break}if(j>=0)ui.loot[j]=a}}});ui.lootImg=ui.loot.map(it=>renderPortrait(Object.assign({},run,{items:Object.assign({},run.items,{[slotKey(it)]:it})}),280,340));ui.screen='reward';render();
+  ui.gain=gg;ui.wagerWon=!!wg;ui.loot=[];if(ui.nohit&&ui.nohit!=='owned')ui.loot.push(legItem(ui.nohit));const nL=(wg||perk==='butin')?4:3;seeded(()=>{const AR=['fur','rem','cel'].sort(()=>Math.random()-.5);while(ui.loot.length<nL)ui.loot.push(genItem(ui.loot.map(x=>x.leg).filter(Boolean),ui.loot.map(x=>x.slot),AR[ui.loot.length%3]));if(perk==='butin'||mutd||Math.random()<.3){const a=randAlt(null,ui.loot.map(x=>x.alt).filter(Boolean));if(a){let j=-1;for(let q=ui.loot.length-1;q>=0;q--)if(!ui.loot[q].leg){j=q;break}if(j>=0)ui.loot[j]=a}}});ui.lootImg=ui.loot.map(it=>renderPortrait(Object.assign({},run,{items:Object.assign({},run.items,{[slotKey(it)]:it})}),280,340));ui.screen='reward';render();
 }
 
 function startEndless(){if(!run||!run.secret)return;run.secret=0;run.endless=1;run.vScore=(ui.end&&ui.end.lad)||0;run.vNh=run.nohits||0;
@@ -5292,7 +5315,7 @@ function act(a,v){
     case 'spdown':{const sp=spells().find(x=>x.id===v),S=run.spAlloc||(run.spAlloc={});if(!sp||!S[v])break;const lv=lvOf(sp);if(lv<=1)break;run.spellLv[v]=lv-1;run.spPts=(run.spPts??1)+spCost(lv-1);S[v]--;save();render()} break;
     case 'take': {const [iv,fk]=String(v).split('|');const it=ui.loot[+iv];const k=slotKey(it,fk);const old=run.items[k];const dv=(it.stats.vit||0)-(old?old.stats.vit||0:0);run.items[k]=it;checkSyn();run.hp=Math.max(1,Math.min(maxHp(),run.hp+Math.max(0,dv)));nextFloor()} break;
     case 'skip': nextFloor(); break;
-    case 'reroll': if(run&&RC().reroll&&!run.rerolled&&ui.loot&&ui.loot.length){run.rerolled=1;const n=ui.loot.length,lg=ui.loot.filter(x=>x.leg);ui.loot=lg.slice();while(ui.loot.length<n)ui.loot.push(genItem(ui.loot.map(x=>x.leg).filter(Boolean),ui.loot.map(x=>x.slot)));ui.toast='Butin relancé.';save();render()} break;
+    case 'reroll': if(run&&RC().reroll&&!run.rerolled&&ui.loot&&ui.loot.length){run.rerolled=1;const n=ui.loot.length,lg=ui.loot.filter(x=>x.leg);ui.loot=lg.slice();{const AR=['fur','rem','cel'].sort(()=>Math.random()-.5);while(ui.loot.length<n)ui.loot.push(genItem(ui.loot.map(x=>x.leg).filter(Boolean),ui.loot.map(x=>x.slot),AR[ui.loot.length%3]))}ui.toast='Butin relancé.';save();render()} break;
     case 'gotok': {const G=ui.got;ui.got=null;if(v==='equip'&&G&&G.kind==='weapon'){run.wsel=G.k;PORT.key='';save()}render()} break;
     case 'node': doNode(v); break;
     case 'wsel': run.wsel=v==='base'?null:v;PORT.key='';save();render(); break;
@@ -5805,9 +5828,9 @@ function rProg(){const sp=spAffordable(),pt=run.pts>0;let tab=ui.ptab||(pt&&!sp?
     <div id="sec-${tab}">${tab==='stats'?rStatsP():rSpellsP()}</div></section>`}
 function rGear(){
   const c=setCounts(),sb=setBonus();
-  return `<section class="panel"><span class="label">Équipement</span><div class="list">${SLOTS.map(sl=>{const it=run.items[sl];return `<div class="it"><span class="row" style="gap:6px">${it?`<span class="pip" style="--c:${it.col||'var(--dim)'}"></span>${esc(it.name)}${runeHtml(it,1)}${it.alt?` <span class="chip" style="color:${ALTCOL}" title="${esc(ALTS[it.alt].d)}">Altération</span>`:it.leg?' <span class="chip" style="color:var(--ember)">Légendaire</span>':''}`:`<span class="dim">${sl} : vide</span>`}</span><span class="dim num" style="text-align:right">${it?Object.entries(it.stats).map(([k,v])=>`+${v} ${STATN[k]}`).join(' · '):''}</span></div>`}).join('')}</div>
+  return `<section class="panel"><span class="label">Équipement</span><div class="list">${SLOTS.map(sl=>{const it=run.items[sl];return `<div class="it"><span class="row" style="gap:6px">${it?`<span class="pip" style="--c:${it.col||'var(--dim)'}"></span>${esc(it.name)}${runeHtml(it,1)}${it.arch&&VOIES[it.arch]?` <span class="chip" style="color:${VOIES[it.arch].c};border-color:${VOIES[it.arch].c}">${VOIES[it.arch].ic} ${VOIES[it.arch].r}</span>`:''}${it.alt?` <span class="chip" style="color:${ALTCOL}" title="${esc(ALTS[it.alt].d)}">Altération</span>`:it.leg?' <span class="chip" style="color:var(--ember)">Légendaire</span>':''}`:`<span class="dim">${sl} : vide</span>`}</span><span class="dim num" style="text-align:right">${it?Object.entries(it.stats).map(([k,v])=>`+${v} ${STATN[k]}`).join(' · '):''}</span></div>`}).join('')}</div>
   ${Object.values(run.items).some(x=>x&&x.alt)?`<div class="alts">${Object.values(run.items).filter(x=>x&&x.alt).map(x=>`<div><b style="color:${ALTCOL}">${esc(x.name)}</b> <span class="dim" style="font-size:13px">${ALTS[x.alt].d}</span></div>`).join('')}${Object.keys(SYNS).filter(hasS).map(k=>`<div class="synon"><b>Synergie · ${SYNS[k].n}</b> <span style="font-size:13px">${SYNS[k].d}</span></div>`).join('')}</div>`:''}
-  ${(()=>{const L=Object.keys(RUNES).filter(k=>runeN(k)),E=runeEcoles();if(!L.length)return '';return `<div class="runes"><span class="label">Runes actives</span>${L.map(k=>`<div><b style="color:${RUNEE[RUNES[k].e][1]}">✦ ${RUNES[k].n}${runeN(k)>1?' ×'+runeN(k):''}</b> <span class="dim" style="font-size:13px">${RUNES[k].d(runeN(k))}</span></div>`).join('')}${Object.entries(E).filter(([e,c])=>c>=2).map(([e,c])=>`<div class="synon"><b>Résonance ${RUNEE[e][0]}</b> <span style="font-size:13px">${c} runes : +${c>=3?16:8} % de dégâts</span></div>`).join('')}</div>`})()}
+  ${voiesPanel()}${(()=>{const L=Object.keys(RUNES).filter(k=>runeN(k)),E=runeEcoles();if(!L.length)return '';return `<div class="runes"><span class="label">Runes actives</span>${L.map(k=>`<div><b style="color:${RUNEE[RUNES[k].e][1]}">✦ ${RUNES[k].n}${runeN(k)>1?' ×'+runeN(k):''}</b> <span class="dim" style="font-size:13px">${RUNES[k].d(runeN(k))}</span></div>`).join('')}${Object.entries(E).filter(([e,c])=>c>=2).map(([e,c])=>`<div class="synon"><b>Résonance ${RUNEE[e][0]}</b> <span style="font-size:13px">${c} runes : +${c>=3?16:8} % de dégâts</span></div>`).join('')}</div>`})()}
   ${Object.keys(c).length?`<div class="sets">${Object.entries(c).map(([id,n])=>{const S=SETS[id];return `<div><b style="color:${S.col}">${S.n}</b> <span class="num dim">${n}/4</span><span class="dim" style="font-size:13px">${[2,3,4].map(t=>`<span style="color:${n>=t?'var(--bone)':'var(--dim)'}">${t} pièces : ${Object.entries(setB(S,t)).map(([k,v])=>`+${v} ${STATN[k]}`).join(', ')}</span>`).join(' · ')}</span></div>`}).join('')}</div>`:''}
   </section>`;
 }
@@ -5870,31 +5893,32 @@ function rMap(){
   ${ui.confirm==='abandon'?`<div class="confirm"><p>Abandonner compte comme une mort : la moitié de tes grains rejoint le temple, l’autre reste à l’étage ${ROMAN[run.floor]}.</p><div class="row"><button class="btn danger" data-a="abandon">Abandonner</button><button class="btn" data-a="cancel">Continuer</button></div></div>`:''}
   <footer><button data-a="home">Menu principal</button><button data-a="confirm" data-v="abandon">Abandonner l’ascension</button></footer>`;
 }
-function heroSnap(){const w=WPN(),ds=spells().filter(x=>['dmg','leap','nova','order','trap'].includes(x.t)&&x.el);return {pv:maxHp(),dmg:Math.round(dmgBase(wpnSp(false),(w.min+w.max)/2*wMult(),1)),sp:ds.length?Math.round(ds.reduce((a,x)=>a+dmgBase(x,(x.min+x.max)/2,lvOf(x)),0)/ds.length):0,crit:critC(),res:resT(),end:stMax(),soin:itemSum('soin')}}
+function heroSnap(){const w=WPN(),ds=spells().filter(x=>['dmg','leap','nova','order','trap'].includes(x.t)&&x.el);return {pv:maxHp(),dmg:Math.round(dmgBase(wpnSp(false),(w.min+w.max)/2*wMult(),1)),sp:ds.length?Math.round(ds.reduce((a,x)=>a+dmgBase(x,(x.min+x.max)/2,lvOf(x)),0)/ds.length):0,crit:critC(),res:resT()+(voie('rem',2)?10:0),end:stMax(),soin:itemSum('soin'),spd:spdPct(),cdr:cdrPct()}}
 function withItem(it,fn){const k=slotKey(it),old=run.items[k];run.items[k]=it;try{return fn()}finally{if(old)run.items[k]=old;else delete run.items[k]}}
-const SNAPN={pv:['PV max',''],dmg:['Coup d’arme',''],sp:['Sorts (moyenne)',''],crit:['Critique','%'],res:['Résistance','%'],end:['Endurance',''],soin:['Soins','']};
+const SNAPN={pv:['PV max',''],dmg:['Coup d’arme',''],sp:['Sorts (moyenne)',''],crit:['Critique','%'],res:['Résistance','%'],end:['Endurance',''],soin:['Soins',''],spd:['Vitesse','%'],cdr:['Recharge des sorts','%']};
 function itemImpact(it){const a=heroSnap(),c0=setCounts(),b=withItem(it,heroSnap),c1=withItem(it,setCounts);
   const rows=Object.keys(SNAPN).filter(k=>a[k]!==b[k]).map(k=>({k,a:a[k],b:b[k],d:b[k]-a[k],pc:a[k]?Math.round((b[k]-a[k])/a[k]*100):0}));
   const sets=[];new Set([...Object.keys(c0),...Object.keys(c1)]).forEach(id=>{const S=SETS[id];if(!S)return;[2,3,4].forEach(t=>{const x=c0[id]||0,y=c1[id]||0;
     if(x<t&&y>=t)sets.push({ok:1,txt:`${S.n} ${t}/4 : `+Object.entries(setB(S,t)).map(([k,v])=>`+${v} ${STATN[k]}`).join(', ')});
     if(x>=t&&y<t)sets.push({ok:0,txt:`Perdu : ${S.n} ${t}/4`})})});
   return {rows,sets}}
-function lootScore(it){const im=itemImpact(it),W={pv:1,dmg:1.6,sp:1.2,crit:1,res:1,end:.5,soin:.4};return (it.alt?8:0)+(it.leg?6:0)+(it.rune?7:0)+im.rows.reduce((a,r)=>a+(r.pc||Math.sign(r.d)*5)*(W[r.k]||1),0)+im.sets.reduce((a,x)=>a+(x.ok?15:-15),0)}
+function lootScore(it){const im=itemImpact(it),W={pv:1,dmg:1.6,sp:1.2,crit:1,res:1,end:.5,soin:.4,spd:.6,cdr:.6};return (it.alt?8:0)+(it.leg?6:0)+(it.rune?7:0)+im.rows.reduce((a,r)=>a+(r.pc||Math.sign(r.d)*5)*(W[r.k]||1),0)+im.sets.reduce((a,x)=>a+(x.ok?15:-15),0)}
 function lootBest(){const L=ui.loot||[];if(L.length<2)return -1;const sc=L.map(lootScore);const m=Math.max(...sc);return m>4?sc.indexOf(m):-1}
 function lootCard(it,i,best){const k=slotKey(it),old=run.items[k],im=itemImpact(it),img=ui.lootImg&&ui.lootImg[i];
   const rar=it.alt?['Altération',ALTCOL]:it.leg?(it.tier==='ep'?['Épique','#b48cff']:['Légendaire','#e8b04a']):it.set?['Panoplie',SETS[it.set].col]:['Commun','#8f969d'];
   const keys=[...new Set([...Object.keys(it.stats),...Object.keys(old?old.stats:{})])];
   const diff=keys.map(st=>({st,d:(it.stats[st]||0)-(old&&old.stats[st]||0)})).filter(x=>x.d!==0).sort((a,b)=>b.d-a.d);
   const gain=diff.filter(x=>x.d>0),lose=diff.filter(x=>x.d<0);
-  const W={pv:1,dmg:1.6,sp:1.2,crit:1,res:1,end:.5,soin:.4},score=im.rows.reduce((a,r)=>a+(r.pc||Math.sign(r.d)*5)*(W[r.k]||1),0)+im.sets.reduce((a,x)=>a+(x.ok?15:-15),0);
-  const neg=im.rows.some(r=>r.d<0)||im.sets.some(x=>!x.ok),pos=im.rows.some(r=>r.d>0)||im.sets.some(x=>x.ok)||!!(it.rune&&!(old&&old.rune===it.rune));
+  const W={pv:1,dmg:1.6,sp:1.2,crit:1,res:1,end:.5,soin:.4,spd:.6,cdr:.6},score=im.rows.reduce((a,r)=>a+(r.pc||Math.sign(r.d)*5)*(W[r.k]||1),0)+im.sets.reduce((a,x)=>a+(x.ok?15:-15),0);
+  const vx=x=>x.st==='spd'||x.st==='cdr',vUp=it.arch&&VOIES[it.arch]&&VOIES[it.arch].t.some(t=>withItem(it,()=>voieN(it.arch))>=t[0]&&voieN(it.arch)<t[0]);
+  const neg=im.rows.some(r=>r.d<0)||im.sets.some(x=>!x.ok)||lose.some(vx),pos=im.rows.some(r=>r.d>0)||im.sets.some(x=>x.ok)||!!(it.rune&&!(old&&old.rune===it.rune))||gain.some(vx)||vUp;
   const syn=it.alt?Object.keys(SYNS).filter(k=>SYNS[k].a.includes(it.alt)&&SYNS[k].a.every(a=>a===it.alt||hasA(a))):[];
   const v=it.alt?['Nouveau pouvoir','up','✦']:!neg&&!pos?['Sans effet','mid','•']:!neg&&pos?['Amélioration','up','▲']:score>5?['Échange favorable','mid','◆']:score<-5||!pos?['Moins bon','down','▼']:['Échange','mid','◆'];
   return `<div class="lc ${it.leg&&it.tier!=='ep'?'legend':''}" style="--rc:${rar[1]};--i:${i}">
     <div class="lc-top"><span class="lc-rar">${rar[0]}</span>${best===i?'<span class="lc-best">★ Conseillé</span>':''}<span class="lc-slot">${k==='Anneau 2'?'Anneau (2e)':it.slot}</span></div>
     <div class="lc-img">${img?`<img src="${img}" alt="Ton héros avec ${esc(it.name)}">`:''}<span class="lc-verdict ${v[1]}">${v[2]} ${v[0]}</span></div>
     <h3>${esc(it.name)}</h3>
-    ${it.rune?`<p class="lc-rune">${runeHtml(it)}${(()=>{const e=RUNES[it.rune].e,c=(runeEcoles()[e]||0)+1-(old&&old.rune&&RUNES[old.rune]&&RUNES[old.rune].e===e?1:0);return c>=2?`<small class="up"> · Résonance ${RUNEE[e][0]} ${c>=3?'+16':'+8'} %</small>`:''})()}</p>`:''}${it.d?`<p class="lc-pow">${it.d}</p>`:''}${syn.length?`<p class="lc-syn">✦ Synergie inconnue possible avec ce que tu portes…</p>`:''}${it.set?`<p class="lc-set" style="color:${SETS[it.set].col}">${SETS[it.set].n} · ${withItem(it,setCounts)[it.set]}/4 une fois équipé</p>`:''}
+    ${voieHtml(it,old)}${it.rune?`<p class="lc-rune">${runeHtml(it)}${(()=>{const e=RUNES[it.rune].e,c=(runeEcoles()[e]||0)+1-(old&&old.rune&&RUNES[old.rune]&&RUNES[old.rune].e===e?1:0);return c>=2?`<small class="up"> · Résonance ${RUNEE[e][0]} ${c>=3?'+16':'+8'} %</small>`:''})()}</p>`:''}${it.d?`<p class="lc-pow">${it.d}</p>`:''}${syn.length?`<p class="lc-syn">✦ Synergie inconnue possible avec ce que tu portes…</p>`:''}${it.set?`<p class="lc-set" style="color:${SETS[it.set].col}">${SETS[it.set].n} · ${withItem(it,setCounts)[it.set]}/4 une fois équipé</p>`:''}
     <div class="lc-rep">${old?`Remplace <b>${esc(old.name)}</b>`:'<span class="up">Emplacement libre : tu ne perds rien</span>'}</div>
     <div class="lc-cols"><div><span class="lc-h up">Tu gagnes</span>${gain.length?gain.map(x=>`<span class="up">+${x.d} ${STATN[x.st]}</span>`).join(''):'<span class="dim">—</span>'}</div>
       <div><span class="lc-h down">Tu perds</span>${lose.length?lose.map(x=>`<span class="down">${x.d} ${STATN[x.st]}</span>`).join(''):'<span class="dim">rien</span>'}</div></div>

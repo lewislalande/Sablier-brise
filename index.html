@@ -17,7 +17,7 @@
 :root{
   color-scheme: dark;
   --bg:#111418; --well:#0a0c0f; --panel:#181d23; --panel2:#1f252d; --line:#2c343d;
-  --bone:#e3d9c5; --dim:#8f969d; --ember:#d89b47; --blood:#c4483d; --frost:#9fc7d9; --ok:#86b57c;
+  --bone:#e3d9c5; --dim:#8f969d; --ember:#d89b47; --blood:#c4483d; --frost:#9fc7d9;--neutre:#b9b2a6; --ok:#86b57c;
   --terre:#b98b58; --feu:#e26b43; --air:#88ba76; --eau:#63a0d6;
   --f-disp:"IM Fell English SC","Cormorant SC",Georgia,"Times New Roman",serif;
   --f-body:"Alegreya Sans","Segoe UI",system-ui,sans-serif;
@@ -1490,23 +1490,23 @@ function maxHp(){return Math.round([1,1.04,1.08,1.12][palLv('vit')]*(CLS().hp+UP
 const stMax=()=>100+UP('pa')*25+itemSum('end')+(RC().end||0)+talE('st');
 const stRegen=()=>Math.min(85,Math.round((42+statT('agi')*.1)*(RC().regen||1)));
 const resT=()=>Math.min(40,itemSum('res')+(RC().res||0));
-const critC=()=>Math.min(70,Math.round((run&&hasS('rasoir')&&run.hp<maxHp()*.35?25:0)+5+(RC().crit||0)+statT('agi')/8+itemSum('crit')+(WPN().crit||0)+(run&&run.inf==='foudre'?10:0)+talE('crit')+[0,2,4,7][palLv('agi')]+(voie('fur',4)?6:0)));
+const critC=()=>Math.min(70,Math.round((run&&hasS('rasoir')&&run.hp<maxHp()*.35?25:0)+5+(RC().crit||0)+statT('agi')/5+itemSum('crit')+(WPN().crit||0)+(run&&run.inf==='foudre'?10:0)+talE('crit')+[0,2,4,7][palLv('agi')]+(voie('fur',4)?6:0)));
 const infPow=()=>1+.15*(wRank()-1);
 const pctDmg=()=>(voie('fur',2)?10:0)+(fight&&voie('fur',6)?(fight.ms.carn||0)*2:0)+(WM('verre')?40:0)+(WM('hate')?20:0)+UP('pow')*5+run.bonus+(ML(4)?5:0)+(ML(7)?5:0)+itemSum('pct')+(RC().pct||0);
 const flaskMax=()=>WM('vamp')?0:WM('fiole')?1:Math.max(1,3+UP('flask')+(run&&run.fb||0)-(PK('secheresse')?1:0)-(SL(6)?1:0)+(run&&hasS('alchi')?1:0));
 const flaskHeal=()=>WM('fiole')?maxHp():Math.round([1,1,1.15,1.3][palLv('vit')]*(RC().flask||1)*(maxHp()*.35*(1+UP('flaskPow')*.1)+(run?itemSum('soin')*2:0))*(hasL('cawotte')?2:1)*(hasA('bourse')?.7:1)*(hasA('rouage')?.8:1)*(SL(2)?.85:1)*(voie('rem',4)?1.25:1));
 const lvOf=sp=>run.spellLv[sp.id]||1;
-const spellCd=sp=>(1-cdrPct()/100)*(hasA('rouage')?.8:1)*at(sp.cds,lvOf(sp))*(fight&&fight.ms.p2?.5:1)*(1+talE('cd',sp.id)/100)*(WM('arcane')?.65:1);
+const spellCd=sp=>(1-cdrPct()/100)*(1-Math.min(20,statT('cha')*.15)/100)*(hasA('rouage')?.8:1)*at(sp.cds,lvOf(sp))*(fight&&fight.ms.p2?.5:1)*(1+talE('cd',sp.id)/100)*(WM('arcane')?.65:1);
 const unlocked=sp=>sp.unlock-(run.libAdv&&sp.unlock>=4?1:0)<=run.lvl;
 const MPREG=5,MPHIT={wl:3,wh:8};
-const mpMax=()=>100+UP('pa')*15+(RC().mp||0)+talE('mp');
+const mpMax=()=>100+UP('pa')*15+(RC().mp||0)+talE('mp')+(run?Math.round(statT('int')*.5):0);
 const stCost=sp=>Math.round((1-Math.min(.45,.15*runeN('econome')))*[1,.94,.88,.82][palLv('int')]*sp.pa*7*(fight&&fight.ms.stim>0&&fight.ms.stimL5?.5:1)*(hasL('glyphe')?.5:1)*(1+talE('mana',sp.id)/100)*(WM('arcane')?1.5:1));
 const buffPct=()=>fight?fight.buffs.reduce((a,b)=>a+(b.def?0:b.v),0):0;
 function resOf(el){const B=fight.B;return (B.res[el]||0)+(B.resMod?B.resMod(fight,el):0)}
 const SPELLMUL=sp=>(['wl','wh','pet','quake'].includes(sp.id)||sp.splashed||sp.wave||sp.altfx)?1:2.6;
 const isSpell=sp=>!(['wl','wh','pet','quake'].includes(sp.id)||sp.wave||sp.altfx);
 function altMul(sp){if(!run)return 1;let m=1;if(hasA('verre'))m*=1.4;if(hasA('sang')&&isSpell(sp))m*=1.3;if(hasA('furie')){const r=run.hp/maxHp();m*=1+.6*Math.max(0,Math.min(1,(1-r)/.7))}return m}
-function dmgBase(sp,base,lv){if(sp.fixed)return sp.fixed;const PWc=run&&!run.pvp&&!run.bm?(CLSPW[run.cls]||1):1;const wp=sp.id==='wl'||sp.id==='wh',tm=(1+(talE('dmg',sp.id)+(wp?talE('wdmg')+(sp.id==='wh'?talE('heavy'):0):0))/100)*(sp.id==='wh'&&WM('geant')?1.4:1);return PWc*(sp.id==='wh'?[1,1.08,1.16,1.25][palLv('for')]:wp?1:[1,1.05,1.1,1.15][palLv('cha')])*altMul(sp)*tm*base*SPELLMUL(sp)*LV5[lv-1]*(100+statT(sp.stat||EL[sp.el].s)+pctDmg())/100+itemSum('dmg')}
+function dmgBase(sp,base,lv){if(sp.fixed)return sp.fixed;const PWc=run&&!run.pvp&&!run.bm?(CLSPW[run.cls]||1):1;const wp=sp.id==='wl'||sp.id==='wh',tm=(1+(talE('dmg',sp.id)+(wp?talE('wdmg')+(sp.id==='wh'?talE('heavy'):0):0))/100)*(sp.id==='wh'&&WM('geant')?1.4:1);return PWc*(sp.id==='wh'?[1,1.08,1.16,1.25][palLv('for')]:wp?1:[1,1.05,1.1,1.15][palLv('cha')])*altMul(sp)*tm*base*(sp.id==='wh'?1+statT('for')*(sp.stat==='for'?.005:.01):1)*SPELLMUL(sp)*LV5[lv-1]*(100+statT(sp.stat||EL[sp.el].s)+pctDmg())/100+itemSum('dmg')}
 function dmgCalc(sp,base){let d=dmgBase(sp,base,lvOf(sp));d*=1+buffPct()/100;if(fight){if(!sp.pure)d*=1-resOf(sp.el)/100;if(fight.b.vuln>0)d*=1.25}return Math.max(1,Math.round(d))}
 function healCalc(sp,base,lv){return Math.round([1,1,1.08,1.15][palLv('int')]*base*LV5[(lv||lvOf(sp))-1]*(100+statT('int'))/100*(1+talE('heal')/100)+itemSum('soin'))}
 function healP(h){const before=run.hp;run.hp=Math.min(maxHp(),run.hp+h);const got=run.hp-before;if(h>0&&duoHas('lien')&&fight&&fight.co)coHealAlly(Math.round(h*.5));return got}
@@ -1668,7 +1668,7 @@ function startFight(){tickClock();if(run){run.alloc={};run.spAlloc={}}
   const mut=main&&!B.secret&&run.mut===run.floor;if(main&&B.secret)meta.secretSeen=1;
   save();
   PR=Math.round(13*(RC().hit||1));
-  const hp=PB?PB.hp:Math.round((main?C0.hp*1.72:B.hp)*3*sc*(run.wager?1.25:1)*(main?(SL(1)?1.1:1)*(SL(8)?1.15:1)*(mut?1.35:1)*(WM('geant')?1.4:1):1));
+  const hp=PB?PB.hp:Math.round((main?C0.hp*1.97:B.hp)*3*sc*(run.wager?1.25:1)*(main?(SL(1)?1.1:1)*(SL(8)?1.15:1)*(mut?1.35:1)*(WM('geant')?1.4:1):1));
   fight={B,sc,bmax:hp,bhp:hp,bshield:0,bshieldT:0,t:0,step:0,
     p:{x:CX,y:CY+170,face:-Math.PI/2,roll:0,rdx:0,rdy:0,iframe:0,cast:0,drink:0,frozen:0,slow:0,hurt:0,st:stMax(),stDelay:0,mp:mpMax()},
     b:{x:CX,y:CY-150,r:B.r,atk:null,cool:1.6,rec:0,vuln:0,inv:0,dash:null,wait:0,hurt:0},
@@ -4446,12 +4446,12 @@ function buildFightDom(){
   <div class="hud-bl"><div class="sk">
     <button class="skb wpn" data-f="wl" id="wl"><span class="kk" data-kk="light">${ka('light')}</span><b>${w.n}</b><small>léger · ${w.st} end.</small><span class="cd" id="wlc" hidden></span></button>
     <button class="skb wpn" data-f="wh" id="wh"><span class="kk" data-kk="heavy">${ka('heavy')}</span><b>Coup lourd</b><small>maintenir : ×${w.heavy.m} → ×${+(w.heavy.m*CHM[3]).toFixed(1)}</small><span class="chbar" id="chb"></span><span class="cd" id="whc" hidden></span></button></div>
-    <div class="sk">${spells().map((s,i)=>`<button class="skb${unlocked(s)?'':' lock'}" style="--c:${s.el?`var(--${s.el})`:'var(--frost)'}" data-f="cast" data-v="${i}" id="sk${i}" title="${esc(s.n+(s.d?' · '+s.d:''))}"><span class="kk" data-kk="s${i+1}">${ka('s'+(i+1))}</span><b>${s.s}</b><small>${s.hpPct?s.hpPct+'% PV':stCost(s)+' mana'}${s.t==='dmg'&&!s.proj?' · cac':''}</small><span class="cd" id="skc${i}" ${unlocked(s)?'hidden':''}>${unlocked(s)?'':'Niv. '+s.unlock}</span></button>`).join('')}</div>
+    <div class="sk">${spells().map((s,i)=>`<button class="skb${unlocked(s)?'':' lock'}" style="--c:${s.el?`var(--${s.el})`:'var(--neutre)'}" data-f="cast" data-v="${i}" id="sk${i}" title="${esc(s.n+(s.d?' · '+s.d:''))}"><span class="kk" data-kk="s${i+1}">${ka('s'+(i+1))}</span><b>${s.s}</b><small>${s.hpPct?s.hpPct+'% PV':stCost(s)+' mana'}${s.t==='dmg'&&!s.proj?' · cac':''}</small><span class="cd" id="skc${i}" ${unlocked(s)?'hidden':''}>${unlocked(s)?'':'Niv. '+s.unlock}</span></button>`).join('')}</div>
     <button class="skb grd" id="grd" title="Maintenir"><span class="kk" data-kk="guard">${ka('guard')}</span><b>Parade</b><small>parfaite 0,2 s</small></button>
     <button class="btn flask" data-f="flask" id="fl"><span>Fiole <kbd data-kk="flask">${ka('flask')}</kbd></span><small id="flT"></small></button></div>
   <div class="hud-br"><button class="btn sm" data-f="pause">Pause</button></div>
   ${TOUCH?`<div class="tc" id="tc"><div class="tjoy" id="tjoy" hidden><i id="tknob"></i></div>
-    <div class="tpad"><div class="tsp">${spells().map((s,i)=>`<button class="tb sp${unlocked(s)?'':' lock'}" data-t="s${i+1}" id="tsk${i}" style="--c:${s.el?`var(--${s.el})`:'var(--frost)'}"><b>${unlocked(s)?esc(s.s):'niv. '+s.unlock}</b><span class="cd" id="tskc${i}" hidden></span></button>`).join('')}</div>
+    <div class="tpad"><div class="tsp">${spells().map((s,i)=>`<button class="tb sp${unlocked(s)?'':' lock'}" data-t="s${i+1}" id="tsk${i}" style="--c:${s.el?`var(--${s.el})`:'var(--neutre)'}"><b>${unlocked(s)?esc(s.s):'niv. '+s.unlock}</b><span class="cd" id="tskc${i}" hidden></span></button>`).join('')}</div>
       <div class="tmain"><button class="tb tf" data-t="flask" id="tfl"><b>Fiole</b><small id="tflT"></small></button><button class="tb tk" data-t="lock"><b>Cible</b><small>tenir : libre</small></button>
         <button class="tb tg" data-t="guard" id="tgd"><b>Parade</b></button><button class="tb th" data-t="heavy" id="thv"><b>Lourd</b><small>tenir : charger</small><span class="chbar" id="tchb"></span></button>
         <button class="tb tr" data-t="roll"><b>Roulade</b></button><button class="tb tl" data-t="light" id="tlt"><b>Frapper</b></button></div></div>
@@ -4854,7 +4854,7 @@ function pvpChar(seed,role,fc){const sv=run,R0=Math.random;Math.random=mulberry(
     run={cls,race,lvl:7,pts:0,stats:Object.assign({},CLASSES[cls].base),items:{},spellLv:{},carried:0,floor:6,flasks:2,wpn:3,spPts:0,node:null,hpPct:220,bonus:0,pacts:[],asc:0,tal:[],pvp:1,order:[0,1,2,3,4,5,6,7,8],paths:{},dmgSrc:{},daily:seed%100000+7};
     {const RR=RC();for(const k in RR.stats||{})run.stats[k]=(run.stats[k]||0)+RR.stats[k]}
     const els=clsEls().map(e=>EL[e].s),main=pick(els);let pts=40;
-    while(pts>0){const r=Math.random(),k=r<.55?main:r<.78?'vit':pick(['for','int','agi','cha']);const n=Math.min(pts,5);pts-=n;run.stats[k]=(run.stats[k]||0)+(k==='vit'?n*3:n)}
+    while(pts>0){const r=Math.random(),k=r<.55?main:r<.78?'vit':pick(['for','int','agi','cha']);const n=Math.min(pts,5);pts-=n;run.stats[k]=(run.stats[k]||0)+n*ptVal(k)}
     let sp=8;const S=spells();for(let i=0;i<40&&sp>0;i++){const x=pick(S),lv=run.spellLv[x.id]||1;if(lv<5&&sp>=lv){run.spellLv[x.id]=lv+1;sp-=lv}}
     for(let i=0;i<4;i++){run.floor=3+Math.floor(Math.random()*6);const it=genItem([],Object.keys(run.items));run.items[slotKey(it)]=it}run.floor=6;
     if(Math.random()<.5){const a=randAlt();if(a)run.items[slotKey(a)]=a}
@@ -5305,11 +5305,11 @@ function act(a,v){
     case 'aura': ui.auraPrev=v||'';if(!v||cosOk(v)){meta.aura=v&&cosOk(v)?v:'';save()}render(); break;
     case 'asc': meta.ascSel=Math.max(0,Math.min(meta.ascMax||0,+v));save();render(); break;
     case 'fight': if(needPath()){render();break}if(unspent()&&ui.confirm!=='unspent'){ui.confirm='unspent';render();break}ui.confirm=null;if(coRun()&&!run.train&&!run.mini){coReady(false);break}startFight(); break;
-    case 'autopts':{const k=topStat();run.stats[k]=(run.stats[k]||0)+run.pts;run.pts=0;save();render()} break;
+    case 'autopts':{const k=topStat();run.stats[k]=(run.stats[k]||0)+run.pts*ptVal(k);if(k==='vit')run.hp+=run.pts*3;run.pts=0;save();render()} break;
     case 'goto':{ui.confirm=null;if(v==='sec-stats'||v==='sec-spells'){ui.ptab=v==='sec-stats'?'stats':'spells';v='sec-prog'}render();const el=document.getElementById(v);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})} break;
-    case 'pt': {const [k,nn]=v.split(':');const n=nn==='all'?run.pts:Math.min(+nn,run.pts);if(n<1)break;run.pts-=n;const add=k==='vit'?n*3:n;const L0=palLv(k);run.stats[k]=(run.stats[k]||0)+add;if(PAL[k]&&palLv(k)>L0)ui.toast=`Palier ${STATN[k]} ${PAL[k].t[palLv(k)-1]} atteint : ${PAL[k].d[palLv(k)-1]} !`;if(k==='vit')run.hp+=add;const A=run.alloc||(run.alloc={});A[k]=(A[k]||0)+n;save();render()} break;
-    case 'ptm': {const A=run.alloc||(run.alloc={}),k=v,n=Math.min(1,A[k]||0);if(n<1)break;A[k]-=n;run.pts+=n;const add=k==='vit'?n*3:n;run.stats[k]=(run.stats[k]||0)-add;if(k==='vit')run.hp=Math.max(1,Math.min(maxHp(),run.hp-add));save();render()} break;
-    case 'ptreset': {const A=run.alloc||{};for(const k in A){const n=A[k];if(!n)continue;run.pts+=n;const add=k==='vit'?n*3:n;run.stats[k]=(run.stats[k]||0)-add;if(k==='vit')run.hp=Math.max(1,Math.min(maxHp(),run.hp-add))}run.alloc={};save();render()} break;
+    case 'pt': {const [k,nn]=v.split(':');const n=nn==='all'?run.pts:Math.min(+nn,run.pts);if(n<1)break;run.pts-=n;const add=n*ptVal(k);const L0=palLv(k);run.stats[k]=(run.stats[k]||0)+add;if(PAL[k]&&palLv(k)>L0)ui.toast=`Palier ${STATN[k]} ${PAL[k].t[palLv(k)-1]} atteint : ${PAL[k].d[palLv(k)-1]} !`;if(k==='vit')run.hp+=add;const A=run.alloc||(run.alloc={});A[k]=(A[k]||0)+n;save();render()} break;
+    case 'ptm': {const A=run.alloc||(run.alloc={}),k=v,n=Math.min(1,A[k]||0);if(n<1)break;A[k]-=n;run.pts+=n;const add=n*ptVal(k);run.stats[k]=(run.stats[k]||0)-add;if(k==='vit')run.hp=Math.max(1,Math.min(maxHp(),run.hp-add));save();render()} break;
+    case 'ptreset': {const A=run.alloc||{};for(const k in A){const n=A[k];if(!n)continue;run.pts+=n;const add=n*ptVal(k);run.stats[k]=(run.stats[k]||0)-add;if(k==='vit')run.hp=Math.max(1,Math.min(maxHp(),run.hp-add))}run.alloc={};save();render()} break;
     case 'ptab': ui.ptab=v;render(); break;
     case 'mtab': ui.ptab=v;render();{const el=id('sec-prog');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})} break;
     case 'spdown':{const sp=spells().find(x=>x.id===v),S=run.spAlloc||(run.spAlloc={});if(!sp||!S[v])break;const lv=lvOf(sp);if(lv<=1)break;run.spellLv[v]=lv-1;run.spPts=(run.spPts??1)+spCost(lv-1);S[v]--;save();render()} break;
@@ -5323,7 +5323,7 @@ function act(a,v){
     case 'spup':{const sp=spells().find(x=>x.id===v);if(!sp)break;const lv=lvOf(sp),c=spCost(lv);if(unlocked(sp)&&lv<5&&(run.spPts??1)>=c){run.spPts=(run.spPts??1)-c;run.spellLv[v]=lv+1;const S=run.spAlloc||(run.spAlloc={});S[v]=(S[v]||0)+1;save();render()}} break;
     case 'forge_old': run.spellLv[v]=Math.min(3,(run.spellLv[v]||1)+1);run.node=null;ui.sub=null;ui.toast=`${spells().find(s=>s.id===v).n} passe au niveau ${run.spellLv[v]}.`;save();render(); break;
     case 'camp': {if(ui.sub!=='camp'||!run)break;if(v==='rest'){const h=healP(Math.round(maxHp()*(SL(4)?.3:.5)));run.flasks=flaskMax();ui.toast=`Tu te reposes : +${h} PV, fioles remplies (${run.flasks} / ${flaskMax()}). Tes ${run.carried} grains restent sur toi.`}else{const b=run.carried;meta.souls+=b;run.carried=0;ui.toast=`${b} grains mis à l’abri au temple. Pas de repos cette fois.`}run.node=null;ui.sub=null;save();render()} break;
-    case 'parch': {const n=10+run.floor*2;const add=v==='vit'?n*3:n;run.stats[v]=(run.stats[v]||0)+add;if(v==='vit')run.hp+=add;run.node=null;ui.sub=null;ui.toast=`+${add} ${STATN[v]}.`;save();render()} break;
+    case 'parch': {const n=10+run.floor*2;const add=n*ptVal(v);run.stats[v]=(run.stats[v]||0)+add;if(v==='vit')run.hp+=add;run.node=null;ui.sub=null;ui.toast=`+${add} ${STATN[v]}.`;save();render()} break;
     case 'confirm': ui.confirm=v;render(); break;
     case 'cancel': ui.confirm=null;render(); break;
     case 'abandon':if(run&&run.endless){endlessEnd('abandon');break}heirSnap();{const kept=Math.floor(run.carried/2),left=run.carried-kept;meta.souls+=kept;ui.end={floor:run.floor,boss:'l’abandon',souls:left,kept,lost:meta.stain?meta.stain.souls:0,mast:gainMast(false)};meta.stain=left>0?{floor:run.floor,souls:left}:null;}meta.runs++;run=null;ui.confirm=null;ui.screen='dead';save();render(); break;
@@ -5343,7 +5343,7 @@ function doNode(k){
 }
 
 /* ===================== RENDU ===================== */
-const elC=el=>el?`var(--${el})`:'var(--frost)';
+const elC=el=>el?`var(--${el})`:'var(--neutre)';
 function bar(cur,max,cls=''){const p=Math.max(0,Math.min(100,cur/max*100));return `<div class="bar ${cls}"><i style="width:${p}%"></i></div>`}
 function mastHtml(k){const lv=mastLv(k),x=mastXp(k),nx=MAST[lv],pv=lv?MAST[lv-1].xp:0;return `<div class="mast" title="${MAST.map((m,i)=>`${ROMAN[i+1]} (${m.xp} XP) : ${m.d}`).join('\n')}"><small><b>Maîtrise ${ROMAN[lv]||0}</b>${nx?` · ${x}/${nx.xp} XP`:' · complète'}</small><div class="mb"><i style="width:${nx?Math.round((x-pv)/(nx.xp-pv)*100):100}%"></i></div>${nx?`<small class="dim">Prochain : ${nx.d}</small>`:'<small style="color:var(--ember)">Grand maître</small>'}</div>`}
 function codexHtml(){const C=cx(),bs=BOSSES,nB=bs.length*2+bs.length-1,gB=bs.reduce((a,b)=>a+(C.boss[b.id]?.w?1:0)+(C.boss[b.id]?.nh?1:0)+(b.id!=='secret'&&C.boss[b.id]?.mut?1:0),0),
@@ -5698,16 +5698,18 @@ function palHtml(k){const P=PAL[k];if(!P||!run)return '';const v=statT(k),L=palL
   return `<span class="pal">${P.t.map((t,i)=>`<span class="pl ${i<L?'on':''}" title="${esc(P.d[i])}"><b>${t}</b>${esc(P.d[i])}</span>`).join('')}${L<3?`<em>Prochain palier : encore ${P.t[L]-v} point${P.t[L]-v>1?'s':''}</em>`:''}</span>`}
 function rStats(){
   const keys=['vit','for','int','agi','cha'];
-  const sub={vit:'Vie',for:'Terre',int:'Feu · soins',agi:'Air · critique · endurance',cha:'Eau (pas le critique)'};
+  const sub={vit:'Vie · +3 par point',for:'Terre · coup lourd · +2 par point',int:'Feu · soins · mana · +2 par point',agi:'Air · critique · endurance · +2 par point',cha:'Eau · recharges · +2 par point'};
   const w=WPN(),wS=mainStat(),wAvg=add=>{const sp=wpnSp(false),k=sp.stat;run.stats[k]=(run.stats[k]||0)+add;const v=Math.round(dmgBase(sp,(w.min+w.max)/2*wMult(),1));run.stats[k]-=add;return v};
   const uses=k=>{const u=[];
     if(k==='vit')u.push(`<b>+3 PV max</b> par point (${maxHp()} actuellement)`);
-    if(k==='cha')u.push(`Malgré son nom, la Chance ne donne pas de critique : c’est la caractéristique de l’<b>Eau</b>. Le critique vient de l’Agilité.`);
+    if(k==='for')u.push(`<b>Coup lourd</b> : +1% par point de Force, quelle que soit ta classe (actuellement <b>+${Math.round(statT('for')*(mainStat()==='for'?1.5:1))}%</b>)`);
+    if(k==='int')u.push(`<b>Mana max</b> +1 tous les 2 points (${mpMax()})`);
+    if(k==='cha')u.push(`<b>Recharge de tous tes sorts</b> −0,15% par point, jusqu’à −20% (actuellement <b>−${Math.min(20,Math.round(statT('cha')*.15*10)/10)}%</b>)`);
     if(k===wS){u.push(`<b>Coups d’arme</b> (léger et lourd) : +1% de dégâts par point (bonus actuel <b>+${statT(k)+pctDmg()}%</b>, coup léger moyen ${wAvg(0)})`)}
     const sps=spells().filter(sp=>unlocked(sp)&&(sp.stat||EL[sp.el]&&EL[sp.el].s)===k&&sp.t!=='heal'&&sp.t!=='buff').map(sp=>sp.n);
     if(sps.length)u.push(`Sorts : <b>${sps.join(', ')}</b> (+1% par point)`);
     if(k==='int'&&spells().some(sp=>unlocked(sp)&&sp.t==='heal'))u.push('Soins de tes sorts : +1% par point');
-    if(k==='agi')u.push(`Critique +1% tous les 8 points (${critC()}%) · récupération d’endurance +1/s tous les 10 points (${stRegen()}/s)`);
+    if(k==='agi')u.push(`Critique +1% tous les 5 points (${critC()}%) · récupération d’endurance +1/s tous les 10 points (${stRegen()}/s)`);
     if(!u.length)u.push('<span class="dim">Aucun de tes coups actuels n’utilise cette caractéristique.</span>');
     return u.join(' · ')};
   return `<section class="panel" id="sec-stats">
@@ -5752,7 +5754,7 @@ function spInfo(sp,lv){const o=[];
 function rSpells(){const pts=run.spPts??1;
   return `<section class="panel" id="sec-spells"><div class="between"><span class="label">Sorts</span><span style="color:${pts?'var(--ember)':'var(--dim)'}">${pts} point${pts>1?'s':''} de sort</span></div>
   <div class="spl">${spells().map((s,si)=>{const lv=lvOf(s),un=unlocked(s),c=spCost(lv);return `<div class="spr ${un?'':'locked'}" style="--c:${elC(s.el)}">
-    <div class="between"><span class="row"><kbd class="spk" data-kk="s${si+1}" title="Touche du sort (modifiable dans Touches)">${ka('s'+(si+1))}</kbd><span class="pip"></span><b>${s.n}</b><span class="chip">${s.role}</span></span>${un?`<span class="lv">${[1,2,3,4,5].map(i=>`<i class="${i<=lv?'on':''}"></i>`).join('')}</span>`:`<span class="dim">Niveau ${s.unlock}</span>`}</div>
+    <div class="between"><span class="row"><kbd class="spk" data-kk="s${si+1}" title="Touche du sort (modifiable dans Touches)">${ka('s'+(si+1))}</kbd><span class="pip"></span><b>${s.n}</b><span class="chip">${s.role}</span><span class="chip" style="color:${elC(s.el)};border-color:${elC(s.el)}">${s.el&&EL[s.el]?EL[s.el].n:'Neutre'}</span></span>${un?`<span class="lv">${[1,2,3,4,5].map(i=>`<i class="${i<=lv?'on':''}"></i>`).join('')}</span>`:`<span class="dim">Niveau ${s.unlock}</span>`}</div>
     <p class="dim">${s.d}</p>
     ${un?`<p class="num" style="font-size:13px">Niv. ${lv} : ${spInfo(s,lv)}</p>${lv<5?`<p class="num dim" style="font-size:13px">Niv. ${lv+1} : ${spInfo(s,lv+1)}</p>`:''}`:''}
     <p style="font-size:13px;color:${lv>=5?'var(--ember)':'var(--dim)'}">Niv. 5 : ${s.l5}</p>
@@ -5762,11 +5764,11 @@ function rSpells(){const pts=run.spPts??1;
 /* ===================== PROGRESSION : caractéristiques et sorts ===================== */
 const STATK=['vit','for','int','agi','cha'];
 const STATC={vit:'var(--ok)',for:'var(--terre)',int:'var(--feu)',agi:'var(--air)',cha:'var(--eau)'},STATI={vit:'✚',for:'▲',int:'◆',agi:'➶',cha:'❖'};
-const ptVal=k=>k==='vit'?3:1;
+const ptVal=k=>k==='vit'?3:2;
 function heroLite(){const w=WPN(),sp=wpnSp(false);const ds=spells().filter(x=>unlocked(x)&&['dmg','leap','nova','order','trap','zone'].includes(x.t)&&x.el);
   const hs=spells().filter(x=>unlocked(x)&&x.t==='heal');
-  return {pv:maxHp(),arme:Math.round(dmgBase(sp,(w.min+w.max)/2*wMult(),1)),sorts:ds.length?Math.round(ds.reduce((a,x)=>a+dmgBase(x,(x.min+x.max)/2,lvOf(x)),0)/ds.length):0,soin:hs.length?Math.round(hs.reduce((a,x)=>a+healCalc(x,(x.min+x.max)/2),0)/hs.length):0,crit:critC(),reg:stRegen()}}
-const HLN={pv:['PV max',''],arme:['Coup léger',''],sorts:['Sorts',''],soin:['Soins',''],crit:['Critique','%'],reg:['Récupération','/s']};
+  return {pv:maxHp(),lourd:Math.round(dmgBase(wpnSp(true),(w.min+w.max)/2*wMult()*(w.heavy?w.heavy.m||2.3:2.3),1)),mana:mpMax(),rech:Math.min(20,Math.round(statT('cha')*.15*10)/10),arme:Math.round(dmgBase(sp,(w.min+w.max)/2*wMult(),1)),sorts:ds.length?Math.round(ds.reduce((a,x)=>a+dmgBase(x,(x.min+x.max)/2,lvOf(x)),0)/ds.length):0,soin:hs.length?Math.round(hs.reduce((a,x)=>a+healCalc(x,(x.min+x.max)/2),0)/hs.length):0,crit:critC(),reg:stRegen()}}
+const HLN={pv:['PV max',''],lourd:['Coup lourd',''],mana:['Mana',''],rech:['Recharges −','%'],arme:['Coup léger',''],sorts:['Sorts',''],soin:['Soins',''],crit:['Critique','%'],reg:['Récupération','/s']};
 function withStat(k,n,fn){run.stats[k]=(run.stats[k]||0)+n;try{return fn()}finally{run.stats[k]-=n}}
 function statInfo(k){const wS=mainStat(),tags=[];
   if(k==='vit')tags.push(['Survie',1]);
@@ -5775,8 +5777,11 @@ function statInfo(k){const wS=mainStat(),tags=[];
   if(sps.length)tags.push([sps.length>1?sps.length+' sorts':'1 sort',1,sps.map(x=>x.n).join(', ')]);
   if(k==='int'&&spells().some(sp=>unlocked(sp)&&sp.t==='heal'))tags.push(['Soins',1]);
   if(k==='agi')tags.push(['Critique · endurance',1]);
+  if(k==='for')tags.push(['Coup lourd',1]);if(k==='int')tags.push(['Mana',1]);if(k==='cha')tags.push(['Recharges',1]);
   const useful=tags.some(t=>t[1]);
-  const per=k==='vit'?'+3 PV max par point':k==='agi'?`+1% de critique tous les 8 points, +1 endurance/s tous les 10${k===wS||sps.length?' · +1% de dégâts par point':''}`:useful?`+1% de dégâts${k==='int'&&tags.some(t=>t[0]==='Soins')?' et de soins':''} par point`:'Aucun de tes coups actuels ne l’utilise.';
+  const dm=k===wS||sps.length?'+1% de dégâts'+(k==='int'&&tags.some(t=>t[0]==='Soins')?' et de soins':'')+' par point':'';
+  const ex={for:'Coup lourd +1% par point (toutes classes)',int:'+1 mana max tous les 2 points',agi:'+1% de critique tous les 5 points, +1 endurance/s tous les 10',cha:'Recharge de tous tes sorts −0,15% par point (max −20%)'}[k];
+  const per=k==='vit'?'Chaque point investi : +3 PV max':'Chaque point investi : +2. '+[dm,ex].filter(Boolean).join(' · ');
   return {tags,useful,per,sps}}
 function statPreview(k){const n=Math.max(1,Math.min(5,run.pts||5)),a=heroLite(),b=withStat(k,n*ptVal(k),heroLite);
   const d=Object.keys(HLN).filter(x=>b[x]!==a[x]).map(x=>`${HLN[x][0]} <b>${a[x]}${HLN[x][1]} → ${b[x]}${HLN[x][1]}</b>`);
@@ -5815,7 +5820,7 @@ function rSpellsP(){const pts=run.spPts??1,S=run.spAlloc||{};
     if(!un)return `<div class="spc lock" style="--c:${elC(s.el)}"><div class="spc-h"><kbd class="spk">${ka('s'+(si+1))}</kbd><b>${s.n}</b><span class="chip soft">${s.role}</span><span class="dim spc-r">Débloqué au niveau ${s.unlock}</span></div><p class="spc-d dim">${s.d}</p></div>`;
     const A=spParts(s,lv),B=lv<5?spParts(s,lv+1):null;
     return `<div class="spc ${can?'can':''}" style="--c:${elC(s.el)}">
-    <div class="spc-h"><kbd class="spk" data-kk="s${si+1}" title="Touche du sort">${ka('s'+(si+1))}</kbd><span class="pip"></span><b>${s.n}</b><span class="chip">${s.role}</span><span class="lv spc-r" title="Niveau ${lv} / 5">${[1,2,3,4,5].map(i=>`<i class="${i<=lv?'on':''}"></i>`).join('')}</span></div>
+    <div class="spc-h"><kbd class="spk" data-kk="s${si+1}" title="Touche du sort">${ka('s'+(si+1))}</kbd><span class="pip"></span><b>${s.n}</b><span class="chip">${s.role}</span><span class="chip" style="color:${elC(s.el)};border-color:${elC(s.el)}">${s.el&&EL[s.el]?EL[s.el].n:'Neutre'}</span><span class="lv spc-r" title="Niveau ${lv} / 5">${[1,2,3,4,5].map(i=>`<i class="${i<=lv?'on':''}"></i>`).join('')}</span></div>
     <p class="spc-d">${s.d}</p>
     <div class="spc-t num">${A.map((r,i)=>{const nx=B&&B[i]?B[i][1]:null,ch=nx!=null&&nx!==r[1];return `<span class="dim">${r[0]}</span><span>${r[1]}</span>${B?`<span class="${ch?'up':'dim'}">${ch?'→ '+nx:'='}</span>`:'<span></span>'}`}).join('')}</div>
     <p class="spc-5 ${lv>=5?'on':''}"><span>★ Niveau 5</span> ${s.l5}</p>

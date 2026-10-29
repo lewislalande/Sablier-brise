@@ -4297,14 +4297,25 @@ function makeWolf(spirit){const T=THREE,g=new T.Group(),body=new T.Group();g.add
   const tail=new T.Group();tail.position.set(-.75,1.05,0);body.add(tail);const tl=P2(new T.ConeGeometry(.12,.7,5),fur,-.3,0,0,tail);tl.rotation.z=Math.PI/2+.5;
   const bar=new T.Group(),bb=new T.Mesh(new T.PlaneGeometry(1.4,.12),bmat('#000000',.6)),fg2=new T.PlaneGeometry(1.4,.12);fg2.translate(.7,0,0);const fg=new T.Mesh(fg2,bmat(COL.ok));fg.position.x=-.7;fg.position.z=.01;bar.add(bb,fg);bar.position.y=2.1;g.add(bar);bar.visible=!spirit;
   g.scale.setScalar(1.2);return {g,body,head,legs,tail,bar,fg,ph:0,last:null}}
+/* serviteurs squelettes du Nécromancien (modèle KayKit) ; repli sur le loup si le modèle n'est pas chargé */
+function petSkel(o,f){return o.opet?!!(PV.oppRun&&PV.oppRun.cls==='necro'):!!(run&&run.cls==='necro')}
+function makeSkel(spirit){const T=THREE,key=KK.chars.sk_warrior?'sk_warrior':KK.chars.sk_rogue?'sk_rogue':null;if(!key||!THREE.SkeletonUtils)return null;
+  const g=new T.Group(),body=new T.Group();g.add(body);const model=THREE.SkeletonUtils.clone(KK.chars[key]),sc=2.45/(KK.h[key]||2.5);model.scale.setScalar(sc);model.rotation.y=Math.PI/2;body.add(model);
+  model.traverse(o=>{if(o.isMesh||o.isSkinnedMesh){o.castShadow=true;o.frustumCulled=false;o.material=o.material.clone();o.material.color.multiplyScalar(.8);o.material.emissive=new T.Color(spirit?'#5fd8a0':'#3a7a52');o.material.emissiveIntensity=spirit?.7:.35;if(spirit){o.material.transparent=true;o.material.opacity=.78}}});
+  const own=KK.own&&KK.own[key],mixer=new T.AnimationMixer(model),act={};(own||KK.clips).forEach(c=>{act[c.name]=mixer.clipAction(c)});
+  const pick=(...n)=>n.find(x=>act[x]);const A={idle:pick('Idle_A','Idle','Idle_Weapon'),run:pick('Running_A','Run','Run_Weapon','Walking_A'),atk:pick('Atk1','1H_Melee_Attack_Chop','Sword_Attack','Attack','Punch')};
+  const bar=new T.Group(),bb=new T.Mesh(new T.PlaneGeometry(1.4,.12),bmat('#000000',.6)),fg2=new T.PlaneGeometry(1.4,.12);fg2.translate(.7,0,0);const fg=new T.Mesh(fg2,bmat(COL.ok));fg.position.x=-.7;fg.position.z=.01;bar.add(bb,fg);bar.position.y=2.6;g.add(bar);
+  const dummy=()=>new T.Object3D();return {g,body,head:dummy(),legs:[],tail:dummy(),bar,fg,ph:0,last:null,mixer,act,A,cur:null}}
+function skelAnim(m,want,dt){const n=m.A[want]||m.A.idle;if(n&&m.cur!==n){const a=m.act[n],o=m.cur&&m.act[m.cur];a.reset();a.setLoop(want==='atk'?THREE.LoopOnce:THREE.LoopRepeat,Infinity);a.clampWhenFinished=want==='atk';a.fadeIn(.12).play();if(o)o.fadeOut(.12);m.cur=n}m.mixer.update(dt)}
 function syncPets(f,dt){const R=R3,M=R.petM||(R.petM=new Map()),live=new Set();
   const all=[...(f.pet&&f.pet.hp>0?[f.pet]:[]),...(f.pack||[]),...f.adds.filter(a=>a.opet&&a.alive)];
-  all.forEach(o=>{live.add(o);let m=M.get(o);if(!m){m=makeWolf(o.spirit);R.scene.add(m.g);M.set(o,m)}
+  all.forEach(o=>{live.add(o);let m=M.get(o);if(!m){m=(petSkel(o,f)&&makeSkel(o.spirit))||makeWolf(o.spirit);R.scene.add(m.g);M.set(o,m)}
     const p=W3(o,0);const sp=m.last?Math.hypot(p.x-m.last.x,p.z-m.last.z)/Math.max(dt,1e-3):0;m.last=p.clone();m.g.position.copy(p);
     m.g.rotation.y=lerpAng(m.g.rotation.y,-o.face,1-Math.exp(-dt*10));m.ph+=dt*Math.min(sp,20)*1.2;
     m.legs.forEach((l,i)=>l.rotation.z=Math.sin(m.ph+(i%2?Math.PI:0)+(i>1?Math.PI/2:0))*Math.min(.7,sp*.08));
     m.tail.rotation.y=Math.sin(f.t*6)*.4;const lg=o.lunge>0?o.lunge/.2:0;if(o.lunge>0)o.lunge-=dt;m.body.position.x=lg*.5;m.head.rotation.z=-lg*.4;
-    if(o.bite)m.body.position.y=Math.sin(Math.min(1,(.35-o.bite.t)/.35)*Math.PI)*.8;else m.body.position.y=0;
+    if(m.mixer){m.body.position.set(0,0,0);skelAnim(m,o.bite||o.lunge>0?'atk':sp>1.5?'run':'idle',dt)}
+    else if(o.bite)m.body.position.y=Math.sin(Math.min(1,(.35-o.bite.t)/.35)*Math.PI)*.8;else m.body.position.y=0;
     if(o.spirit&&o.life<1)m.g.children.forEach(c=>{});
     m.bar.quaternion.copy(R.camera.quaternion);m.fg.scale.x=Math.max(.001,o.hp/o.max)});
   for(const [k,m] of M)if(!live.has(k)){R.scene.remove(m.g);disposeObj(m.g);M.delete(k)}
@@ -4563,7 +4574,7 @@ function bindFight(){
   if(!ensureRenderer()){H.pause.hidden=true;id('nogl').hidden=false;return}
   id('gl').appendChild(R3.renderer.domElement);
   const f=fight,go=()=>{if(fight!==f||!R3||ui.screen!=='fight')return;if(H.pgo){H.pgo.disabled=false;H.pgo.textContent=f.paused&&H.ptitle&&H.ptitle.textContent==='Pause'?'Reprendre':'Combattre'}buildScene(f);resize3D();lastTs=0;if(f.pvp||f.co){f.paused=false;H.pause.hidden=true;try{requestLock()}catch(e){}}if(!raf)raf=requestAnimationFrame(loop)};
-  const need=[];monKeysOf(f.B).forEach(k=>{if(!MON[k])need.push(kkNeed('m:'+k))});if(KKMAP[run.cls]&&!KK.chars[KKMAP[run.cls]]&&KK.ready)need.push(kkNeed(KKMAP[run.cls]));if(f.pvp&&PV.oppRun){const ok2=KKMAP[PV.oppRun.cls];if(ok2&&!KK.chars[ok2]&&KK.ready)need.push(kkNeed(ok2))}if(f.bm)Object.values(f.allies).forEach(A=>{const k=KKMAP[A.cls];if(k&&!KK.chars[k]&&KK.ready)need.push(kkNeed(k))});if(f.co&&CO.mate){const ok3=KKMAP[CO.mate.cls];if(ok3&&!KK.chars[ok3]&&KK.ready)need.push(kkNeed(ok3))}
+  const need=[];monKeysOf(f.B).forEach(k=>{if(!MON[k])need.push(kkNeed('m:'+k))});if(KKMAP[run.cls]&&!KK.chars[KKMAP[run.cls]]&&KK.ready)need.push(kkNeed(KKMAP[run.cls]));if((run.cls==='necro'||(f.pvp&&PV.oppRun&&PV.oppRun.cls==='necro'))&&!KK.chars.sk_warrior&&KK.ready)need.push(kkNeed('sk_warrior'));if(f.pvp&&PV.oppRun){const ok2=KKMAP[PV.oppRun.cls];if(ok2&&!KK.chars[ok2]&&KK.ready)need.push(kkNeed(ok2))}if(f.bm)Object.values(f.allies).forEach(A=>{const k=KKMAP[A.cls];if(k&&!KK.chars[k]&&KK.ready)need.push(kkNeed(k))});if(f.co&&CO.mate){const ok3=KKMAP[CO.mate.cls];if(ok3&&!KK.chars[ok3]&&KK.ready)need.push(kkNeed(ok3))}
   if(need.length){if(H.pgo){H.pgo.disabled=true;H.pgo.textContent='Chargement…'}Promise.race([Promise.all(need),new Promise(r=>setTimeout(r,12000))]).then(go)}else go();
 }
 function sceneRebuild(){const f=fight;if(!f||!R3||ui.screen!=='fight'||!R3.scene)return;try{if(R3.comp){try{R3.comp.renderTarget1.dispose();R3.comp.renderTarget2.dispose()}catch(_){}R3.comp=null}disposeObj(R3.scene);TEL.clear();buildScene(f);resize3D()}catch(e){}}
@@ -4919,7 +4930,7 @@ function pvpOn(e2,m){const f=fight&&fight.pvp?fight:null;
   if(e2==='pick'){PV.last=performance.now();if(PV.pk&&PV.pk.m.round===m.r){PV.pk.theirs=m.c;pvpPickPaint();pvpPickGo()}else PV.pkEarly={r:m.r,c:m.c};return}
   if(e2==='cld'){PV.last=performance.now();const F=fight;if(F&&F.pvp&&coKey()===m.k){if(F.coWait)F.coWait.mate=1;else if(performance.now()-(PV.ldT||0)>400){PV.ldT=performance.now();pvpSend('cld',{k:m.k})}}else PV.pendLd=m.k;return}
   if(!f)return;PV.last=performance.now();
-  if(e2==='s'){const q=mir(m);PV.os=Object.assign({},m,{x:q.x,y:q.y,face:(m.face||0)+Math.PI});f.bhp=Math.max(0,m.hp);f.bmax=m.mx||f.bmax;
+  if(e2==='s'){const q=mir(m);PV.os=Object.assign({},m,{x:q.x,y:q.y,vx:-(m.vx||0),vy:-(m.vy||0),at:performance.now(),face:(m.face||0)+Math.PI});f.bhp=Math.max(0,m.hp);f.bmax=m.mx||f.bmax;
     const seen=new Set();(m.pe||[]).forEach(r=>{const [pid,x,y,hp,mx,sp,fa,lu]=r,Q=mir({x,y});seen.add(pid);let o=f.adds.find(a=>a.opet&&a.pid===pid);
       if(!o){o={id:(f.addId=(f.addId||0)+1),k:'opet',A:ADD.opet,pid,opet:1,x:Q.x,y:Q.y,r:14,hp,max:mx,alive:hp>0,cool:99,atk:null,hurt:0,link:false,spirit:!!sp,face:fa+Math.PI};f.adds.push(o)}
       o.x+=(Q.x-o.x)*.5;o.y+=(Q.y-o.y)*.5;o.face=fa+Math.PI;if(lu)o.lunge=.18;if(!o.pend||performance.now()-o.pend>600){o.hp=hp;o.max=mx}if(hp<=0&&o.alive){o.alive=false;ev(f,'adeath',{x:o.x,y:o.y,col:'ember'})}});
@@ -4999,9 +5010,9 @@ function pvpOrbs(f,dt){if(f.over)return;const every=f.pvMod==='orbes'?7:13;f.orb
   const o=f.orb;if(o&&dist(f.p,o)<PR+22){f.orb=null;pvpSend('orb',{i:o.i});pvpOrbTake(f,o.k)}}
 function pvpOrbTake(f,k){const p=f.p;if(k==='rage'){f.buffs.push({n:'Rage',id:'orbr',v:40,t:6,dur:6})}else if(k==='soin'){const h=healP(Math.round(maxHp()*.3));txt(f,p.x,p.y,'+'+h,'ok')}else if(k==='vent'){f.cds={}}f.msg={txt:'Orbe de '+ORBS[k].n+' : '+ORBS[k].d,t:1.8,big:1};ev(f,'revive')}
 function pvpTick(f,dt){const b=f.b,o=PV.os;pvpZone(f,dt);pvpOrbs(f,dt);
-  if(o){b.x+=(o.x-b.x)*Math.min(1,dt*14);b.y+=(o.y-b.y)*Math.min(1,dt*14);let df=o.face-(b.face||0);df=Math.atan2(Math.sin(df),Math.cos(df));b.face=(b.face||0)+df*Math.min(1,dt*14);b.inv=0}
+  if(o){const age=Math.min(.18,(performance.now()-(o.at||0))/1000),tx=o.x+(o.vx||0)*age,ty=o.y+(o.vy||0)*age,dd=Math.hypot(tx-b.x,ty-b.y);if(dd>220){b.x=tx;b.y=ty}else{const k=Math.min(1,dt*22);b.x+=(tx-b.x)*k;b.y+=(ty-b.y)*k}let df=o.face-(b.face||0);df=Math.atan2(Math.sin(df),Math.cos(df));b.face=(b.face||0)+df*Math.min(1,dt*14);b.inv=0}
   if(performance.now()-PV.last>9000&&!f.over){f.over=true;f.msg={txt:'Adversaire déconnecté',t:3,big:1};PV.err='Plus de nouvelles de ton adversaire.';setTimeout(()=>{if(fight===f)pvpLeaveFight()},2500)}
-  PV.sendT-=dt;if(PV.sendT<=0){PV.sendT=1/12;const p=f.p,pe=[...(f.pet&&f.pet.hp>0?[f.pet]:[]),...(f.pack||[])].map(o=>{if(!o.pid)o.pid=(f.pidN=(f.pidN||0)+1);return [o.pid,Math.round(o.x),Math.round(o.y),Math.max(0,Math.round(o.hp)),o.max,o.spirit?1:0,+(o.face||0).toFixed(2),o.lunge>0?1:0]});pvpSend('s',{x:Math.round(p.x),y:Math.round(p.y),face:+p.face.toFixed(2),hp:run.hp,mx:maxHp(),r:p.roll>0?1:0,g:p.guard?1:0,l:p.leap?1:0,d:p.drink>0?1:0,pe})}
+  PV.sendT-=dt;if(PV.sendT<=0){PV.sendT=1/20;const p=f.p,lp=PV.lastSent||{x:p.x,y:p.y,t:performance.now()},now=performance.now(),el=Math.max(.016,(now-lp.t)/1000),vx=Math.round((p.x-lp.x)/el),vy=Math.round((p.y-lp.y)/el);PV.lastSent={x:p.x,y:p.y,t:now};pe=[...(f.pet&&f.pet.hp>0?[f.pet]:[]),...(f.pack||[])].map(o=>{if(!o.pid)o.pid=(f.pidN=(f.pidN||0)+1);return [o.pid,Math.round(o.x),Math.round(o.y),Math.max(0,Math.round(o.hp)),o.max,o.spirit?1:0,+(o.face||0).toFixed(2),o.lunge>0?1:0]});pvpSend('s',{x:Math.round(p.x),y:Math.round(p.y),vx:Math.abs(vx)<900?vx:0,vy:Math.abs(vy)<900?vy:0,face:+p.face.toFixed(2),hp:run.hp,mx:maxHp(),r:p.roll>0?1:0,g:p.guard?1:0,l:p.leap?1:0,d:p.drink>0?1:0,pe})}
   if(f.frz>0&&!f.ms.frzSent){f.ms.frzSent=1;pvpSend('hit',{raw:0,frz:Math.min(1.4,f.frz),unblock:1})}if(!(f.frz>0))f.ms.frzSent=0;
   if(f.ms.slowB>0&&!f.ms.slowSent){f.ms.slowSent=1;pvpSend('hit',{raw:0,slow:Math.min(2.5,f.ms.slowB),unblock:1})}if(!(f.ms.slowB>0))f.ms.slowSent=0}
 function pvpHit(f,sp,d){const heavy=sp.id==='wh'||sp.fx==='judge'||sp.fx==='exec'||(sp.wind&&!sp.proj);
@@ -5220,7 +5231,7 @@ function coBanner(){if(!run||!run.coop)return '';const M=CO.mate;if(!coLive())re
   return `<div class="coban"><b>À deux avec ${esc(M.pseudo)}</b><span>${CLASSES[M.cls]?CLASSES[M.cls].name:''}${CO.role==='B'?' · il choisit les chemins':' · tu choisis les chemins'}</span><span class="cost">${st}</span>${R?`<button class="btn sm" data-a="coopun">Annuler</button>`:''}</div>`}
 function rCoop(){const st=CO.st,me=pvpName(),M=CO.mate,RR=ui.rushRes,best=meta.rushBest||0;
   const res=RR?`<div class="rushres"><span class="label">Fin de la tour</span><h2>${RR.kills} gardien${RR.kills>1?'s':''} vaincu${RR.kills>1?'s':''}${RR.mate?' avec '+esc(RR.mate):''}</h2><p class="dim">+${RR.g} grains au temple · record : ${RR.best}</p></div>`:'';
-  const intro=`<p class="dim" style="margin:2px 0 10px">Les gardiens s’enchaînent sans fin dans l’arène, sans carte ni retour au camp. Après chaque gardien, chacun choisit <b>son</b> bonus parmi trois. Tous les 9 gardiens, la boucle recommence plus forte. À deux, les gardiens ont plus de PV et visent celui qui les blesse le plus ; si l’un tombe, l’autre peut gagner le combat et le relever.${best?` <span style="color:var(--bone)">Ton record : ${best} gardien${best>1?'s':''}.</span>`:''}</p>`;
+  const intro=`<p class="dim" style="margin:2px 0 10px">Les gardiens s’enchaînent sans fin dans l’arène, sans carte ni retour au camp. Après chaque gardien, chacun choisit <b>son</b> bonus parmi trois et <b>gagne des grains tout de suite</b> (de plus en plus à chaque gardien, +25 % à deux). Tous les 9 gardiens, la boucle recommence plus forte. À deux, les gardiens ont plus de PV et visent celui qui les blesse le plus ; si l’un tombe, l’autre peut gagner le combat et le relever.${best?` <span style="color:var(--bone)">Ton record : ${best} gardien${best>1?'s':''}.</span>`:''}</p>`;
   const myC=CLASSES[meta.sel],hero=myC?RACES[meta.race].n+' '+myC.name:'aucune classe choisie';
   if(!pvpOk())return `<section class="panel coopp"><span class="label">Tour à deux</span>${res}${intro}<p class="dim">Le jeu à deux fonctionne sur le site hébergé. Tu peux jouer la tour seul ici.</p><div class="row" style="gap:8px"><button class="btn primary" data-a="rushsolo">Jouer seul · ${esc(hero)}</button><button class="btn" data-a="hub" data-v="play">Changer de héros</button></div></section>`;
   let body='';
@@ -5275,7 +5286,7 @@ function rushFight(){const w=run.rush.w;run.floor=(w%9)+1;run.order=[0,1,2,3,4,5
 /* fin d'un combat de la tour */
 function rushAfter(f,won){if(!run||!run.rush)return;
   if(!won){rushOver();return}
-  const R=run.rush;R.kills++;meta.rushBest=Math.max(meta.rushBest||0,R.kills);
+  const R=run.rush;R.kills++;meta.rushBest=Math.max(meta.rushBest||0,R.kills);{const gk=Math.round((40+15*R.kills)*(R.role&&R.role!=='S'?1.25:1));meta.souls+=gk;R.g=(R.g||0)+gk;ui.toast=`+${gk} grains au temple (${R.g} sur cette tour)`;save()}
   if(run.lvl<12)run.lvl++;{const ms=mainStat();run.stats[ms]=(run.stats[ms]||0)+8;run.stats.vit=(run.stats.vit||0)+9}
   {const L=spells().filter(s=>unlocked(s)&&lvOf(s)<5);if(L.length){L.sort((a,b)=>lvOf(a)-lvOf(b));run.spellLv[L[0].id]=lvOf(L[0])+1}}
   run.hp=Math.min(maxHp(),Math.max(run.hp,1)+Math.round(maxHp()*.4));run.flasks=Math.max(run.flasks,Math.min(flaskMax(),run.flasks+1));
@@ -5291,7 +5302,7 @@ function rushTaken(dk){if(!dk)return;const md=CO.mateDuo||(CO.mateDuo=[]);if(!md
     if(alt)P.opts[i]={k:'duo',dk:alt};else{const ks=Object.keys(RBON).filter(k=>k!=='duo'&&!P.opts.some(x=>x.k===k)&&(!RBON[k].ok||RBON[k].ok()));const k=pick(ks);P.opts[i]=Object.assign({k},RBON[k].mk(run.rush.w))}}});rushPaint()}
 function rushGo(){if(!run||!run.rush)return;clearInterval(CO.rpT);const w=run.rush.w+1;if(coRun()&&CO.role==='A')coSend('cnx',{w});rushNext(w)}
 function rushNext(w){CO.myPick=0;CO.matePick=0;ui.rpick=null;if(!run||!run.rush)return;run.rush.w=w;rushFight()}
-function rushOver(){clearInterval(CO.rpT);const R=run.rush,g=Math.round(R.kills*(30+6*R.kills));meta.souls+=g;meta.rushBest=Math.max(meta.rushBest||0,R.kills);
+function rushOver(){clearInterval(CO.rpT);const R=run.rush,g=R.g||0;meta.rushBest=Math.max(meta.rushBest||0,R.kills);
   ui.rushRes={kills:R.kills,g,best:meta.rushBest,mate:R.role!=='S'&&CO.mate?CO.mate.pseudo:null};run=RUSHSV;RUSHSV=null;fight=null;ui.rpick=null;try{teardown3D()}catch(e){}document.body.style.overflow='';ui.screen='home';ui.hub='arena';save();render()}
 function rushPaint(){const st=id('stage');if(!st)return;let el=id('rushp');const P=ui.rpick;if(!P){if(el)el.remove();return}
   if(!el){el=document.createElement('div');el.id='rushp';el.className='rushp';st.appendChild(el)}

@@ -2374,6 +2374,9 @@ function ensureRenderer(){
     R3={renderer:r,cam:{yaw:-Math.PI/2,pitch:.42,lock:true,off:0},wasLocked:false,scene:null};
     r.domElement.addEventListener('mousedown',onCanvasDown);
     r.domElement.addEventListener('contextmenu',e=>e.preventDefault());
+    /* le navigateur peut retirer le contexte 3D quand on change de fenêtre : on reconstruit l'arène au retour */
+    r.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();if(R3)R3.lost=1;if(fight&&!fight.over&&!fight.paused)setPause(true)});
+    r.domElement.addEventListener('webglcontextrestored',()=>{if(!R3)return;R3.lost=0;sceneRebuild()});
   }
   return true;
 }
@@ -3558,7 +3561,7 @@ function buildScene(f){
   const vuln=new T.Mesh(flat(new T.RingGeometry(R+.6,R+1.1,64)),bmat(COL.ember,.9));S.add(vuln);
   const camera=new T.PerspectiveCamera(55,1,.3,220);
   {const bx=new T.Box3().setFromObject(cr?cr.g:core);R3.bossH=Math.max(2,((cr&&cr.g.userData.hT)||(bx.max.y-Math.min(0,bx.min.y)))*(B.big||1));}
-  Object.assign(R3,{kk:ch.kk||null,scene:S,camera,wp,pg,pm,egg,rig,head,legL,legR,armL,armR,capeP,pmats,addM:new Map(),tmark:null,walkPh:0,amp:0,lastP:{x:f.p.x,y:f.p.y},parts:[],shocks:[],flinch:0,pflinch:0,lunge:0,stagger:0,leapAnim:null,dead:null,pdead:null,drink,charge,bg,holder,core,cm:cr?cr.mat:cm,cr:cr?Object.assign(cr,{walk:0}):null,blast:{x:f.b.x,y:f.b.y},extras,rc,shield,vuln,R,pools:{bp:[],pp:[]},pm2:new Map(),vfx:[],petM:new Map(),trapM:new Map(),slashes:new Map()});
+  Object.assign(R3,{kk:ch.kk||null,scene:S,camera,wp,pg,pm,egg,rig,head,legL,legR,armL,armR,capeP,pmats,addM:new Map(),tmark:null,walkPh:0,amp:0,lastP:{x:f.p.x,y:f.p.y},parts:[],shocks:[],flinch:0,pflinch:0,lunge:0,stagger:0,leapAnim:null,dead:null,pdead:null,drink,charge,bg,holder,core,cm:cr?cr.mat:cm,cr:cr?Object.assign(cr,{walk:0}):null,blast:{x:f.b.x,y:f.b.y},extras,rc,shield,vuln,R,pools:{bp:[],pp:[]},pm2:new Map(),vfx:[],petM:new Map(),trapM:new Map(),slashes:new Map(),chg:null,stFx:null,big:null,chAura:null,cosS:null});
   R3.ally=f.co&&f.ally?coAllyBuild(S,f):null;R3.bgFade=0;R3.bmA=f.bm?Object.fromEntries(Object.values(f.allies).map(A=>[A.id,coAllyBuild(S,f,A)]).filter(x=>x[1])):null;R3.bmRing=null;
   R3.cam={yaw:-Math.PI/2,pitch:.42,lock:true,off:0};
   TEL.clear();PG.clear();PGEO=null;R3.fxp=[];R3.decals=[];FXQ=GFXQ()?1:.55;R3.axeM=null;R3.pbub=null;R3.trail=null;R3.tchev=null;R3.bulb=null;R3.bulbOn=false;R3.rev=null;R3.pz=null;R3.orbM=null;R3.pfx=null;R3.waura=null;if(R3.wp)R3.wp.lastD=R3.wp.lastZ=null;
@@ -4563,6 +4566,7 @@ function bindFight(){
   const need=[];monKeysOf(f.B).forEach(k=>{if(!MON[k])need.push(kkNeed('m:'+k))});if(KKMAP[run.cls]&&!KK.chars[KKMAP[run.cls]]&&KK.ready)need.push(kkNeed(KKMAP[run.cls]));if(f.pvp&&PV.oppRun){const ok2=KKMAP[PV.oppRun.cls];if(ok2&&!KK.chars[ok2]&&KK.ready)need.push(kkNeed(ok2))}if(f.bm)Object.values(f.allies).forEach(A=>{const k=KKMAP[A.cls];if(k&&!KK.chars[k]&&KK.ready)need.push(kkNeed(k))});if(f.co&&CO.mate){const ok3=KKMAP[CO.mate.cls];if(ok3&&!KK.chars[ok3]&&KK.ready)need.push(kkNeed(ok3))}
   if(need.length){if(H.pgo){H.pgo.disabled=true;H.pgo.textContent='Chargement…'}Promise.race([Promise.all(need),new Promise(r=>setTimeout(r,12000))]).then(go)}else go();
 }
+function sceneRebuild(){const f=fight;if(!f||!R3||ui.screen!=='fight'||!R3.scene)return;try{if(R3.comp){try{R3.comp.renderTarget1.dispose();R3.comp.renderTarget2.dispose()}catch(_){}R3.comp=null}disposeObj(R3.scene);TEL.clear();buildScene(f);resize3D()}catch(e){}}
 function resize3D(){if(!R3||!R3.camera)return;const el=id('stage');if(!el)return;const w=el.clientWidth,h=el.clientHeight;R3.renderer.setSize(w,h);if(R3.comp&&w>0&&h>0){R3.comp.setSize(w,h);if(R3.bloom)R3.bloom.setSize(w,h)}R3.camera.aspect=w/Math.max(1,h);R3.camera.updateProjectionMatrix()}
 function teardown3D(){if(H.cob)H.cob.hidden=true;
   if(R3){R3.renderer.toneMapping=THREE.ACESFilmicToneMapping;if(R3.comp){try{R3.comp.renderTarget1.dispose();R3.comp.renderTarget2.dispose()}catch(_){}R3.comp=null}R3.rimL=null;R3.pblob=null;R3.bblob=null;if(R3.scene&&R3.scene.environment){R3.scene.environment.dispose();R3.scene.environment=null}}
@@ -4726,7 +4730,8 @@ document.addEventListener('pointerlockchange',()=>{
   R3.wasLocked=locked;
 });
 window.addEventListener('blur',()=>{input.keys.clear()});
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&fight&&!fight.over&&!fight.paused)setPause(true)});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&fight&&!fight.over&&!fight.paused)setPause(true);if(!document.hidden&&ui.screen==='fight')setTimeout(()=>{resize3D();if(R3&&R3.renderer&&R3.renderer.getContext().isContextLost&&R3.renderer.getContext().isContextLost())R3.lost=1},100)});
+window.addEventListener('focus',()=>{if(ui.screen==='fight')setTimeout(resize3D,100)});
 window.addEventListener('resize',()=>{if(ui.screen==='fight')resize3D()});
 
 const fmtT=t=>{t=Math.max(0,Math.round(t||0));const h=Math.floor(t/3600),m=Math.floor(t%3600/60),s2=t%60;return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(s2).padStart(2,'0')};

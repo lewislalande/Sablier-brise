@@ -516,6 +516,7 @@ footer button{background:none;border:0;color:var(--dim);text-decoration:underlin
 .lc-voie{border:1px solid var(--vc);border-left:4px solid var(--vc);border-radius:6px;padding:5px 8px;margin:4px 0 6px;background:color-mix(in srgb,var(--vc) 12%,transparent);display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px}
 .lc-voie b{color:var(--vc);font-size:15px;letter-spacing:.03em}.lc-voie span{font-size:12.5px;color:var(--bone)}.lc-voie i{display:flex;gap:3px;margin-left:auto}.lc-voie u{width:9px;height:9px;border-radius:2px;border:1px solid var(--vc);display:block}.lc-voie u.on{background:var(--vc)}.lc-voie u.st{margin-right:4px}.lc-voie small{flex-basis:100%;font-size:12.5px;color:var(--dim)}.lc-voie small.up{color:var(--ok)}
 .voies .off{color:var(--dim)}.voies .on{color:var(--bone)}
+.ladrow.mp{grid-template-columns:34px minmax(0,1.4fr) minmax(0,1fr) 80px}@media (max-width:560px){.ladrow.mp{grid-template-columns:2em minmax(0,1fr) 4.5em}}
 .rune{display:inline-flex;gap:4px;align-items:baseline;margin-left:6px;color:var(--rc);font-size:12.5px}.rune b{color:var(--rc);font-weight:600}.rune small{color:var(--dim)}.lc-rune{margin:2px 0 4px;font-size:13px}.lc-rune .rune{margin-left:0;flex-wrap:wrap}.lc-rune .rune b{font-size:14px}.runes{display:flex;flex-direction:column;gap:4px;margin-top:10px}
 </style>
 
@@ -4886,14 +4887,31 @@ function ladRows(){const me=ladName(meta.pseudo).toLowerCase(),today=todaySeed()
   else if(LAD.mode==='claude')A=LAD.rows.map(r=>{const x=LAD.tab==='day'?(r.day&&r.day.d===today?r.day:null):LAD.tab==='week'?(r.wk&&r.wk.d===weekSeed()?r.wk:null):r.best;return x&&Object.assign({},x,{pseudo:r.pseudo,title:r.title,me:r.uid===LAD.uid})}).filter(Boolean);
   else A=ladDedupe(loc.filter(x=>LAD.tab==='day'?x.day===today:LAD.tab==='week'?x.day===weekSeed():!x.day).filter(x=>x.pseudo)).map(x=>Object.assign({},x,{me:1}));
   return A.filter(r=>typeof r.score==='number').sort((a,b)=>b.score-a.score).slice(0,25)}
-function ladPaint(){const box=id('ladlist');if(!box)return;const md=id('ladmode');
+/* ===================== CLASSEMENT MULTIJOUEUR : tour à deux et duels ===================== */
+const MP={tour:null,duel:null,st:''};
+function mpSubmit(row){try{if(!(LADDER_API.url&&LADDER_API.key))return;const ps=ladName(meta.pseudo);if(!ps)return;
+  fetch(LADDER_API.url.replace(/\/+$/,'')+'/rest/v1/mp_results',{method:'POST',keepalive:true,headers:Object.assign({'Content-Type':'application/json',Prefer:'return=minimal'},ladH()),body:JSON.stringify(Object.assign({pseudo:ps},row))}).catch(()=>{})}catch(e){}}
+async function mpFetch(){if(!(LADDER_API.url&&LADDER_API.key)){MP.st='local';ladPaint();return}const B=LADDER_API.url.replace(/\/+$/,'')+'/rest/v1/';
+  try{const [t,d]=await Promise.all([fetch(B+'mp_results?mode=eq.tour&select=pseudo,mate,cls,mate_cls,kills,created_at&order=kills.desc&limit=400',{headers:ladH()}),fetch(B+'duel_ladder?select=*&order=wins.desc,losses.asc&limit=100',{headers:ladH()})]);
+    if(!t.ok||!d.ok)throw 0;MP.tour=await t.json();MP.duel=await d.json();MP.st=''}catch(e){MP.st='err'}ladPaint()}
+function mpRows(){const me=String(ladName(meta.pseudo)||'').toLowerCase();
+  if(LAD.tab==='tour'){const seen=new Set(),out=[];for(const r of MP.tour||[]){const a=String(r.pseudo||''),b=String(r.mate||''),k=(b?[a,b].sort().join('+').toLowerCase():a.toLowerCase()+'|solo');if(seen.has(k))continue;seen.add(k);out.push(Object.assign({},r,{me:a.toLowerCase()===me||b.toLowerCase()===me}))}return out.slice(0,60)}
+  return (MP.duel||[]).filter(r=>r.played>0).map(r=>Object.assign({},r,{me:String(r.pseudo).toLowerCase()===me}))}
+function mpPaint(box){const clsN=k=>CLASSES[k]?CLASSES[k].name:'—';
+  if(MP.st==='local'){box.innerHTML='<div class="ladempty">Le classement multijoueur est disponible sur le site hébergé du jeu.</div>';return}
+  if(MP.st==='err'){box.innerHTML='<div class="ladempty">Classement multijoueur injoignable pour le moment.</div>';return}
+  if(!MP.tour){box.innerHTML='<div class="ladempty">Chargement…</div>';return}
+  const R=mpRows();
+  if(LAD.tab==='tour')box.innerHTML=R.length?`<div class="ladrow hd mp"><span>#</span><span>Équipe</span><span class="cl">Classes</span><span class="sc">Gardiens</span></div>`+R.map((r,i)=>`<div class="ladrow mp ${r.me?'me':''} ${i===0?'top1':''}"><span class="r num">${i+1}</span><span class="nm">${esc(r.pseudo)}${r.mate?` <span class="dim">&amp;</span> ${esc(r.mate)}`:' <span class="dim">(seul)</span>'}</span><span class="cl">${esc(clsN(r.cls))}${r.mate?' · '+esc(clsN(r.mate_cls)):''}</span><span class="sc">${r.kills}</span></div>`).join(''):'<div class="ladempty">Aucune tour terminée pour l’instant : lance une tour à deux !</div>';
+  else box.innerHTML=R.length?`<div class="ladrow hd mp"><span>#</span><span>Joueur</span><span class="cl">Classe</span><span class="sc">V – D</span></div>`+R.map((r,i)=>`<div class="ladrow mp ${r.me?'me':''} ${i===0?'top1':''}"><span class="r num">${i+1}</span><span class="nm">${esc(r.pseudo)}</span><span class="cl">${esc(clsN(r.cls))}</span><span class="sc">${r.wins} – ${r.losses}</span></div>`).join(''):'<div class="ladempty">Aucun duel terminé pour l’instant.</div>'}
+function ladPaint(){const box=id('ladlist');if(!box)return;const md=id('ladmode');if(LAD.tab==='tour'||LAD.tab==='duel'){if(md)md.textContent='En ligne';mpPaint(box);return}
   if(md)md.textContent=LAD.st||(LAD.mode==='api'?'En ligne':LAD.mode==='claude'?(LAD.canW===false?'Partagé · lecture seule':'Partagé'):'Sur cet appareil');
   const R=ladRows(),clsN=k=>CLASSES[k]?CLASSES[k].name:k;
   box.innerHTML=R.length?`<div class="ladrow hd"><span>#</span><span>${LAD.tab==='me'?'Pseudo':'Joueur'}</span><span class="cl">Classe</span><span class="rs">Résultat</span><span class="tm">Temps</span><span class="sc">Score</span></div>`+R.map((r,i)=>`<div class="ladrow ${r.me?'me':''} ${i===0?'top1':''}"><span class="r num">${i+1}</span><span class="nm">${esc(r.pseudo||'—')}${r.title&&TITLES().includes(r.title)?`<span class="ttl">${esc(r.title)}</span>`:''}</span><span class="cl">${esc(clsN(r.cls))}</span><span class="rs">${r.won?(r.floor>9?'Tour · étage '+(ROMAN[r.floor]||r.floor):r.sec?'Sablier vaincu':'Victoire'):'Étage '+(ROMAN[r.floor]||r.floor)}${r.seal?' · sceau '+ROMAN[r.seal]:''}</span><span class="tm">${fmtT(r.secs)}</span><span class="sc">${Number(r.score).toLocaleString('fr-FR')}</span></div>`).join('')
     :`<div class="ladempty">${LAD.tab==='week'?'Personne n’a encore tenté le défi de la semaine.':LAD.tab==='day'?'Personne n’a encore tenté l’ascension du jour.':LAD.tab==='me'?'Aucune ascension terminée sur cet appareil.':'Aucun score pour l’instant : termine une ascension pour ouvrir le classement.'}</div>`}
 function rLadder(){return `<section class="panel"><div class="between"><span class="label">Classement des Veilleurs</span><span class="dim" id="ladmode"></span></div>
   <div class="ladme"><label class="dim" for="ladname">Ton pseudo</label><input id="ladname" maxlength="16" placeholder="Ex. Veilleuse" value="${esc(ui.ladDraft??meta.pseudo??'')}" autocomplete="off" spellcheck="false"><button class="btn sm" data-a="ladname">Enregistrer</button></div>
-  <div class="ladtabs">${[['gen','Général'],['day','Du jour'],['week','Semaine'],['me','Mes ascensions']].map(([k,n])=>`<button class="${LAD.tab===k?'on':''}" data-a="ladtab" data-v="${k}">${n}</button>`).join('')}</div>
+  <div class="ladtabs">${[['gen','Général'],['day','Du jour'],['week','Semaine'],['tour','Tour à deux'],['duel','Duels'],['me','Mes ascensions']].map(([k,n])=>`<button class="${LAD.tab===k?'on':''}" data-a="ladtab" data-v="${k}">${n}</button>`).join('')}</div>
   ${LAD.tab==='day'?'<p class="dim" style="font-size:12.5px;margin:4px 0 8px">Ascension du jour : même départ pour tous, sans améliorations du Temple ni talents.</p>':''}<div id="ladlist" class="ladlist"></div>
   <p class="dim" style="font-size:12.5px;margin:8px 0 0">Score : 1000 par étage franchi, 2000 pour la victoire, 2500 de plus contre le Sablier Vivant, 300 par gardien sans dégâts, 150 par point de chaleur, 500 par sceau et par cycle, et un bonus de vitesse en cas de victoire. Ton meilleur score compte ; les ascensions du jour ont leur propre tableau.</p></section>`}
 
@@ -5022,6 +5040,7 @@ function pvpAct(k,o){if(!fight||!fight.pvp)return;const f=fight;pvpSend('act',Ob
 function pvpRoundOver(won){const f=fight;const i=pvpMe();if(won)PV.score[i]++;else{PV.score[1-i]++;pvpSend('dead',{})}
   f.msg={txt:won?'Manche gagnée !':'Manche perdue',t:3,big:1};
   const done=PV.score[0]>=2||PV.score[1]>=2;
+  if(done)mpSubmit({mode:'duel',mate:PV.opp?ladName(PV.opp.pseudo)||null:null,cls:(PV.me&&PV.me.cls)||null,mate_cls:(PV.oppRun&&PV.oppRun.cls)||null,won:PV.score[i]>=2,score:PV.score[i]+'-'+PV.score[1-i]});
   if(done&&PV.score[i]>=2){meta.pvpW=(meta.pvpW||0)+1;achieve('arena1');if(meta.pvpW>=10)achieve('arena10');save()}
   setTimeout(()=>{if(!fight||fight!==f)return;if(done){PV.st='end';PV.res={won:PV.score[i]>=2,score:PV.score.slice()};pvpLeaveFight()}else if(PV.role==='A')pvpHostStart(false)},3200)}
 function pvpLeaveFight(){fight=null;if(PV.saved){run=PV.saved.run;PV.saved=null}teardown3D&&teardown3D();ui.screen='home';ui.hub='arena';if(PV.st==='fight')PV.st=PV.opp?'ready':'err';document.body.style.overflow='';render()}
@@ -5308,7 +5327,7 @@ function rushTaken(dk){if(!dk)return;const md=CO.mateDuo||(CO.mateDuo=[]);if(!md
     if(alt)P.opts[i]={k:'duo',dk:alt};else{const ks=Object.keys(RBON).filter(k=>k!=='duo'&&!P.opts.some(x=>x.k===k)&&(!RBON[k].ok||RBON[k].ok()));const k=pick(ks);P.opts[i]=Object.assign({k},RBON[k].mk(run.rush.w))}}});rushPaint()}
 function rushGo(){if(!run||!run.rush)return;clearInterval(CO.rpT);const w=run.rush.w+1;if(coRun()&&CO.role==='A')coSend('cnx',{w});rushNext(w)}
 function rushNext(w){CO.myPick=0;CO.matePick=0;ui.rpick=null;if(!run||!run.rush)return;run.rush.w=w;rushFight()}
-function rushOver(){clearInterval(CO.rpT);const R=run.rush,g=R.g||0;meta.rushBest=Math.max(meta.rushBest||0,R.kills);
+function rushOver(){clearInterval(CO.rpT);const R=run.rush,g=R.g||0;if(R.kills>0){const duo=R.role!=='S'&&CO.mate;mpSubmit({mode:'tour',mate:duo?ladName(CO.mate.pseudo)||null:null,cls:run.cls,mate_cls:duo&&CLASSES[CO.mate.cls]?CO.mate.cls:null,kills:R.kills})}meta.rushBest=Math.max(meta.rushBest||0,R.kills);
   ui.rushRes={kills:R.kills,g,best:meta.rushBest,mate:R.role!=='S'&&CO.mate?CO.mate.pseudo:null};run=RUSHSV;RUSHSV=null;fight=null;ui.rpick=null;try{teardown3D()}catch(e){}document.body.style.overflow='';ui.screen='home';ui.hub='arena';save();render()}
 function rushPaint(){const st=id('stage');if(!st)return;let el=id('rushp');const P=ui.rpick;if(!P){if(el)el.remove();return}
   if(!el){el=document.createElement('div');el.id='rushp';el.className='rushp';st.appendChild(el)}
@@ -5375,7 +5394,7 @@ function act(a,v){
     case 'tutnever': meta.tutAsk=1;ui.tutNo=0;save();render(); break;
     case 'ladname': {const el=id('ladname'),n=ladName(el&&el.value);meta.pseudo=n;ui.ladDraft=null;save();if(el)el.value=n;ui.toast=n?`Pseudo enregistré : ${n}.`:'Pseudo effacé.';
       if(n&&LAD.mode==='claude'&&LAD.uid&&LAD.canW!==false&&LAD.rows.some(r=>r.uid===LAD.uid))LAD.db.doc('ladder/'+LAD.uid).update({pseudo:n}).catch(()=>{});render()} break;
-    case 'ladtab': LAD.tab=v;if(LAD.mode==='api')ladFetch();render(); break;
+    case 'ladtab': LAD.tab=v;if(v==='tour'||v==='duel')mpFetch();else if(LAD.mode==='api')ladFetch();render(); break;
     case 'train': if(run&&!run.secret)startTraining(v); break;
     case 'secretgo': if(run&&run.secret){if(coRun()){coReady(true);break}startFight()} break;
     case 'coopnew': {const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<4;i++)c+=A[Math.floor(Math.random()*A.length)];coConnect(c,'A')} break;

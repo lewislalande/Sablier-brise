@@ -716,15 +716,15 @@ const CLASSES={
   wpn:{n:'Fendeciel',god:'Orvane',el:'terre',min:12,max:15,rng:70,cd:.3,st:9,heavy:{m:2.3,wind:.5,st:24,cd:1.6},combo:1,glow:'ember',melee:1,
    fx:'Le 3e coup d\u2019un enchaînement inflige +60%.',lore:'Épée divine trempée dans la colère d\u2019Orvane. Plus haute qu\u2019un homme, elle fend la pierre comme la chair.'},
   spells:[
-   {id:'bond',n:'Saut de brèche',s:'Brèche',role:'Rapprochement',el:'terre',pa:3,min:12,max:16,cds:[6,5.5,5,4.5,4],rng:320,t:'leap',unlock:1,
+   {id:'bond',n:'Saut de brèche',s:'Brèche',role:'Rapprochement',el:'terre',pa:3,min:18,max:24,cds:[6,5.5,5,4.5,4],rng:320,t:'leap',unlock:1,
     d:'Bondit jusqu\u2019au boss et frappe à l\u2019atterrissage. Invulnérable pendant le saut.',l5:'L\u2019atterrissage ouvre la garde du boss pendant 2 s.'},
-   {id:'colere',n:'Courroux d\u2019Orvane',s:'Courroux',role:'Gros dégâts',el:'terre',pa:5,min:34,max:42,cds:[10,9.5,9,8.5,8],rng:58,t:'dmg',wind:[.7,.65,.6,.55,.45],unlock:1,
+   {id:'colere',n:'Courroux d\u2019Orvane',s:'Courroux',role:'Gros dégâts',el:'terre',pa:5,min:48,max:58,cds:[8,7.5,7,6.5,6],rng:58,t:'dmg',wind:[.7,.65,.6,.55,.45],unlock:1,
     d:'Charge un coup énorme au contact. Tu peux bouger pendant la charge (plus lentement). Rouler ou parer l’annule sans perdre la recharge ; un coup reçu l’interrompt.',l5:'Charge très courte : 0,45 s.'},
-   {id:'intim',n:'Cri d\u2019enclume',s:'Cri',role:'Défense',el:'terre',pa:2,min:6,max:8,cds:[8,7.5,7,6.5,6],rng:60,t:'dmg',fx:'weaken',v:[25,30,35,40,45],dur:4,unlock:3,
+   {id:'intim',n:'Cri d\u2019enclume',s:'Cri',role:'Défense',el:'terre',pa:2,min:12,max:16,cds:[8,7.5,7,6.5,6],rng:60,t:'dmg',fx:'weaken',v:[25,30,35,40,45],dur:4,unlock:3,
     d:'Un coup qui affaiblit le boss : ses attaques font moins mal pendant 4 s.',l5:'Interrompt aussi l\u2019attaque en préparation (sauf coups puissants).'},
    {id:'puiss',n:'Forge intérieure',s:'Forge',role:'Renfort',el:null,pa:2,cds:[16,15,14,13,12],t:'buff',v:[20,25,30,37,45],dur:6,unlock:4,
     d:'Augmente tous tes dégâts pendant 6 s.',l5:'Récupération d\u2019endurance +50% pendant l\u2019effet.'},
-   {id:'epee',n:'Lame de ciel',s:'Lame',role:'Distance',el:'air',pa:4,min:20,max:26,cds:[5,4.5,4,3.5,3],rng:300,proj:1,t:'dmg',unlock:6,
+   {id:'epee',n:'Lame de ciel',s:'Lame',role:'Distance',el:'air',pa:4,min:28,max:36,cds:[5,4.5,4,3.5,3],rng:300,proj:1,t:'dmg',unlock:6,
     d:'Projette une lame d\u2019énergie à distance.',l5:'Critique garanti sur un boss en ouverture.'}]},
  rog:{name:'Ombrelame',tag:'Corps à corps · Chance',hp:118,base:{vit:0,for:0,int:0,agi:0,cha:20},cost:220,
   desc:'Au contact, vite : marque le gardien puis l\u2019exécute.',
@@ -940,13 +940,13 @@ const CLASSES={
 
 /* Invocations : hp = part des PV max du boss. atk : slam (zone autour), shot (tir), radial (salve), boom (explose). */
 const ADD={
- bouftou:{n:'Rejeton de Grondecorne',r:18,hp:.05,spd:120,trig:70,atk:'slam',ar:55,wind:.6,dmg:10,cd:2,geo:'dodeca',col:'terre'},
+ bouftou:{n:'Rejeton de Grondecorne',r:18,hp:.05,spd:110,trig:70,atk:'slam',ar:50,wind:.7,dmg:7,cd:2.7,geo:'dodeca',col:'terre'},
  tofu:{n:'Plumet',r:12,hp:.025,spd:175,trig:60,atk:'slam',ar:40,wind:.45,dmg:6,cd:1.6,geo:'octa',col:'air'},
  scaraf:{n:'Aragnée',r:15,hp:.045,spd:150,trig:55,atk:'slam',ar:42,wind:.5,dmg:9,cd:1.7,geo:'ico',col:'ok',slow:1.2},
  wabbit:{n:'Radicelle',r:14,hp:.04,spd:140,trig:65,atk:'slam',ar:48,wind:.55,dmg:12,cd:1.8,geo:'tetra',col:'eau'},
  roc:{n:'Golem éveillé',r:24,hp:.08,spd:55,trig:90,atk:'slam',ar:85,wind:1,dmg:22,cd:3,geo:'box',col:'terre'},
  tentacule:{n:'Leurre des profondeurs',r:18,hp:.035,spd:0,trig:520,atk:'shot',wind:.8,dmg:14,cd:2.8,geo:'cone',col:'eau',slow:2},
- glyphe:{n:'Double d’ombre',r:16,hp:.05,spd:0,trig:600,atk:'radial',count:8,wind:.9,dmg:14,cd:3.5,geo:'octa',col:'ember'},
+ glyphe:{n:'Double d’ombre',r:16,hp:.05,spd:0,trig:600,atk:'radial',count:6,wind:1,dmg:11,cd:3.8,geo:'octa',col:'ember'},
  givre:{n:'Éclat de givre',r:14,hp:.035,spd:135,trig:62,atk:'boom',ar:90,wind:1,dmg:30,cd:1,geo:'cone',col:'frost',gel:1},
  opet:{n:'Loup adverse',r:14,hp:.05,spd:0,trig:0,atk:null,wind:1,dmg:0,cd:99,geo:'ico',col:'ember'},
  rouage:{n:'Rouage',r:20,hp:.05,spd:0,trig:600,atk:'radial',count:6,wind:1,dmg:16,cd:3,geo:'torus',col:'ember'}
@@ -965,7 +965,7 @@ const PHASES={
      {at:.3,n:'Sève affolée',evo:{wak:{n:'Trois rayons de sève',multi:[-.6,0,.6],w:80,wind:1.2},bond:{n:'Envols en série',repeat:3,gap:.35},tourb:{n:'Tempête de feuilles',count:16,repeat:3,gap:.4}},d:'+20% de dégâts, +30% de vitesse, bulbes et feuilles plus fréquents.',dmg:1.2,spd:1.3,seq:['cawotte','bond','tourb','coup','wak','ronces']}],
  craq:[{at:.5,evo:{seisme:{n:'Séisme double',r1:40,r2:150,grow:110,repeat:2,gap:.5},poing:{n:'Poings de roche',r:170,half:.65,repeat:2,gap:.4},ebou:{n:'Grand éboulement',count:7,onP:3}},n:'Éveil des rochers',d:'Invoque 2 Golems éveillés, des Basalte en miniature. Basalte frappe plus fort et plus vite.',adds:[['roc',2]],wind:.9,dmg:1.15}],
  krala:[{at:.5,evo:{encre:{n:'Déluge de vase',count:5,spread:.9,repeat:2,gap:.35},tent:{n:'Marée de geysers',count:5,onP:2},leurre:{n:'Double rayon',multi:[-.35,.35]}},n:'Les leurres s\u2019allument',d:'3 Leurres flottants crachent de la vase. Mâchevase est invulnérable tant qu\u2019ils brillent.',adds:[['tentacule',3]],link:1}],
- kimbo:[{at:.6,evo:{dague:{n:'Éventail de dagues',count:7,spread:.9},ombre:{n:'Pas de l’ombre redoublé',repeat:2,gap:.45},lame:{n:'Double entaille',repeat:2,gap:.35}},n:'Doubles d’ombre',d:'Invoque 2 Doubles d’ombre (boss −50% tant qu\u2019ils vivent).',adds:[['glyphe',2]],link:.5},
+ kimbo:[{at:.6,evo:{dague:{n:'Éventail de dagues',count:5,spread:1.15,repeat:2,dmg:12},ombre:{n:'Pas de l’ombre redoublé',repeat:2,gap:.45},lame:{n:'Double entaille',repeat:2,gap:.35}},n:'Doubles d’ombre',d:'Invoque 2 Doubles d’ombre (boss −50% tant qu\u2019ils vivent).',adds:[['glyphe',2]],link:.5},
         {at:.42,n:'Jugement',d:'Intouchable 8 s : des anneaux de glyphes partent de l’Arbitre. Glisse-toi dans les brèches.',storm:{dur:8,pat:'rings'}},
         {at:.25,n:'Glyphes affolés',evo:{fatal:{n:'Double exécution',repeat:2,gap:.7},ruee:{n:'Ruées en chaîne',repeat:3}},d:'La parité change toutes les 3 s. Attaques plus rapides.',wind:.85,fx:f=>{f.ms.parFast=1}}],
  obsi:[{at:.6,evo:{pic:{n:'Éventail d’obsidienne',multi:[-.45,0,.45],repeat:2,gap:.45}},n:'Hiver éternel',d:'+20% de dégâts, attaques plus rapides.',dmg:1.2,wind:.9},
@@ -1511,7 +1511,7 @@ const stRegen=()=>Math.min(85,Math.round((42+statT('agi')*.1)*(RC().regen||1)));
 const resT=()=>Math.min(40,itemSum('res')+(RC().res||0));
 const critC=()=>Math.min(70,Math.round((run&&hasS('rasoir')&&run.hp<maxHp()*.35?25:0)+5+(RC().crit||0)+statT('agi')/5+itemSum('crit')+(WPN().crit||0)+(run&&run.inf==='foudre'?10:0)+talE('crit')+[0,2,4,7][palLv('agi')]+(voie('fur',4)?6:0)));
 const infPow=()=>1+.15*(wRank()-1);
-const pctDmg=()=>comboPct()+(voie('fur',2)?10:0)+(fight&&voie('fur',6)?(fight.ms.carn||0)*2:0)+(WM('verre')?40:0)+(WM('hate')?20:0)+UP('pow')*5+run.bonus+(ML(4)?5:0)+(ML(7)?5:0)+itemSum('pct')+(RC().pct||0);
+const pctDmg=()=>comboPct()+(run&&voie('rem',4)?Math.min(20,Math.floor(Math.max(0,1-run.hp/maxHp())*25)):0)+(voie('fur',2)?10:0)+(fight&&voie('fur',6)?(fight.ms.carn||0)*2:0)+(WM('verre')?40:0)+(WM('hate')?20:0)+UP('pow')*5+run.bonus+(ML(4)?5:0)+(ML(7)?5:0)+itemSum('pct')+(RC().pct||0);
 const flaskMax=()=>WM('vamp')?0:WM('fiole')?1:Math.max(1,3+UP('flask')+(run&&run.fb||0)-(PK('secheresse')?1:0)-(SL(6)?1:0)+(run&&hasS('alchi')?1:0));
 const flaskHeal=()=>WM('fiole')?maxHp():Math.round([1,1,1.15,1.3][palLv('vit')]*(RC().flask||1)*(maxHp()*.35*(1+UP('flaskPow')*.1)+(run?itemSum('soin')*2:0))*(hasL('cawotte')?2:1)*(hasA('bourse')?.7:1)*(hasA('rouage')?.8:1)*(SL(2)?.85:1)*(voie('rem',4)?1.25:1));
 const lvOf=sp=>run.spellLv[sp.id]||1;
@@ -1558,7 +1558,7 @@ function usefulStats(){const U=new Set(['vit','res','crit','pct','dmg','soin']),
    Plus tu portes de pièces d'une même voie, plus elle te transforme : 2, 4 puis 6 pièces. */
 const VOIES={
  fur:{n:'Fureur',r:'Dégâts',c:'#ff7a52',ic:'⚔',t:[[2,'+10 % de dégâts'],[4,'+6 % de critique, critiques +25 % plus forts'],[6,'Carnage : chaque coup porté +2 % de dégâts (jusqu’à +20 %), perdu quand tu es touché']]},
- rem:{n:'Rempart',r:'Résistance',c:'#6fb4ff',ic:'⛨',t:[[2,'−10 % de dégâts subis'],[4,'+15 % de PV max, fioles +25 %'],[6,'Inflexible : une fois par combat, un coup mortel te laisse à 1 PV, invulnérable 1,5 s']]},
+ rem:{n:'Rempart',r:'Résistance',c:'#6fb4ff',ic:'⛨',t:[[2,'−10 % de dégâts subis. Riposte de fer : chaque coup encaissé rend ta prochaine attaque +40 %'],[4,'+15 % de PV max, fioles +25 %. Rage du rempart : +1 % de dégâts par tranche de 4 % de PV manquants (jusqu’à +20 %)'],[6,'Épines : 25 % des dégâts subis renvoyés au gardien. Inflexible : une fois par combat, un coup mortel te laisse à 1 PV, invulnérable 1,5 s']]},
  cel:{n:'Célérité',r:'Vitesse',c:'#7fe08a',ic:'➶',t:[[2,'+10 % de vitesse de déplacement'],[4,'Sorts −15 % de recharge, roulade −30 % d’endurance'],[6,'Tempo : chaque esquive réussie avance tes recharges de 1 s et donne +30 % de vitesse 2 s']]}};
 function voieN(k,rn){rn=rn||run;if(!rn||!rn.items)return 0;let n=0;for(const s in rn.items){const it=rn.items[s];if(it&&it.arch===k)n+=it.heir&&memLv(it)>=5?2:1}return n}
 const voie=(k,t)=>voieN(k)>=t;
@@ -1903,7 +1903,7 @@ function hurtP(f,raw,d){
   if(!ub&&p.parry>0){perfectParry(f);return false}
   if(!ub&&p.guard){const sh=WPN().shield,cost=(raw*.8+6)*(sh?.5:1);if(p.st>=cost){p.st-=cost;p.stDelay=.6;const r0=raw;raw*=sh?(d&&d.heavy?.25:.1):(d&&d.heavy?.4:.2);ev(f,'block');TM(f).block++;if(hasA('epines')&&!f.storm)applyDmg(f,{id:'ronces',n:'Ronces',el:'terre',t:'dmg',altfx:1,chain:1,fixed:Math.max(1,Math.round((r0-raw)*2))},1,f.b);if(sh)f.resent=Math.min(5,(f.resent||0)+1)}else{p.st=0;p.guard=false;if(!f.buffs.some(x=>x.id==='crep')){p.frozen=.4;say(f,'Garde brisée');ev(f,'gbreak')}}}
   const bas=f.buffs.find(x=>x.id==='bastion'),tgd=f.buffs.find(x=>x.id==='tguard');
-  let dm=raw*(f.weaken>0?1-(f.weakenAmt||.4):1)*(1-resT()/100)*(bas?1-bas.v/100:1)*(tgd?.7:1)*(WM('agile')?1.25:1)*(voie('rem',2)?.9:1);dm=Math.max(1,Math.round(dm));if(f.pending.some(q=>q.w&&q.sp&&q.sp.rng<=120)&&!(d&&d.hz)){chargeStop(f,false);p.cast=0}{const T=TM(f),k=(d&&(d.n||d.k))||'Autre';T.taken[k]=(T.taken[k]||0)+dm;T.hitN[k]=(T.hitN[k]||0)+1;T.killer=k;T.low=Math.min(T.low,Math.max(0,(run.hp-dm)/maxHp()))}if(!(d&&d.hz))comboBreak(f,true);if(f.ms.carn){if(f.ms.carn>=5)txt(f,p.x,p.y-30,'Carnage perdu','dim');f.ms.carn=0}
+  let dm=raw*(f.weaken>0?1-(f.weakenAmt||.4):1)*(1-resT()/100)*(bas?1-bas.v/100:1)*(tgd?.7:1)*(WM('agile')?1.25:1)*(voie('rem',2)?.9:1);dm=Math.max(1,Math.round(dm));if(f.pending.some(q=>q.w&&q.sp&&q.sp.rng<=120)&&!(d&&d.hz)){chargeStop(f,false);p.cast=0}{const T=TM(f),k=(d&&(d.n||d.k))||'Autre';T.taken[k]=(T.taken[k]||0)+dm;T.hitN[k]=(T.hitN[k]||0)+1;T.killer=k;T.low=Math.min(T.low,Math.max(0,(run.hp-dm)/maxHp()))}if(!(d&&d.hz))comboBreak(f,true);if(voie('rem',2)&&!(d&&d.hz)){if(!(f.ms.ripF>f.t))txt(f,p.x,p.y-26,'Riposte de fer prête','frost');f.ms.ripF=f.t+3}if(voie('rem',6)&&!(d&&d.hz)&&!f.pvp&&!f.storm)setTimeout(()=>{if(fight===f&&!f.over)applyDmg(f,{id:'epinesR',n:'Épines du rempart',el:'terre',t:'dmg',altfx:1,chain:1,tick:1,fixed:Math.max(1,Math.round(dm*.25))},1,f.b)},0);if(f.ms.carn){if(f.ms.carn>=5)txt(f,p.x,p.y-30,'Carnage perdu','dim');f.ms.carn=0}
   run.hp=Math.max(0,run.hp-dm);p.hurt=.25;if(runeN('ronces')&&dm>0&&!f.pvp&&f.b&&!f.over)f.bombs.push({t:.05,sp:{id:'ronce',n:'Ronces',el:'terre',t:'dmg',fixed:Math.max(1,Math.round(dm*.3*runeN('ronces'))),chain:1,pure:1},base:0,tgt:f.b});f.lastHit=f.t;if(!f.hits&&!f.pvp)say(f,'Coup reçu : légendaire perdu');f.hits=(f.hits||0)+1;ev(f,'phit',{heavy:d&&d.heavy});if(d&&d.heavy)f.hitstop=Math.max(f.hitstop||0,.1);f.shake=Math.max(f.shake,d&&d.heavy?.35:.18);
   txt(f,p.x,p.y,'−'+dm,'hurt');ev(f,'phit2',{pct:dm/maxHp()});
   const unst=f.buffs.some(x=>x.id==='crep');
@@ -2111,6 +2111,7 @@ function applyDmg(f,sp,base,T){sp._b=base;
   if(sp.fx==='poison'){const L=f.pois||(f.pois=[]);if(L.length>=3)L.shift();L.push({t:6,dps:d*at(sp.v,lv)/100/6});if(lv>=5)f.ms.poisL5=1}
   if(f.ms.gly)d=Math.round(d*(1+.06*f.ms.gly));
   if(sp.id==='wh'&&hasL('solomonk')){d=Math.round(d*1.4);ev(f,'quake',{x:b.x,y:b.y});f.adds.forEach(o=>{if(o.alive&&dist(o,b)<b.r+170)applyDmg(f,Object.assign({},sp,{id:'quake',inf:null}),base*.6,o)})}
+  if(f.ms.ripF>f.t&&!sp.tick&&!sp.chain&&T===b){f.ms.ripF=0;d=Math.round(d*1.4);txt(f,b.x,b.y-30,'Riposte de fer','frost')}
   const rip=(sp.id==='wl'||sp.id==='wh')&&f.ms.riposte>0;if(rip){f.ms.riposte=0;d=Math.round(d*1.5);txt(f,b.x,b.y-30,'Riposte','ember')}
   const forced=altCrit(f,sp)||rip||fx5||sp.id==='epee'&&lv>=5&&b.vuln>0;
   const cc=critC()+(f.buffs.some(x=>x.id==='tir'&&x.l5)?15:0)+(f.buffs.some(x=>x.id==='danse')?20:0);
